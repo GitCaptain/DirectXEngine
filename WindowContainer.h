@@ -3,6 +3,7 @@
 #include "RenderWindow.h"
 #include "Keyboard/KeyboardClass.h"
 #include "Mouse/MouseClass.h"
+#include "Graphics/Graphics.h"
 
 class WindowContainer {
     using key_type = Keyboard::key_type;
@@ -14,4 +15,5 @@ protected:
     RenderWindow renderWindow;
     Keyboard::KeyboardClass keyboard;
     Mouse::MouseClass mouse;
+    Graphics gfx;
 };

@@ -59,6 +59,10 @@ bool RenderWindow::processMessages() {
     return false;
 }
 
+HWND RenderWindow::getHWND() const {
+    return handle;
+}
+
 RenderWindow::~RenderWindow() {
     if (handle != nullptr) {
         UnregisterClass(windowClassWide.c_str(), hInstance);
