@@ -15,6 +15,7 @@ namespace Mouse {
         void onWheelUp(int x, int y);
         void onWheelDown(int x, int y);
         void onMouseMove(int x, int y);
+        void onMouseMoveRaw(int x, int y);
 
         bool isLeftDown();
         bool isMiddleDown();

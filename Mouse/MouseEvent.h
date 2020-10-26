@@ -20,7 +20,7 @@ namespace Mouse {
             WheelUp,
             WheelDown,
             Move,
-            RAW_MODE,
+            RAW_MOVE,
             Invalid
         };
     

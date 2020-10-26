@@ -8,6 +8,7 @@ class WindowContainer {
     using key_type = Keyboard::key_type;
 
 public:
+    WindowContainer();
     LRESULT windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 protected:
     RenderWindow renderWindow;

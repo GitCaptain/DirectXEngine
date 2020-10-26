@@ -19,7 +19,7 @@ void Engine::Update() {
     while (!keyboard.isKeyBufferEmpty()) {
         auto event = keyboard.readKey();
         auto keycode = event.getKeyCode();
-        std::string outmsg;// = "Keycode: ";
+        std::string outmsg;
         if (event.isPressEvent()) {
             outmsg = "key pressed: ";
         }
@@ -33,4 +33,15 @@ void Engine::Update() {
         outmsg += "\n";
         OutputDebugStringA(outmsg.c_str());
     }
+
+    while (!mouse.isEventBufferEmpty()) {
+        auto me = mouse.readEvent();
+        if (me.GetType() == Mouse::MouseEvent::EventType::RAW_MOVE) {
+            std::string outmsg = "X: ";
+            outmsg += std::to_string(me.GetPosX()) + ", Y: ";
+            outmsg += std::to_string(me.GetPosY()) + "\n";
+            OutputDebugStringA(outmsg.c_str());
+        }
+    }
+
 }
