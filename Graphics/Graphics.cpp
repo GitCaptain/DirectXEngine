@@ -97,6 +97,30 @@ bool Graphics::InitializeDirectX(HWND hwnd, int width, int height) {
 }
 
 bool Graphics::InitializeShaders() {
+
+    std::wstring shaderFolder = L"";
+
+#pragma region DetermineShaderPath
+    if (IsDebuggerPresent() == TRUE) {
+#ifdef _DEBUG
+    #ifdef _WIN64
+        shaderFolder = L"x64\\Debug\\";
+    #else
+        shaderFolder = L"Debug\\";
+    #endif
+#else
+    #ifdef _WIN64
+        shaderFolder = L"x64\\Release\\";
+    #else
+        shaderFolder = L"Release\\";
+    #endif
+#endif
+    }
+
+    if (!vertexShader.Initialize(device, shaderFolder + L"vertexshader.cso")) {
+        return false;
+    }
+
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 0},
     };
@@ -105,8 +129,8 @@ bool Graphics::InitializeShaders() {
 
     HRESULT  hr = device->CreateInputLayout(layout, 
                                             numElements, 
-                                            vertexShaderBuffer->GetBufferPointer(),
-                                            vertexShaderBuffer->GetBufferSize(),
+                                            vertexShader.getBuffer()->GetBufferPointer(),
+                                            vertexShader.getBuffer()->GetBufferSize(),
                                             inputLayout.GetAddressOf());
 
     if (FAILED(hr)) {
