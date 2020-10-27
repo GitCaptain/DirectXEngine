@@ -42,7 +42,7 @@ bool RenderWindow::initialize(WindowContainer* pWindowContainer,
 bool RenderWindow::processMessages() {
     MSG msg;
     ZeroMemory(&msg, sizeof(MSG));
-    if(PeekMessage(&msg, handle, 0, 0, PM_REMOVE)) {
+    while (PeekMessage(&msg, handle, 0, 0, PM_REMOVE)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }

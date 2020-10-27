@@ -10,6 +10,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	engine.initialize(hInstance, "Title", "Window", 800, 600);
 	while (engine.processMessages() == true) {
 		engine.Update();
+		engine.renderFrame();
 	}
 	return 0; 
 }

@@ -51,3 +51,7 @@ void Engine::Update() {
     }
 
 }
+
+void Engine::renderFrame() {
+    gfx.renderFrame();
+}
