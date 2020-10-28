@@ -2,14 +2,16 @@
 
 #include "AdapterReader.h"
 #include "Shaders.h"
+#include "Vertex.h"
 
 class Graphics {
 public:
     bool Initialize(HWND hwnd, int width, int height);
     void renderFrame();
 private:
-    bool InitializeDirectX(HWND hwnd, int width, int height);
-    bool InitializeShaders();
+    bool initializeDirectX(HWND hwnd, int width, int height);
+    bool initializeShaders();
+    bool initializeScene();
 
     Microsoft::WRL::ComPtr<ID3D11Device> device;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
@@ -18,4 +20,6 @@ private:
 
     VertexShader vertexShader;
     PixelShader pixelShader;
+    
+    Microsoft::WRL::ComPtr<ID3D11Buffer> vertexBuffer;
 };

@@ -2,11 +2,15 @@
 
 bool Graphics::Initialize(HWND hwnd, int width, int height) {
     
-    if (!InitializeDirectX(hwnd, width, height)) {
+    if (!initializeDirectX(hwnd, width, height)) {
         return false;
     }
 
-    if (!InitializeShaders()) {
+    if (!initializeShaders()) {
+        return false;
+    }
+
+    if (!initializeScene()) {
         return false;
     }
 
@@ -14,13 +18,26 @@ bool Graphics::Initialize(HWND hwnd, int width, int height) {
 }
 
 void Graphics::renderFrame() {
-    float bgcolor[] = {0.0f, 1.0f, 1.0f, 1.0f};
+    float bgcolor[] = {0.0f, 0.0f, 1.0f, 1.0f};
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
+    
+    deviceContext->IASetInputLayout(vertexShader.getInputLayout());
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+    deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
+    deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
+
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
+    deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+    
+    deviceContext->Draw(4, 0);
+    
     const UINT vsync = 1;
     swapChain->Present(vsync, 0);
 }
 
-bool Graphics::InitializeDirectX(HWND hwnd, int width, int height) {
+bool Graphics::initializeDirectX(HWND hwnd, int width, int height) {
     
     auto adapters = AdapterReader::getAdapters(); 
 
@@ -73,7 +90,7 @@ bool Graphics::InitializeDirectX(HWND hwnd, int width, int height) {
                                                deviceContext.GetAddressOf());
 
     if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed  to create device and swapchain.");
+        ErrorLogger::log(hr, "Failed to create device and swapchain.");
         return false;
     }
 
@@ -106,7 +123,7 @@ bool Graphics::InitializeDirectX(HWND hwnd, int width, int height) {
     return true;
 }
 
-bool Graphics::InitializeShaders() {
+bool Graphics::initializeShaders() {
 
     std::wstring shaderFolder = L"";
 
@@ -138,6 +155,40 @@ bool Graphics::InitializeShaders() {
     }
     
     if (!pixelShader.initialize(device, shaderFolder + L"pixelshader.cso")) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Graphics::initializeScene() {
+
+    Vertex v[] = {
+        //Vertex(0.0f, 0.0f),
+        Vertex(-0.1f, 0.0f),
+        Vertex(0.1f, 0.0f),
+        Vertex(0.0f, 0.1f),
+    };
+
+    D3D11_BUFFER_DESC vertexBufferDesc;
+    ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
+
+    vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    vertexBufferDesc.ByteWidth = sizeof(Vertex) * ARRAYSIZE(v);
+    vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    // TODO: change if some cpu operations needed
+    vertexBufferDesc.CPUAccessFlags = 0;
+    vertexBufferDesc.MiscFlags = 0;
+
+    D3D11_SUBRESOURCE_DATA vertexBufferData;
+    ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
+
+    vertexBufferData.pSysMem = v;
+
+    HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, vertexBuffer.GetAddressOf());
+
+    if (FAILED(hr)) {
+        ErrorLogger::log(hr, "Failed to create vertex buffer.");
         return false;
     }
 
