@@ -1,6 +1,9 @@
 #include "Shaders.h"
 
-bool VertexShader::Initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device, std::wstring shaderpath) {
+bool VertexShader::Initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
+                              std::wstring shaderpath, 
+                              D3D11_INPUT_ELEMENT_DESC* layoutDescription, 
+                              UINT numElements) {
     
     HRESULT hr = D3DReadFileToBlob(shaderpath.c_str(), shaderBuffer.GetAddressOf());
     
@@ -20,6 +23,19 @@ bool VertexShader::Initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device, std:
         return false;
     }
 
+
+    hr = device->CreateInputLayout(layoutDescription,
+                                   numElements,
+                                   shaderBuffer->GetBufferPointer() ,
+                                   shaderBuffer->GetBufferSize(),
+                                   inputLayout.GetAddressOf());
+
+    if (FAILED(hr)) {
+        ErrorLogger::log(hr, "Failed to create input layout.");
+        return false;
+    }
+
+
     return true;
 }
 
@@ -29,4 +45,8 @@ ID3D11VertexShader* VertexShader::getShader() {
 
 ID3D10Blob* VertexShader::getBuffer() {
     return shaderBuffer.Get();
+}
+
+ID3D11InputLayout* VertexShader::getInputLayout() {
+    return inputLayout.Get();
 }

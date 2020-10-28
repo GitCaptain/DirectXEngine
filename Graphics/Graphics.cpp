@@ -117,26 +117,15 @@ bool Graphics::InitializeShaders() {
 #endif
     }
 
-    if (!vertexShader.Initialize(device, shaderFolder + L"vertexshader.cso")) {
-        return false;
-    }
-
     D3D11_INPUT_ELEMENT_DESC layout[] = {
         {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 0},
     };
 
     UINT numElements = ARRAYSIZE(layout);
 
-    HRESULT  hr = device->CreateInputLayout(layout, 
-                                            numElements, 
-                                            vertexShader.getBuffer()->GetBufferPointer(),
-                                            vertexShader.getBuffer()->GetBufferSize(),
-                                            inputLayout.GetAddressOf());
-
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create input layout.");
+    if (!vertexShader.Initialize(device, shaderFolder + L"vertexshader.cso", layout, numElements)) {
         return false;
     }
-
+    
     return true;
 }
