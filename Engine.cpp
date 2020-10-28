@@ -4,7 +4,7 @@ bool Engine::initialize(HINSTANCE hInstance, std::string windowTitle, std::strin
     if (!renderWindow.initialize(this, hInstance, windowTitle, windowClass, width, height)) {
         return false;
     }
-    if (gfx.Initialize(renderWindow.getHWND(), width, height)) {
+    if (!gfx.Initialize(renderWindow.getHWND(), width, height)) {
         return false; 
     }
     return true;

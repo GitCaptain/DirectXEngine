@@ -14,7 +14,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 	}
 	else {
-		OutputDebugStringA("fuck\n");
+		OutputDebugStringA("Fuck\n");
 	}
 	return 0; 
 }
