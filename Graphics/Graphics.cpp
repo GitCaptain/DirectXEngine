@@ -1,6 +1,6 @@
 #include "Graphics.h"
 
-bool Graphics::Initialize(HWND hwnd, int width, int height) {
+bool Graphics::initialize(HWND hwnd, int width, int height) {
     
     if (!initializeDirectX(hwnd, width, height)) {
         return false;
@@ -23,16 +23,15 @@ void Graphics::renderFrame() {
     
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
 
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
     deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-    
-    deviceContext->Draw(4, 0);
-    
+
+    deviceContext->Draw(3, 0);
+
     const UINT vsync = 1;
     swapChain->Present(vsync, 0);
 }
@@ -59,6 +58,7 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height) {
 
     scd.BufferDesc.Width = width;
     scd.BufferDesc.Height = height;
+    // TODO: set real numerator and denominator
     scd.BufferDesc.RefreshRate.Numerator = 60;
     scd.BufferDesc.RefreshRate.Denominator = 1;
     scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -121,6 +121,7 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height) {
     deviceContext->RSSetViewports(1, &viewport);
 
     return true;
+
 }
 
 bool Graphics::initializeShaders() {
@@ -145,7 +146,7 @@ bool Graphics::initializeShaders() {
     }
 
     D3D11_INPUT_ELEMENT_DESC layout[] = {
-        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_INSTANCE_DATA, 0},
+        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
 
     UINT numElements = ARRAYSIZE(layout);
@@ -164,10 +165,10 @@ bool Graphics::initializeShaders() {
 bool Graphics::initializeScene() {
 
     Vertex v[] = {
-        //Vertex(0.0f, 0.0f),
+        Vertex(0.0f, 0.0f),
+        Vertex(0.0f, -0.1f),
         Vertex(-0.1f, 0.0f),
         Vertex(0.1f, 0.0f),
-        Vertex(0.0f, 0.1f),
     };
 
     D3D11_BUFFER_DESC vertexBufferDesc;
@@ -193,4 +194,5 @@ bool Graphics::initializeScene() {
     }
 
     return true;
+
 }

@@ -6,7 +6,7 @@
 
 class Graphics {
 public:
-    bool Initialize(HWND hwnd, int width, int height);
+    bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
 private:
     bool initializeDirectX(HWND hwnd, int width, int height);
