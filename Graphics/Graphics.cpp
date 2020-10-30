@@ -20,17 +20,23 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 void Graphics::renderFrame() {
     float bgcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
+    deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0); 
     
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     deviceContext->RSSetState(rasterizerState.Get());
+    deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
 
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
-    deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
 
+    deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
+    deviceContext->Draw(3, 0);
+    
+    // Draw triangle 2
+    deviceContext->IASetVertexBuffers(0, 1, vertexBuffer2.GetAddressOf(), &stride, &offset);
     deviceContext->Draw(3, 0);
 
     const UINT vsync = 1;
@@ -109,7 +115,49 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height) {
         return false;
     }
 
-    deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), nullptr);
+    D3D11_TEXTURE2D_DESC depthStencilDesc;
+
+    depthStencilDesc.Width = width;
+    depthStencilDesc.Height = height;
+    depthStencilDesc.MipLevels = 1;
+    depthStencilDesc.ArraySize = 1;
+    depthStencilDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+    depthStencilDesc.SampleDesc.Count = 1;
+    depthStencilDesc.SampleDesc.Quality = 0;
+    depthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
+    depthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+    depthStencilDesc.CPUAccessFlags = 0;
+    depthStencilDesc.MiscFlags = 0;
+
+    hr = device->CreateTexture2D(&depthStencilDesc, nullptr, depthStencilBuffer.GetAddressOf());
+    if (FAILED(hr)) {
+        ErrorLogger::log(hr, "Failed to create depth Stencil buffer.");
+        return false;
+    }
+
+    hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.GetAddressOf());
+    if (FAILED(hr)) {
+        ErrorLogger::log(hr, "Failed to create depth Stencil view.");
+        return false;
+    }
+
+    deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get() );
+
+    // Create  depth stencil state
+
+    D3D11_DEPTH_STENCIL_DESC depthstencildesc;
+    ZeroMemory(&depthstencildesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
+
+    depthstencildesc.DepthEnable = true;
+    depthstencildesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
+    depthstencildesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+
+    hr = device->CreateDepthStencilState(&depthstencildesc, depthStencilState.GetAddressOf());
+    if (FAILED(hr)) {
+        ErrorLogger::log(hr, "Failed to create depth Stencil view.");
+        return false;
+    }
+
 
     D3D11_VIEWPORT viewport;
     ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
@@ -118,6 +166,8 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height) {
     viewport.TopLeftY = 0;
     viewport.Width = width;
     viewport.Height = height;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
     // Set the viewport
     deviceContext->RSSetViewports(1, &viewport);
 
@@ -126,6 +176,7 @@ bool Graphics::initializeDirectX(HWND hwnd, int width, int height) {
     ZeroMemory(&rasterizerDesc, sizeof(rasterizerDesc));
 
     rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+    // Render object whether it is in font of us or not
     rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
 
     hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf());
@@ -161,7 +212,7 @@ bool Graphics::initializeShaders() {
     }
 
     D3D11_INPUT_ELEMENT_DESC layout[] = {
-        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"COLOR", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
 
@@ -181,9 +232,9 @@ bool Graphics::initializeShaders() {
 bool Graphics::initializeScene() {
 
     Vertex v[] = {
-        Vertex(-0.5f, -0.5f, 1.0f, 0.0f, 0.0f),
-        Vertex(0.0f, 0.5f, 0.0f, 1.0f, 0.0f),
-        Vertex(0.5f, -0.5f, 0.0f, 0.0f, 1.0f),
+        Vertex(-0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f),
+        Vertex( 0.0f,  0.5f, 1.0f, 1.0f, 0.0f, 0.0f),
+        Vertex( 0.5f, -0.5f, 1.0f, 1.0f, 0.0f, 0.0f),
     };
 
     D3D11_BUFFER_DESC vertexBufferDesc;
@@ -202,6 +253,34 @@ bool Graphics::initializeScene() {
     vertexBufferData.pSysMem = v;
 
     HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, vertexBuffer.GetAddressOf());
+
+    if (FAILED(hr)) {
+        ErrorLogger::log(hr, "Failed to create vertex buffer.");
+        return false;
+    }
+
+    // Triangle 2
+
+    Vertex v2[] = {
+        Vertex(-0.25f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f),
+        Vertex( 0.00f,  0.25f, 0.0f, 0.0f, 1.0f, 0.0f),
+        Vertex( 0.25f, -0.25f, 0.0f, 0.0f, 1.0f, 0.0f),
+    };
+
+    ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
+
+    vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    vertexBufferDesc.ByteWidth = sizeof(Vertex) * ARRAYSIZE(v2);
+    vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+    // TODO: change if some cpu operations needed
+    vertexBufferDesc.CPUAccessFlags = 0;
+    vertexBufferDesc.MiscFlags = 0;
+
+    ZeroMemory(&vertexBufferData, sizeof(vertexBufferData));
+
+    vertexBufferData.pSysMem = v2;
+
+    hr = device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, vertexBuffer2.GetAddressOf());
 
     if (FAILED(hr)) {
         ErrorLogger::log(hr, "Failed to create vertex buffer.");
