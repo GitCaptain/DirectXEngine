@@ -7,7 +7,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ int nCmdShow) {
 
 	Engine engine;
-	if (engine.initialize(hInstance, "Title", "Window", 800, 600)) {
+	if (engine.initialize(hInstance, "Engine", "Window", 800, 600)) {
 		while (engine.processMessages()) {
 			engine.Update();
 			engine.renderFrame();
