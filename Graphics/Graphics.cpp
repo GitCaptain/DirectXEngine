@@ -33,14 +33,12 @@ void Graphics::renderFrame() {
     UINT offset = 0;
 
     // Update constatnt buffer
-    CB_VS_vertexshader cb_vs_data;
-    cb_vs_data.xOffset = 0.0f;
-    cb_vs_data.yOffset = 0.5f;
+    constantBuffer.data.xOffset = 0;
+    constantBuffer.data.yOffset = 0.5;
+    if (!constantBuffer.applyChanges()) {
+        return;
+    }
 
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    HRESULT hr = deviceContext->Map(constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-    CopyMemory(mappedResource.pData, &cb_vs_data, sizeof(CB_VS_vertexshader));
-    deviceContext->Unmap(constantBuffer.Get(), 0);
     deviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
 
     // Draw square
@@ -293,14 +291,7 @@ bool Graphics::initializeScene() {
     ONFAILHRLOG(hr, "Failed to create wic texture from file", false);
 
     // Initialize constant buffer(s)
-    D3D11_BUFFER_DESC desc;
-    desc.Usage = D3D11_USAGE_DYNAMIC;
-    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    desc.MiscFlags = 0;
-    desc.ByteWidth = static_cast<UINT>(sizeof(CB_VS_vertexshader) + (16 - sizeof(CB_VS_vertexshader))%16 );
-    desc.StructureByteStride = 0;
-    hr = device->CreateBuffer(&desc, 0, constantBuffer.GetAddressOf());
+    hr = constantBuffer.initialize(device.Get(), deviceContext.Get());
     ONFAILHRLOG(hr, "Failed to initialize constant buffer.", false);
 
     return true;
