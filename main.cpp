@@ -7,7 +7,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ int nCmdShow) {
 
 	HRESULT hr = CoInitialize(nullptr);
-	ONFAILHRLOG(hr, "Failed to call CoInitialize")
+	ONFAILHRLOG(hr, "Failed to call CoInitialize", false);
 
 	Engine engine;
 	if (engine.initialize(hInstance, "Engine", "Window", 800, 600)) {

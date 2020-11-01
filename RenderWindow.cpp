@@ -67,7 +67,6 @@ bool RenderWindow::processMessages() {
     }
 
     return true;
-    return false;
 }
 
 HWND RenderWindow::getHWND() const {
@@ -114,6 +113,7 @@ LRESULT CALLBACK HandleMessageSetup(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
 void RenderWindow::registerWindowClass() {
     WNDCLASSEX wc;
     wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+    // TODO: check whether its always call setup
     wc.lpfnWndProc = HandleMessageSetup;
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;

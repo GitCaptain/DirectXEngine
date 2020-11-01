@@ -36,7 +36,8 @@ void Graphics::renderFrame() {
     // Draw square
     deviceContext->PSSetShaderResources(0, 1, myTexture.GetAddressOf());
     deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), &stride, &offset);
-    deviceContext->Draw(6, 0);
+    deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+    deviceContext->DrawIndexed(6, 0, 0);
     
     //Draw text
     spriteBatch->Begin();
@@ -258,15 +259,19 @@ bool Graphics::initializeShaders() {
 bool Graphics::initializeScene() {
 
     Vertex v[] = {
-        Vertex(-0.5f, -0.5f, 1.0f, 0.0f, 1.0f), // Bottom left
-        Vertex(-0.5f,  0.5f, 1.0f, 0.0f, 0.0f), // Top left
-        Vertex( 0.5f,  0.5f, 1.0f, 1.0f, 0.0f), // Top right 
+        Vertex(-0.5f, -0.5f, 1.0f, 0.0f, 1.0f), // Bottom left 0, 3, 4
+        Vertex(-0.5f,  0.5f, 1.0f, 0.0f, 0.0f), // Top left 1
+        Vertex( 0.5f,  0.5f, 1.0f, 1.0f, 0.0f), // Top right  2
         
-        Vertex(-0.5f, -0.5f, 1.0f, 0.0f, 1.0f), // Bottom left
-        Vertex( 0.5f,  0.5f, 1.0f, 1.0f, 0.0f), // Top right 
-        Vertex( 0.5f, -0.5f, 1.0f, 1.0f, 1.0f), // Bottom right
+        Vertex( 0.5f, -0.5f, 1.0f, 1.0f, 1.0f), // Bottom right 5
     };
 
+    DWORD indices[] = {
+        0, 1, 2,
+        0, 2, 3,
+    };
+
+    // Load vertex data
     D3D11_BUFFER_DESC vertexBufferDesc;
     ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 
@@ -283,19 +288,29 @@ bool Graphics::initializeScene() {
     vertexBufferData.pSysMem = v;
 
     HRESULT hr = device->CreateBuffer(&vertexBufferDesc, &vertexBufferData, vertexBuffer.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to create vertex buffer.", false)
 
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create vertex buffer.");
-        return false;
-    }
+    // Load index data
+    D3D11_BUFFER_DESC indexBufferDesc;
+    ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
+    indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+    indexBufferDesc.ByteWidth = sizeof(DWORD) * ARRAYSIZE(indices);
+    indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    // TODO: change if some cpu operations needed
+    indexBufferDesc.CPUAccessFlags = 0;
+    indexBufferDesc.MiscFlags = 0;
 
+    D3D11_SUBRESOURCE_DATA indexBufferData;
+    ZeroMemory(&indexBufferData, sizeof(indexBufferData));
+
+    indexBufferData.pSysMem = indices;
+
+    hr = device->CreateBuffer(&indexBufferDesc, &indexBufferData, indicesBuffer.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to create indices buffer.", false)
+
+    // Load texture
     hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\piano.png", nullptr, myTexture.GetAddressOf());
-
-    ONFAILHRLOG(hr, "Failed to create wic texture from file")
-    //if (FAILED(hr)) {
-    //    ErrorLogger::log(hr, "Failed to create vertex buffer.");
-    //    return false;
-    //}
+    ONFAILHRLOG(hr, "Failed to create wic texture from file", false)
 
     return true;
 }
