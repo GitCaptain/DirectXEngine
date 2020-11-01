@@ -95,7 +95,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -113,7 +113,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -127,7 +127,7 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -141,7 +141,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -156,6 +156,11 @@
     <ClCompile Include="ErrorLogger.cpp" />
     <ClCompile Include="Graphics\AdapterReader.cpp" />
     <ClCompile Include="Graphics\Graphics.cpp" />
+    <ClCompile Include="Graphics\ImGUI\imgui.cpp" />
+    <ClCompile Include="Graphics\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="Graphics\ImGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Graphics\ImGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="Graphics\ImGUI\imgui_widgets.cpp" />
     <ClCompile Include="Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Graphics\Shaders.cpp" />
     <ClCompile Include="Keyboard\KeyboardClass.cpp" />
@@ -176,6 +181,14 @@
     <ClInclude Include="ErrorLogger.h" />
     <ClInclude Include="Graphics\AdapterReader.h" />
     <ClInclude Include="Graphics\Graphics.h" />
+    <ClInclude Include="Graphics\ImGUI\imconfig.h" />
+    <ClInclude Include="Graphics\ImGUI\imgui.h" />
+    <ClInclude Include="Graphics\ImGUI\imgui_impl_dx11.h" />
+    <ClInclude Include="Graphics\ImGUI\imgui_impl_win32.h" />
+    <ClInclude Include="Graphics\ImGUI\imgui_internal.h" />
+    <ClInclude Include="Graphics\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="Graphics\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="Graphics\ImGUI\imstb_truetype.h" />
     <ClInclude Include="Graphics\Shaders.h" />
     <ClInclude Include="Graphics\Vertex.h" />
     <ClInclude Include="Graphics\IndexBuffer.h" />

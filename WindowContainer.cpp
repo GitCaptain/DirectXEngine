@@ -20,7 +20,18 @@ WindowContainer::WindowContainer() {
     }
 }
 
+
+#ifdef ENABLE_IMGUI
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif
 LRESULT WindowContainer::windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+
+#ifdef ENABLE_IMGUI
+    if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam)) {
+        return true;
+    }
+#endif
+
     switch (uMsg) {
         // keyboard messages
         case WM_CHAR: {
