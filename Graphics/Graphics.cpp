@@ -36,7 +36,7 @@ void Graphics::renderFrame() {
     deviceContext->PSSetShaderResources(0, 1, myTexture.GetAddressOf());
     deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
     deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-    deviceContext->DrawIndexed(6, 0, 0);
+    deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
     
     //Draw text
     spriteBatch->Begin();
@@ -247,7 +247,7 @@ bool Graphics::initializeShaders() {
     if (!vertexShader.initialize(device, shaderFolder + L"vertexshader.cso", layout, numElements)) {
         return false;
     }
-    
+
     if (!pixelShader.initialize(device, shaderFolder + L"pixelshader.cso")) {
         return false;
     }
@@ -258,37 +258,23 @@ bool Graphics::initializeShaders() {
 bool Graphics::initializeScene() {
 
     Vertex v[] = {
-        Vertex(-0.5f, -0.5f, 1.0f, 0.0f, 1.0f), // Bottom left 0, 3, 4
-        Vertex(-0.5f,  0.5f, 1.0f, 0.0f, 0.0f), // Top left 1
-        Vertex( 0.5f,  0.5f, 1.0f, 1.0f, 0.0f), // Top right  2
-        
-        Vertex( 0.5f, -0.5f, 1.0f, 1.0f, 1.0f), // Bottom right 5
+        Vertex(-0.5f, -0.5f, 1.0f, 0.0f, 1.0f),
+        Vertex(-0.5f,  0.5f, 1.0f, 0.0f, 0.0f),
+        Vertex( 0.5f,  0.5f, 1.0f, 1.0f, 0.0f),
+        Vertex( 0.5f, -0.5f, 1.0f, 1.0f, 1.0f),
     };
+
+    // Load vertex data
+    HRESULT hr = vertexBuffer.initialize(device.Get(), v, ARRAYSIZE(v));
+    ONFAILHRLOG(hr, "Failed to create vertex buffer.", false)
 
     DWORD indices[] = {
         0, 1, 2,
         0, 2, 3,
     };
 
-    HRESULT hr = vertexBuffer.initialize(device.Get(), v, ARRAYSIZE(v));
-    ONFAILHRLOG(hr, "Failed to create vertex buffer.", false)
-
     // Load index data
-    D3D11_BUFFER_DESC indexBufferDesc;
-    ZeroMemory(&indexBufferDesc, sizeof(indexBufferDesc));
-    indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-    indexBufferDesc.ByteWidth = sizeof(DWORD) * ARRAYSIZE(indices);
-    indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
-    // TODO: change if some cpu operations needed
-    indexBufferDesc.CPUAccessFlags = 0;
-    indexBufferDesc.MiscFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA indexBufferData;
-    ZeroMemory(&indexBufferData, sizeof(indexBufferData));
-
-    indexBufferData.pSysMem = indices;
-
-    hr = device->CreateBuffer(&indexBufferDesc, &indexBufferData, indicesBuffer.GetAddressOf());
+    hr = indicesBuffer.initialize(device.Get(), indices, ARRAYSIZE(indices));
     ONFAILHRLOG(hr, "Failed to create indices buffer.", false)
 
     // Load texture
