@@ -33,8 +33,10 @@ void Graphics::renderFrame() {
     UINT offset = 0;
 
     // Update constatnt buffer
-    constantBuffer.data.xOffset = 0;
-    constantBuffer.data.yOffset = 0.5;
+    /*constantBuffer.data.mat = DirectX::XMMatrixScaling(0.5f, 1.0f, 1.0f);
+    constantBuffer.data.mat *= DirectX::XMMatrixRotationRollPitchYaw(0.0f, 0.0f, DirectX::XM_PIDIV2);
+    constantBuffer.data.mat *= DirectX::XMMatrixTranslation(0.0f, -0.5f, 0.0f);*/
+    constantBuffer.data.mat = DirectX::XMMatrixTranspose(constantBuffer.data.mat);
     if (!constantBuffer.applyChanges()) {
         return;
     }
