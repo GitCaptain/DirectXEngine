@@ -16,7 +16,7 @@ public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
 private:
-    bool initializeDirectX(HWND hwnd, int width, int height);
+    bool initializeDirectX(HWND hwnd);
     bool initializeShaders();
     bool initializeScene();
 
@@ -43,4 +43,7 @@ private:
 
     Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> myTexture;
+
+    int windowWidth = 800;
+    int windowHeight = 600;
 };
