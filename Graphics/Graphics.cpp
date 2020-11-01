@@ -37,26 +37,9 @@ void Graphics::renderFrame() {
 
     // Update constatnt buffer
     DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
-    constantBuffer.data.mat = worldMatrix;
-    static DirectX::XMVECTOR eyePos = DirectX::XMVectorSet(0.0f, -4.0f, -2.0f, 0.0f);
-    
-    DirectX::XMFLOAT3 eyePosFloat3;
-    DirectX::XMStoreFloat3(&eyePosFloat3, eyePos);
-    eyePosFloat3.y += 0.01f;
-    eyePos = DirectX::XMLoadFloat3(&eyePosFloat3);
-    
-    static DirectX::XMVECTOR lookAtPos = DirectX::XMVectorSet(0.0f, 0.0f, 0.0f, 0.0f);
-    static DirectX::XMVECTOR upVector = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-    DirectX::XMMATRIX viewMatrix = DirectX::XMMatrixLookAtLH(eyePos, lookAtPos, upVector);
-
-    float fovDegrees = 90.0f;
-    float fovRadians = (fovDegrees / 360.0f) * DirectX::XM_2PI;
-    float aspectRatio = static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
-    float nearZ = 0.1f;
-    float farZ = 1000.0f;
-    DirectX::XMMATRIX projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fovRadians, aspectRatio, nearZ, farZ);
-
-    constantBuffer.data.mat = worldMatrix * viewMatrix * projectionMatrix;
+    camera.adjustPosition(0.0f, 0.01f, 0.0f);
+    constantBuffer.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
+    constantBuffer.data.mat = DirectX::XMMatrixTranspose(constantBuffer.data.mat);
     if (!constantBuffer.applyChanges()) {
         return;
     }
@@ -316,5 +299,7 @@ bool Graphics::initializeScene() {
     hr = constantBuffer.initialize(device.Get(), deviceContext.Get());
     ONFAILHRLOG(hr, "Failed to initialize constant buffer.", false);
 
+    camera.setPosition(0.0f, 0.0f, -2.0f);
+    camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f);
     return true;
 }
