@@ -32,6 +32,17 @@ void Graphics::renderFrame() {
 
     UINT offset = 0;
 
+    // Update constatnt buffer
+    CB_VS_vertexshader cb_vs_data;
+    cb_vs_data.xOffset = 0.0f;
+    cb_vs_data.yOffset = 0.5f;
+
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    HRESULT hr = deviceContext->Map(constantBuffer.Get(), 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    CopyMemory(mappedResource.pData, &cb_vs_data, sizeof(CB_VS_vertexshader));
+    deviceContext->Unmap(constantBuffer.Get(), 0);
+    deviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+
     // Draw square
     deviceContext->PSSetShaderResources(0, 1, myTexture.GetAddressOf());
     deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
@@ -266,7 +277,7 @@ bool Graphics::initializeScene() {
 
     // Load vertex data
     HRESULT hr = vertexBuffer.initialize(device.Get(), v, ARRAYSIZE(v));
-    ONFAILHRLOG(hr, "Failed to create vertex buffer.", false)
+    ONFAILHRLOG(hr, "Failed to create vertex buffer.", false);
 
     DWORD indices[] = {
         0, 1, 2,
@@ -275,11 +286,22 @@ bool Graphics::initializeScene() {
 
     // Load index data
     hr = indicesBuffer.initialize(device.Get(), indices, ARRAYSIZE(indices));
-    ONFAILHRLOG(hr, "Failed to create indices buffer.", false)
+    ONFAILHRLOG(hr, "Failed to create indices buffer.", false);
 
     // Load texture
     hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\piano.png", nullptr, myTexture.GetAddressOf());
-    ONFAILHRLOG(hr, "Failed to create wic texture from file", false)
+    ONFAILHRLOG(hr, "Failed to create wic texture from file", false);
+
+    // Initialize constant buffer(s)
+    D3D11_BUFFER_DESC desc;
+    desc.Usage = D3D11_USAGE_DYNAMIC;
+    desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    desc.MiscFlags = 0;
+    desc.ByteWidth = static_cast<UINT>(sizeof(CB_VS_vertexshader) + (16 - sizeof(CB_VS_vertexshader))%16 );
+    desc.StructureByteStride = 0;
+    hr = device->CreateBuffer(&desc, 0, constantBuffer.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to initialize constant buffer.", false);
 
     return true;
 }

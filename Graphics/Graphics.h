@@ -8,6 +8,8 @@
 #include "Vertex.h"
 #include "VertexBuffer.h"
 #include "IndexBuffer.h"
+#include "ConstantBufferTypes.h"
+
 
 class Graphics {
 public:
@@ -25,6 +27,7 @@ private:
 
     VertexShader vertexShader;
     PixelShader pixelShader;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> constantBuffer; 
     
     VertexBuffer<Vertex> vertexBuffer;
     IndexBuffer indicesBuffer;
