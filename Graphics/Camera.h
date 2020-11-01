@@ -27,6 +27,7 @@ namespace Camera {
         void setRotation(float x, float y, float z);
         void adjustRotation(const XMVECTOR& rot);
         void adjustRotation(float x, float y, float z);
+        void setLookAtPos(XMFLOAT3 lookAtPos);
 
     private:
         void updateViewMatrix();

@@ -37,7 +37,8 @@ void Graphics::renderFrame() {
 
     // Update constatnt buffer
     DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
-    camera.adjustPosition(0.0f, 0.01f, 0.0f);
+    camera.adjustPosition(0.01f, 0.0f, 0.0f);
+    camera.setLookAtPos(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
     constantBuffer.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
     constantBuffer.data.mat = DirectX::XMMatrixTranspose(constantBuffer.data.mat);
     if (!constantBuffer.applyChanges()) {

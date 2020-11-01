@@ -91,6 +91,35 @@ void Camera::Camera::adjustRotation(float x, float y, float z) {
     updateViewMatrix();
 }
 
+void Camera::Camera::setLookAtPos(XMFLOAT3 lookAtPos) {
+    // veirfy that look at pos is not the same as camera pos. 
+    // they cannot be the same as that wouldn't make sense and would result in undefined behavior.
+    if (lookAtPos.x == pos.x && lookAtPos.y == pos.y && lookAtPos.z == pos.z) {
+        return;
+    }
+
+    lookAtPos.x = pos.x - lookAtPos.x;
+    lookAtPos.y = pos.y - lookAtPos.y;
+    lookAtPos.z = pos.z - lookAtPos.z;
+
+    float pitch = 0.0f;
+    if (lookAtPos.y != 0.0f) {
+        const float distance = sqrt(lookAtPos.x * lookAtPos.x + lookAtPos.z * lookAtPos.z);
+        pitch = atan(lookAtPos.y / distance);
+    }
+
+    float yaw = 0.0f;
+    if (lookAtPos.x != 0.0f) {
+        yaw = atan(lookAtPos.x / lookAtPos.z);
+    }
+    if (lookAtPos.z > 0) {
+        yaw += XM_PI;
+    }
+
+    setRotation(pitch, yaw, 0.0f);
+
+}
+
 
 // updates view matrix and movement vectors
 void Camera::Camera::updateViewMatrix() {
