@@ -26,8 +26,10 @@ void Engine::Update() {
 
     while (!mouse.isEventBufferEmpty()) {
         auto me = mouse.readEvent();
-        if (me.getType() == Mouse::MouseEvent::EventType::RAW_MOVE) {
-            gfx.getCamera().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
+        if (mouse.isRightDown()) {
+            if (me.getType() == Mouse::MouseEvent::EventType::RAW_MOVE) {
+                gfx.getCamera().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
+            }
         }
     }
     
@@ -35,9 +37,15 @@ void Engine::Update() {
     // it seems ugly, but its quick workaround for now
     using DirectX::operator*;
     const float cameraSpeed = 0.02f;
+    float cameraSpeedMultiplyer = 1.0f;
+
+    if (keyboard.isKeyPressed(VK_SHIFT)) {
+        cameraSpeedMultiplyer *= 2;
+    }
+    
 
     if (keyboard.isKeyPressed('W')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getForwardVector() * cameraSpeed);
+        gfx.getCamera().adjustPosition(gfx.getCamera().getForwardVector() * cameraSpeed * cameraSpeedMultiplyer);
     }
     if (keyboard.isKeyPressed('S')) {
         gfx.getCamera().adjustPosition(gfx.getCamera().getBackwardVector() * cameraSpeed);
