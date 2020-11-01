@@ -10,6 +10,7 @@
 #include "IndexBuffer.h"
 #include "ConstantBuffer.h"
 #include "Camera.h"
+#include "../Timer.h"
 
 class Graphics {
 public:
@@ -48,6 +49,6 @@ private:
 
     int windowWidth = 800;
     int windowHeight = 600;
-    
+    Timer fpsTimer; 
     Camera::Camera camera;
 };

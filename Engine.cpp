@@ -1,6 +1,8 @@
 #include "Engine.h"
 
 bool Engine::initialize(HINSTANCE hInstance, std::string windowTitle, std::string windowClass, int width, int height) {
+    
+    timer.startTimer();
     if (!renderWindow.initialize(this, hInstance, windowTitle, windowClass, width, height)) {
         return false;
     }
@@ -15,6 +17,9 @@ bool Engine::processMessages() {
 }
 
 void Engine::Update() {
+    float dt = timer.getMillisecondsElapsed();
+    timer.restartTimer();
+
     while (!keyboard.isCharBufferEmpty()) {
         auto ch = keyboard.readChar();
     }
@@ -36,7 +41,7 @@ void Engine::Update() {
     // have to use it for directx::vector multiplications
     // it seems ugly, but its quick workaround for now
     using DirectX::operator*;
-    const float cameraSpeed = 0.02f;
+    const float cameraSpeed = 0.005f;
     float cameraSpeedMultiplyer = 1.0f;
 
     if (keyboard.isKeyPressed(VK_SHIFT)) {
@@ -45,22 +50,22 @@ void Engine::Update() {
     
 
     if (keyboard.isKeyPressed('W')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getForwardVector() * cameraSpeed * cameraSpeedMultiplyer);
+        gfx.getCamera().adjustPosition(gfx.getCamera().getForwardVector() * cameraSpeed * cameraSpeedMultiplyer * dt);
     }
     if (keyboard.isKeyPressed('S')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getBackwardVector() * cameraSpeed);
+        gfx.getCamera().adjustPosition(gfx.getCamera().getBackwardVector() * cameraSpeed * dt);
     }
     if (keyboard.isKeyPressed('A')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getLeftVector() * cameraSpeed);
+        gfx.getCamera().adjustPosition(gfx.getCamera().getLeftVector() * cameraSpeed * dt);
     }
     if (keyboard.isKeyPressed('D')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getRightVector() * cameraSpeed);
+        gfx.getCamera().adjustPosition(gfx.getCamera().getRightVector() * cameraSpeed * dt);
     }
     if (keyboard.isKeyPressed(VK_SPACE)) {
-        gfx.getCamera().adjustPosition(0.0f, cameraSpeed, 0.0f);
+        gfx.getCamera().adjustPosition(0.0f, cameraSpeed * dt, 0.0f);
     }
     if (keyboard.isKeyPressed('Z')) {
-        gfx.getCamera().adjustPosition(0.0f, - cameraSpeed, 0.0f);
+        gfx.getCamera().adjustPosition(0.0f, - cameraSpeed * dt, 0.0f);
     }
 }
 
