@@ -27,10 +27,10 @@ namespace Mouse {
         MouseEvent();
         MouseEvent(const EventType eType, const int x, const int y);
         bool isValid() const;
-        EventType GetType() const;
-        MousePoint GetPoint() const;
-        int GetPosX() const;
-        int GetPosY() const;
+        EventType getType() const;
+        MousePoint getPoint() const;
+        int getPosX() const;
+        int getPosY() const;
 
     private:
         EventType eType;

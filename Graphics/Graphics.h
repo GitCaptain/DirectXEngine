@@ -15,6 +15,8 @@ class Graphics {
 public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
+    Camera::Camera& const getCamera();
+
 private:
     bool initializeDirectX(HWND hwnd);
     bool initializeShaders();

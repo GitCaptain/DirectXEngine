@@ -39,6 +39,22 @@ const XMFLOAT3& Camera::Camera::getRotationFloat3() const {
     return rot;
 }
 
+const XMVECTOR& Camera::Camera::getForwardVector() {
+    return vecForward;
+}
+
+const XMVECTOR& Camera::Camera::getBackwardVector() {
+    return vecBackward;
+}
+
+const XMVECTOR& Camera::Camera::getLeftVector() {
+    return vecLeft;
+}
+
+const XMVECTOR& Camera::Camera::getRightVector() {
+    return vecRight;
+}
+
 void Camera::Camera::setPosition(const XMVECTOR& pos) {
     XMStoreFloat3(&this->pos, pos);
     posVector = pos;
@@ -134,4 +150,10 @@ void Camera::Camera::updateViewMatrix() {
     XMVECTOR upDir = XMVector3TransformCoord(DEFAULT_UP_VECTOR, camRotationMatrix);
     // rebuild view matrix
     viewMatrix = XMMatrixLookAtLH(posVector, camTarget, upDir);
+
+    XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, rot.y, 0.0f);
+    vecForward = XMVector3Transform(DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
+    vecBackward = XMVector3Transform(DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
+    vecLeft = XMVector3Transform(DEFAULT_LEFT_VECTOR, vecRotationMatrix);
+    vecRight = XMVector3Transform(DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
 }

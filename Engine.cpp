@@ -17,39 +17,43 @@ bool Engine::processMessages() {
 void Engine::Update() {
     while (!keyboard.isCharBufferEmpty()) {
         auto ch = keyboard.readChar();
-        std::string outmsg = "Char: ";
-        outmsg += ch;
-        outmsg += "\n";
-        OutputDebugStringA(outmsg.c_str());
     }
+
     while (!keyboard.isKeyBufferEmpty()) {
         auto event = keyboard.readKey();
         auto keycode = event.getKeyCode();
-        std::string outmsg;
-        if (event.isPressEvent()) {
-            outmsg = "key pressed: ";
-        }
-        else if (event.isReleaseEvent()) {
-            outmsg = "key released: ";
-        }
-        else {
-            outmsg = "unknown event: ";
-        }
-        outmsg += keycode;
-        outmsg += "\n";
-        OutputDebugStringA(outmsg.c_str());
     }
 
     while (!mouse.isEventBufferEmpty()) {
         auto me = mouse.readEvent();
-        if (me.GetType() == Mouse::MouseEvent::EventType::RAW_MOVE) {
-            std::string outmsg = "X: ";
-            outmsg += std::to_string(me.GetPosX()) + ", Y: ";
-            outmsg += std::to_string(me.GetPosY()) + "\n";
-            OutputDebugStringA(outmsg.c_str());
+        if (me.getType() == Mouse::MouseEvent::EventType::RAW_MOVE) {
+            gfx.getCamera().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
         }
     }
+    
+    // have to use it for directx::vector multiplications
+    // it seems ugly, but its quick workaround for now
+    using DirectX::operator*;
+    const float cameraSpeed = 0.02f;
 
+    if (keyboard.isKeyPressed('W')) {
+        gfx.getCamera().adjustPosition(gfx.getCamera().getForwardVector() * cameraSpeed);
+    }
+    if (keyboard.isKeyPressed('S')) {
+        gfx.getCamera().adjustPosition(gfx.getCamera().getBackwardVector() * cameraSpeed);
+    }
+    if (keyboard.isKeyPressed('A')) {
+        gfx.getCamera().adjustPosition(gfx.getCamera().getLeftVector() * cameraSpeed);
+    }
+    if (keyboard.isKeyPressed('D')) {
+        gfx.getCamera().adjustPosition(gfx.getCamera().getRightVector() * cameraSpeed);
+    }
+    if (keyboard.isKeyPressed(VK_SPACE)) {
+        gfx.getCamera().adjustPosition(0.0f, cameraSpeed, 0.0f);
+    }
+    if (keyboard.isKeyPressed('Z')) {
+        gfx.getCamera().adjustPosition(0.0f, - cameraSpeed, 0.0f);
+    }
 }
 
 void Engine::renderFrame() {
