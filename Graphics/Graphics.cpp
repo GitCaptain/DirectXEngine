@@ -39,28 +39,62 @@ void Graphics::renderFrame() {
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     deviceContext->RSSetState(rasterizerState.Get());
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+    deviceContext->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
-
+ 
     UINT offset = 0;
-     
-    // Update constatnt buffer
-    DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
-    constantBuffer.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
-    constantBuffer.data.mat = DirectX::XMMatrixTranspose(constantBuffer.data.mat);
-    if (!constantBuffer.applyChanges()) {
-        return;
+    static float alpha = 0.1f;
+
+    { // pink
+        // Update constatnt buffer
+        DirectX::XMMATRIX worldMatrix = /*DirectX::XMMatrixScaling(5.0f, 5.0f, 5.0f) **/ DirectX::XMMatrixTranslation(0, 0, -1.0f);
+        cb_vs_vertexshader.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
+        cb_vs_vertexshader.data.mat = DirectX::XMMatrixTranspose(cb_vs_vertexshader.data.mat);
+        if (!cb_vs_vertexshader.applyChanges()) { // ignore frame in case of errors
+            return;
+        }
+
+        cb_ps_pixelshader.data.alpha = alpha;
+        if (!cb_ps_pixelshader.applyChanges()) { // ignore frame in case of errors
+            return;
+        }
+
+        deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
+        deviceContext->PSSetConstantBuffers(0, 1, cb_ps_pixelshader.GetAddressOf());
+
+        // Draw square
+        deviceContext->PSSetShaderResources(0, 1, pinkTexture.GetAddressOf());
+        deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
+        deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+        deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
     }
 
-    deviceContext->VSSetConstantBuffers(0, 1, constantBuffer.GetAddressOf());
+    { // grass
+        // Update constatnt buffer
+        DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixScaling(5.0f, 5.0f, 5.0f) * DirectX::XMMatrixIdentity();
+        cb_vs_vertexshader.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
+        cb_vs_vertexshader.data.mat = DirectX::XMMatrixTranspose(cb_vs_vertexshader.data.mat);
+        if (!cb_vs_vertexshader.applyChanges()) { // ignore frame in case of errors
+            return;
+        }
 
-    // Draw square
-    deviceContext->PSSetShaderResources(0, 1, myTexture.GetAddressOf());
-    deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
-    deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-    deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
-    
+        cb_ps_pixelshader.data.alpha = 1;
+        if (!cb_ps_pixelshader.applyChanges()) { // ignore frame in case of errors
+            return;
+        }
+
+        deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
+        deviceContext->PSSetConstantBuffers(0, 1, cb_ps_pixelshader.GetAddressOf());
+
+        // Draw square
+        deviceContext->PSSetShaderResources(0, 1, grassTexture.GetAddressOf());
+        deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
+        deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+        deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
+    }
+
     //Draw text
     static int fpsCounter = 0;
     fpsCounter += 1;
@@ -80,14 +114,8 @@ void Graphics::renderFrame() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     // create imgui test window
-    ImGui::Begin("Test");
-    ImGui::Text("This is text example");
-    static int counter = 0;
-    if (ImGui::Button("CLICK ME!")) {
-        counter += 1;
-    }
-    ImGui::SameLine();
-    ImGui::Text(("click count: " + std::to_string(counter)).c_str());
+    ImGui::Begin("Settings");
+    ImGui::DragFloat("Texture alpha", &alpha, 0.01f, 0.0f, 1.0f);
     ImGui::End();
     // Assemble Together Draw data
     ImGui::Render();
@@ -106,11 +134,7 @@ Camera::Camera& const Graphics::getCamera() {
 bool Graphics::initializeDirectX(HWND hwnd) {
     
     auto adapters = AdapterReader::getAdapters(); 
-
-    if (adapters.empty()) {
-        ErrorLogger::log("No DXGI Adapters found.");
-        return false;
-    }
+    ONFAILLOG(adapters.empty(), "No DXGI Adapters found.", false);
 
     // take adapter with maximum video memory
     auto bestAdapter = &adapters[0];
@@ -155,28 +179,16 @@ bool Graphics::initializeDirectX(HWND hwnd) {
                                                device.GetAddressOf(),
                                                nullptr,
                                                deviceContext.GetAddressOf());
-
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create device and swapchain.");
-        return false;
-    }
-
+    ONFAILHRLOG(hr, "Failed to create device and swapchain.", false);
+    
     Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
     hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "GetBuffer failed.");
-        return false;
-    }
+    ONFAILHRLOG(hr, "GetBuffer failed.", false);
 
     hr = device->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
-
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create render target view.");
-        return false;
-    }
+    ONFAILHRLOG(hr, "Failed to create render target view.", false);
 
     D3D11_TEXTURE2D_DESC depthStencilDesc;
-
     depthStencilDesc.Width = windowWidth;
     depthStencilDesc.Height = windowHeight;
     depthStencilDesc.MipLevels = 1;
@@ -190,21 +202,14 @@ bool Graphics::initializeDirectX(HWND hwnd) {
     depthStencilDesc.MiscFlags = 0;
 
     hr = device->CreateTexture2D(&depthStencilDesc, nullptr, depthStencilBuffer.GetAddressOf());
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create depth Stencil buffer.");
-        return false;
-    }
+    ONFAILHRLOG(hr, "Failed to create depth Stencil buffer.", false);
 
     hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.GetAddressOf());
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create depth Stencil view.");
-        return false;
-    }
+    ONFAILHRLOG(hr, "Failed to create depth Stencil view.", false);
 
     deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get() );
 
     // Create  depth stencil state
-
     D3D11_DEPTH_STENCIL_DESC depthstencildesc;
     ZeroMemory(&depthstencildesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
 
@@ -213,12 +218,8 @@ bool Graphics::initializeDirectX(HWND hwnd) {
     depthstencildesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
 
     hr = device->CreateDepthStencilState(&depthstencildesc, depthStencilState.GetAddressOf());
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create depth Stencil view.");
-        return false;
-    }
-
-
+    ONFAILHRLOG(hr, "Failed to create depth Stencil view.", false);
+    
     D3D11_VIEWPORT viewport;
     ZeroMemory(&viewport, sizeof(D3D11_VIEWPORT));
 
@@ -228,6 +229,7 @@ bool Graphics::initializeDirectX(HWND hwnd) {
     viewport.Height = windowHeight;
     viewport.MinDepth = 0.0f;
     viewport.MaxDepth = 1.0f;
+    
     // Set the viewport
     deviceContext->RSSetViewports(1, &viewport);
 
@@ -240,11 +242,29 @@ bool Graphics::initializeDirectX(HWND hwnd) {
     rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
 
     hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to create rasterizer state.", false);
+
+    // Create blend state
+    D3D11_BLEND_DESC blendDesc;
+    ZeroMemory(&blendDesc, sizeof(blendDesc));
+
+    D3D11_RENDER_TARGET_BLEND_DESC rtbd;
+    ZeroMemory(&rtbd, sizeof(rtbd));
+
+    rtbd.BlendEnable = true;
+    rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+    rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+    rtbd.BlendOp =  D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+    rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+    rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+    rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+    rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
     
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create rasterizer state.");
-        return false;
-    }
+    blendDesc.RenderTarget[0] = rtbd;
+    
+    hr = device->CreateBlendState(&blendDesc, blendState.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to create blend state", false);
+
 
     spriteBatch = std::make_unique<DirectX::SpriteBatch>(deviceContext.Get());
     spriteFont = std::make_unique<DirectX::SpriteFont>(device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
@@ -263,11 +283,7 @@ bool Graphics::initializeDirectX(HWND hwnd) {
 
     // Create sampler state
     hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
-
-    if (FAILED(hr)) {
-        ErrorLogger::log(hr, "Failed to create rasterizer state.");
-        return false;
-    }
+    ONFAILHRLOG(hr, "Failed to create rasterizer state.", false);
 
     return true;
 }
@@ -334,12 +350,18 @@ bool Graphics::initializeScene() {
     ONFAILHRLOG(hr, "Failed to create indices buffer.", false);
 
     // Load texture
-    hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\piano.png", nullptr, myTexture.GetAddressOf());
+    hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to create wic texture from file", false);
+
+    hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
     ONFAILHRLOG(hr, "Failed to create wic texture from file", false);
 
     // Initialize constant buffer(s)
-    hr = constantBuffer.initialize(device.Get(), deviceContext.Get());
-    ONFAILHRLOG(hr, "Failed to initialize constant buffer.", false);
+    hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
+    ONFAILHRLOG(hr, "Failed to initialize cb_vs_vertexhader constant buffer.", false);
+
+    hr = cb_ps_pixelshader.initialize(device.Get(), deviceContext.Get());
+    ONFAILHRLOG(hr, "Failed to initialize cb_ps_pixelshader constant buffer.", false);
 
     camera.setPosition(0.0f, 0.0f, -2.0f);
     camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f);
