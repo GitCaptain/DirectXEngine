@@ -14,6 +14,10 @@ UINT IndexBuffer::getBufferSize() {
 
 HRESULT IndexBuffer::initialize(ID3D11Device* device, DWORD* data, UINT numIndices) {
     
+    if (buffer.Get() != nullptr) {
+        buffer.Reset();
+    }
+
     bufferSize = numIndices;
     // Load index data
     D3D11_BUFFER_DESC indexBufferDesc;

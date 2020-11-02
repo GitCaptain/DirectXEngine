@@ -44,7 +44,7 @@ void Graphics::renderFrame() {
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
 
     UINT offset = 0;
-
+     
     // Update constatnt buffer
     DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixIdentity();
     constantBuffer.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
@@ -81,6 +81,13 @@ void Graphics::renderFrame() {
     ImGui::NewFrame();
     // create imgui test window
     ImGui::Begin("Test");
+    ImGui::Text("This is text example");
+    static int counter = 0;
+    if (ImGui::Button("CLICK ME!")) {
+        counter += 1;
+    }
+    ImGui::SameLine();
+    ImGui::Text(("click count: " + std::to_string(counter)).c_str());
     ImGui::End();
     // Assemble Together Draw data
     ImGui::Render();

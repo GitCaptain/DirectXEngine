@@ -52,9 +52,14 @@ const UINT* VertexBuffer<T>::getStridePtr() const {
 template<typename T>
 HRESULT VertexBuffer<T>::initialize(ID3D11Device* device, T* data, UINT numVertices) {
 
-    bufferSize = numVertices;
-    stride = std::make_unique<UINT>(sizeof(T));
+    if (buffer.Get() != nullptr) {
+        buffer.Reset();
+    }
 
+    bufferSize = numVertices;
+    if (stride.get() == nullptr) {
+        stride = std::make_unique<UINT>(sizeof(T));
+    }
     D3D11_BUFFER_DESC vertexBufferDesc;
     ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 
