@@ -10,10 +10,10 @@ public:
     IndexBuffer() = default;
     ID3D11Buffer* Get() const;
     ID3D11Buffer* const* GetAddressOf() const;
-    UINT getBufferSize();
+    UINT getIndexCount();
     HRESULT initialize(ID3D11Device *device, DWORD *data, UINT numIndices);
 
 private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
-    UINT bufferSize = 0;
+    UINT indexCount = 0;
 };
