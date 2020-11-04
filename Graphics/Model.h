@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Vertex.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h" 
-#include "ConstantBuffer.h"
+#include <string>
+#include <vector>
+#include "Mesh.h"
 
 namespace Model {
 
@@ -12,7 +11,8 @@ namespace Model {
     class ModelClass {
     
     public:
-        bool initialize(ID3D11Device *device, 
+        bool initialize(const std::string& filePath,
+                        ID3D11Device *device, 
                         ID3D11DeviceContext *deviceContext, 
                         ID3D11ShaderResourceView *texture, 
                         ConstantBuffer<CB_VS_vertexshader> &cb_vs_vertexshader);
@@ -45,15 +45,15 @@ namespace Model {
 
     private:
         void updateWorldMatrix();
+        bool loadModel(const std::string& filePath);
+        void processNode(aiNode* node, const aiScene* scene);
+        Mesh processMesh(aiMesh *mesh, const aiScene *scene);
 
+        std::vector<Mesh> meshes;
         ID3D11Device* device = nullptr;
         ID3D11DeviceContext* deviceContext = nullptr;
         ConstantBuffer<CB_VS_vertexshader> *cb_vs_vertexshader = nullptr;
         ID3D11ShaderResourceView* texture = nullptr;
-        
-        VertexBuffer<Vertex> vertexBuffer;
-        IndexBuffer indexBuffer;
-
         XMMATRIX worldMatrix = XMMatrixIdentity();
 
         XMVECTOR posVector;

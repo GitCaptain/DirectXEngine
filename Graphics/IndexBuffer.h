@@ -6,7 +6,7 @@
 
 class IndexBuffer {
 public:
-    IndexBuffer(const IndexBuffer& rhs) = delete;
+    IndexBuffer(const IndexBuffer& rhs) = default;
     IndexBuffer() = default;
     ID3D11Buffer* Get() const;
     ID3D11Buffer* const* GetAddressOf() const;

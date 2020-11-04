@@ -9,7 +9,7 @@ class VertexBuffer {
 
 public:
     VertexBuffer() = default;
-    VertexBuffer(const VertexBuffer<T>& rhs) = delete;
+    VertexBuffer(const VertexBuffer<T>& rhs) = default;
     ID3D11Buffer* Get() const;
     ID3D11Buffer* const* GetAddressOf() const;
     UINT getBufferSize() const;

@@ -2,10 +2,11 @@
 
 using namespace Model;
 
-bool ModelClass::initialize(ID3D11Device* device, 
-                              ID3D11DeviceContext* deviceContext, 
-                              ID3D11ShaderResourceView* texture, 
-                              ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
+bool ModelClass::initialize(const std::string& filePath, 
+                            ID3D11Device* device,
+                            ID3D11DeviceContext* deviceContext, 
+                            ID3D11ShaderResourceView* texture, 
+                            ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
     this->device = device;
     this->deviceContext = deviceContext;
     this->texture = texture;
@@ -13,40 +14,9 @@ bool ModelClass::initialize(ID3D11Device* device,
     setPosition(0.0f, 0.0f, 0.0f);
     setRotation(0.0f, 0.0f, 0.0f);
     try {
-        Vertex v[] = {
-        Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f), // Front bottom left
-        Vertex(-0.5f,  0.5f, -0.5f, 0.0f, 0.0f), // Front top left
-        Vertex(0.5f,  0.5f, -0.5f, 1.0f, 0.0f), // Front top right
-        Vertex(0.5f, -0.5f, -0.5f, 1.0f, 1.0f), // Front bottom right
-
-        Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 1.0f), // Back  bottom left
-        Vertex(-0.5f,  0.5f, 0.5f, 0.0f, 0.0f), // Back top left
-        Vertex(0.5f,  0.5f, 0.5f, 1.0f, 0.0f), // Back top right
-        Vertex(0.5f, -0.5f, 0.5f, 1.0f, 1.0f), // Back bottom right
-        };
-
-        // Load vertex data
-        HRESULT hr = vertexBuffer.initialize(device, v, ARRAYSIZE(v));
-        COM_ERROR_IF_FAILED(hr, "Failed to create vertex buffer.");
-
-        DWORD indices[] = {
-            0, 1, 2, // front
-            0, 2, 3, // front
-            4, 7, 6, // back
-            4, 6, 5, // back
-            3, 2, 6, // right
-            3, 6, 7, // right
-            4, 5, 1, // left
-            4, 1, 0, // left
-            1, 5, 6, // top
-            1, 6, 2, // top
-            0, 3, 7, // bottom
-            0, 7, 4, // bottom
-        };
-
-        // Load index data
-        hr = indexBuffer.initialize(device, indices, ARRAYSIZE(indices));
-        COM_ERROR_IF_FAILED(hr, "Failed to create indices buffer.");
+        if (!loadModel(filePath)) {
+            return false;
+        }
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
@@ -67,13 +37,11 @@ void ModelClass::draw(const XMMATRIX& viewProjectionMatrix) {
     cb_vs_vertexshader->data.mat = XMMatrixTranspose(cb_vs_vertexshader->data.mat);
     cb_vs_vertexshader->applyChanges();
     deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader->GetAddressOf());
-
     deviceContext->PSSetShaderResources(0, 1, &texture);
-    deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
 
-    UINT offset = 0;
-    deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
-    deviceContext->DrawIndexed(indexBuffer.getBufferSize(), 0, 0);
+    for (size_t i = 0; i < meshes.size(); i++) {
+        meshes[i].draw();
+    }
 }
 
 void ModelClass::updateWorldMatrix() {
@@ -83,6 +51,58 @@ void ModelClass::updateWorldMatrix() {
     vecBackward = XMVector3TransformCoord(DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
     vecLeft = XMVector3TransformCoord(DEFAULT_LEFT_VECTOR, vecRotationMatrix);
     vecRight = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
+}
+
+bool Model::ModelClass::loadModel(const std::string& filePath) {
+    Assimp::Importer importer;
+    const aiScene* pScene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
+
+    if (pScene == nullptr) {
+        return false;
+    }
+
+    processNode(pScene->mRootNode, pScene);
+
+    return true;
+}
+
+void Model::ModelClass::processNode(aiNode* node, const aiScene* scene) {
+    for (size_t i = 0; i < node->mNumMeshes; i++) {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        meshes.push_back(processMesh(mesh, scene));
+    }
+
+    for (size_t i = 0; i < node->mNumChildren; i++) {
+        processNode(node->mChildren[i], scene);
+    }
+}
+
+Mesh Model::ModelClass::processMesh(aiMesh* mesh, const aiScene* scene) {
+    std::vector<Vertex> vertices;
+    std::vector<DWORD> indices;
+    for (size_t i = 0; i < mesh->mNumVertices; i++) {
+        Vertex vertex;
+        vertex.pos.x = mesh->mVertices[i].x;
+        vertex.pos.y = mesh->mVertices[i].y;
+        vertex.pos.z = mesh->mVertices[i].z;
+
+        // TODO: what if mesh doesn't have a texture?
+        if (mesh->mTextureCoords[0]) {
+            vertex.texCoord.x = static_cast<float>(mesh->mTextureCoords[0][i].x);
+            vertex.texCoord.y = static_cast<float>(mesh->mTextureCoords[0][i].y);
+        }
+
+        vertices.push_back(vertex);
+    }
+
+    for (size_t i = 0; i < mesh->mNumFaces; i++) {
+        aiFace *face = &mesh->mFaces[i];
+        for (size_t j = 0; j < face->mNumIndices; j++) {
+            indices.push_back(face->mIndices[j]);
+        }
+    }
+
+    return Mesh(device, deviceContext, vertices, indices);
 }
 
 const XMVECTOR& ModelClass::getPositionVector() const {

@@ -10,7 +10,7 @@ class ConstantBuffer {
 
 public:
     ConstantBuffer() = default;
-    ConstantBuffer(const ConstantBuffer<T>& rhs) = delete;
+    ConstantBuffer(const ConstantBuffer<T>& rhs) = default;
     T data;
     ID3D11Buffer* Get() const;
     ID3D11Buffer* const* GetAddressOf() const;
