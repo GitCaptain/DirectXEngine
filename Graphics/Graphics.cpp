@@ -39,39 +39,13 @@ void Graphics::renderFrame() {
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     deviceContext->RSSetState(rasterizerState.Get());
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
-    deviceContext->OMSetBlendState(blendState.Get(), nullptr, 0xFFFFFFFF);
+    deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
- 
-    UINT offset = 0;
-
-    static float alpha = 0.1f;
-    { // cube
-        // Update constant buffer
-        DirectX::XMMATRIX worldMatrix = /*DirectX::XMMatrixScaling(5.0f, 5.0f, 5.0f) **/ DirectX::XMMatrixTranslation(0, 0, -1.0f);
-        cb_vs_vertexshader.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
-        cb_vs_vertexshader.data.mat = DirectX::XMMatrixTranspose(cb_vs_vertexshader.data.mat);
-        if (!cb_vs_vertexshader.applyChanges()) { // ignore frame in case of errors
-            return;
-        }
-
-        cb_ps_pixelshader.data.alpha = alpha;
-        if (!cb_ps_pixelshader.applyChanges()) { // ignore frame in case of errors
-            return;
-        }
-
-        deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
-        deviceContext->PSSetConstantBuffers(0, 1, cb_ps_pixelshader.GetAddressOf());
-
-        // Draw square
-        deviceContext->PSSetShaderResources(0, 1, pavementTexture.GetAddressOf());
-        deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
-        deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-        deviceContext->RSSetState(rasterizerStateCullFront.Get());
-        deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
-        deviceContext->RSSetState(rasterizerState.Get());
-        deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
+    
+    { // Pavement cube
+        model.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
     }
 
     //Draw text
@@ -94,7 +68,6 @@ void Graphics::renderFrame() {
     ImGui::NewFrame();
     // create imgui test window
     ImGui::Begin("Settings");
-    ImGui::DragFloat("Texture alpha", &alpha, 0.01f, 0.0f, 1.0f);
     ImGui::End();
     // Assemble Together Draw data
     ImGui::Render();
@@ -202,39 +175,39 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         hr = device->CreateRasterizerState(&rasterizerDescCullFront, rasterizerStateCullFront.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state for cull front.");
 
-        // Create blend state
-        D3D11_BLEND_DESC blendDesc;
-        ZeroMemory(&blendDesc, sizeof(blendDesc));
+// Create blend state
+D3D11_BLEND_DESC blendDesc;
+ZeroMemory(&blendDesc, sizeof(blendDesc));
 
-        D3D11_RENDER_TARGET_BLEND_DESC rtbd;
-        ZeroMemory(&rtbd, sizeof(rtbd));
+D3D11_RENDER_TARGET_BLEND_DESC rtbd;
+ZeroMemory(&rtbd, sizeof(rtbd));
 
-        rtbd.BlendEnable = true;
-        rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
-        rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
-        rtbd.BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-        rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-        rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
-        rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-        rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+rtbd.BlendEnable = true;
+rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+rtbd.BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
 
-        blendDesc.RenderTarget[0] = rtbd;
+blendDesc.RenderTarget[0] = rtbd;
 
-        hr = device->CreateBlendState(&blendDesc, blendState.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create blend state");
+hr = device->CreateBlendState(&blendDesc, blendState.GetAddressOf());
+COM_ERROR_IF_FAILED(hr, "Failed to create blend state");
 
 
-        spriteBatch = std::make_unique<DirectX::SpriteBatch>(deviceContext.Get());
-        spriteFont = std::make_unique<DirectX::SpriteFont>(device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
+spriteBatch = std::make_unique<DirectX::SpriteBatch>(deviceContext.Get());
+spriteFont = std::make_unique<DirectX::SpriteFont>(device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
 
-        // Create sampler description for sampler state
-        CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
-        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-        // Create sampler state
-        hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
+// Create sampler description for sampler state
+CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
+sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+// Create sampler state
+hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
+COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
@@ -250,17 +223,17 @@ bool Graphics::initializeShaders() {
 #pragma region DetermineShaderPath
     if (IsDebuggerPresent() == TRUE) {
 #ifdef _DEBUG
-    #ifdef _WIN64
+#ifdef _WIN64
         shaderFolder = L"x64\\Debug\\";
-    #else
-        shaderFolder = L"Debug\\";
-    #endif
 #else
-    #ifdef _WIN64
+        shaderFolder = L"Debug\\";
+#endif
+#else
+#ifdef _WIN64
         shaderFolder = L"x64\\Release\\";
-    #else
+#else
         shaderFolder = L"Release\\";
-    #endif
+#endif
 #endif
     }
 
@@ -284,43 +257,8 @@ bool Graphics::initializeShaders() {
 
 bool Graphics::initializeScene() {
     try {
-        Vertex v[] = {
-            Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f), // Front bottom left
-            Vertex(-0.5f,  0.5f, -0.5f, 0.0f, 0.0f), // Front top left
-            Vertex(0.5f,  0.5f, -0.5f, 1.0f, 0.0f), // Front top right
-            Vertex(0.5f, -0.5f, -0.5f, 1.0f, 1.0f), // Front bottom right
-
-            Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 1.0f), // Back  bottom left
-            Vertex(-0.5f,  0.5f, 0.5f, 0.0f, 0.0f), // Back top left
-            Vertex(0.5f,  0.5f, 0.5f, 1.0f, 0.0f), // Back top right
-            Vertex(0.5f, -0.5f, 0.5f, 1.0f, 1.0f), // Back bottom right
-        };
-
-        // Load vertex data
-        HRESULT hr = vertexBuffer.initialize(device.Get(), v, ARRAYSIZE(v));
-        COM_ERROR_IF_FAILED(hr, "Failed to create vertex buffer.");
-
-        DWORD indices[] = {
-            0, 1, 2, // front
-            0, 2, 3, // front
-            4, 7, 6, // back
-            4, 6, 5, // back
-            3, 2, 6, // right
-            3, 6, 7, // right
-            4, 5, 1, // left
-            4, 1, 0, // left
-            1, 5, 6, // top
-            1, 6, 2, // top
-            0, 3, 7, // bottom
-            0, 7, 4, // bottom
-        };
-
-        // Load index data
-        hr = indicesBuffer.initialize(device.Get(), indices, ARRAYSIZE(indices));
-        COM_ERROR_IF_FAILED(hr, "Failed to create indices buffer.");
-
         // Load texture
-        hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
+        HRESULT hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
 
         hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
@@ -335,6 +273,13 @@ bool Graphics::initializeScene() {
 
         hr = cb_ps_pixelshader.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_pixelshader constant buffer.");
+
+        // Initialize Model(s)
+        if(!model.initialize(device.Get(), deviceContext.Get(), pavementTexture.Get(), cb_vs_vertexshader)){
+            return false;
+        }
+
+        model.setPosition(2.0f, 0.0f, 0.0f);
 
         camera.setPosition(0.0f, 0.0f, -2.0f);
         camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f);

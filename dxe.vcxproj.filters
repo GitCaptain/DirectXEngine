@@ -105,6 +105,9 @@
     <ClCompile Include="COMException.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Model.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StringConverter.h">
@@ -190,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\Shaders.h">
       <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Model.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

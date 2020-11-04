@@ -5,10 +5,7 @@
 #include <WICTextureLoader.h> 
 #include "AdapterReader.h"
 #include "Shaders.h"
-#include "Vertex.h"
-#include "VertexBuffer.h"
-#include "IndexBuffer.h"
-#include "ConstantBuffer.h"
+#include "Model.h"
 #include "Camera.h"
 #include "../Timer.h"
 
@@ -23,6 +20,7 @@ public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
     Camera::Camera& const getCamera();
+    Model::ModelClass model;
 
 private:
     bool initializeDirectX(HWND hwnd);
@@ -38,9 +36,6 @@ private:
     PixelShader pixelShader;
     ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader; 
     ConstantBuffer<CB_PS_pixelshader> cb_ps_pixelshader; 
-    
-    VertexBuffer<Vertex> vertexBuffer;
-    IndexBuffer indicesBuffer;
     
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;

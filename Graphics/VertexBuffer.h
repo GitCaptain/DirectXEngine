@@ -11,15 +11,15 @@ public:
     VertexBuffer() = default;
     VertexBuffer(const VertexBuffer<T>& rhs) = delete;
     ID3D11Buffer* Get() const;
-    ID3D11Buffer* const * GetAddressOf() const;
+    ID3D11Buffer* const* GetAddressOf() const;
     UINT getBufferSize() const;
     const UINT getStride() const;
     const UINT* getStridePtr() const;
-    HRESULT initialize(ID3D11Device *device, T *data, UINT numVertices);
+    HRESULT initialize(ID3D11Device* device, T* data, UINT numVertices);
 
 private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> buffer;
-    std::unique_ptr<UINT> stride;
+    UINT stride = 0;
     UINT bufferSize = 0;
 
 };
@@ -41,12 +41,12 @@ UINT VertexBuffer<T>::getBufferSize() const {
 
 template<typename T>
 const UINT VertexBuffer<T>::getStride() const {
-    return *stride.get();
+    return stride;
 }
 
 template<typename T>
 const UINT* VertexBuffer<T>::getStridePtr() const {
-    return stride.get();
+    return &stride;
 }
 
 template<typename T>
@@ -57,9 +57,7 @@ HRESULT VertexBuffer<T>::initialize(ID3D11Device* device, T* data, UINT numVerti
     }
 
     bufferSize = numVertices;
-    if (stride.get() == nullptr) {
-        stride = std::make_unique<UINT>(sizeof(T));
-    }
+    stride = sizeof(T);
     D3D11_BUFFER_DESC vertexBufferDesc;
     ZeroMemory(&vertexBufferDesc, sizeof(vertexBufferDesc));
 
