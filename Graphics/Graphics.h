@@ -47,6 +47,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
 
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStateCullFront;
     Microsoft::WRL::ComPtr<ID3D11BlendState> blendState; 
 
     std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
@@ -55,6 +56,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pinkTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
 
     int windowWidth = 800;
     int windowHeight = 600;

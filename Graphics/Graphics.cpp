@@ -45,10 +45,10 @@ void Graphics::renderFrame() {
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
  
     UINT offset = 0;
-    static float alpha = 0.1f;
 
-    { // pink
-        // Update constatnt buffer
+    static float alpha = 0.1f;
+    { // cube
+        // Update constant buffer
         DirectX::XMMATRIX worldMatrix = /*DirectX::XMMatrixScaling(5.0f, 5.0f, 5.0f) **/ DirectX::XMMatrixTranslation(0, 0, -1.0f);
         cb_vs_vertexshader.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
         cb_vs_vertexshader.data.mat = DirectX::XMMatrixTranspose(cb_vs_vertexshader.data.mat);
@@ -65,33 +65,12 @@ void Graphics::renderFrame() {
         deviceContext->PSSetConstantBuffers(0, 1, cb_ps_pixelshader.GetAddressOf());
 
         // Draw square
-        deviceContext->PSSetShaderResources(0, 1, pinkTexture.GetAddressOf());
+        deviceContext->PSSetShaderResources(0, 1, pavementTexture.GetAddressOf());
         deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
         deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+        deviceContext->RSSetState(rasterizerStateCullFront.Get());
         deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
-    }
-
-    { // grass
-        // Update constatnt buffer
-        DirectX::XMMATRIX worldMatrix = DirectX::XMMatrixScaling(5.0f, 5.0f, 5.0f) * DirectX::XMMatrixIdentity();
-        cb_vs_vertexshader.data.mat = worldMatrix * camera.getViewMatrix() * camera.getProjectionMatrix();
-        cb_vs_vertexshader.data.mat = DirectX::XMMatrixTranspose(cb_vs_vertexshader.data.mat);
-        if (!cb_vs_vertexshader.applyChanges()) { // ignore frame in case of errors
-            return;
-        }
-
-        cb_ps_pixelshader.data.alpha = 1;
-        if (!cb_ps_pixelshader.applyChanges()) { // ignore frame in case of errors
-            return;
-        }
-
-        deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
-        deviceContext->PSSetConstantBuffers(0, 1, cb_ps_pixelshader.GetAddressOf());
-
-        // Draw square
-        deviceContext->PSSetShaderResources(0, 1, grassTexture.GetAddressOf());
-        deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
-        deviceContext->IASetIndexBuffer(indicesBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+        deviceContext->RSSetState(rasterizerState.Get());
         deviceContext->DrawIndexed(indicesBuffer.getBufferSize(), 0, 0);
     }
 
@@ -239,10 +218,21 @@ bool Graphics::initializeDirectX(HWND hwnd) {
 
     rasterizerDesc.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
     // Render object whether it is in font of us or not
-    rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_NONE;
+    rasterizerDesc.CullMode = D3D11_CULL_MODE::D3D11_CULL_BACK;
 
     hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf());
     ONFAILHRLOG(hr, "Failed to create rasterizer state.", false);
+
+    // Create rasterizer state for culling front
+    D3D11_RASTERIZER_DESC rasterizerDescCullFront;
+    ZeroMemory(&rasterizerDescCullFront, sizeof(rasterizerDescCullFront));
+
+    rasterizerDescCullFront.FillMode = D3D11_FILL_MODE::D3D11_FILL_SOLID;
+    // Render object whether it is in font of us or not
+    rasterizerDescCullFront.CullMode = D3D11_CULL_MODE::D3D11_CULL_FRONT;
+
+    hr = device->CreateRasterizerState(&rasterizerDescCullFront, rasterizerStateCullFront.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to create rasterizer state for cull front.", false);
 
     // Create blend state
     D3D11_BLEND_DESC blendDesc;
@@ -330,10 +320,15 @@ bool Graphics::initializeShaders() {
 bool Graphics::initializeScene() {
 
     Vertex v[] = {
-        Vertex(-0.5f, -0.5f, 0.0f, 0.0f, 1.0f),
-        Vertex(-0.5f,  0.5f, 0.0f, 0.0f, 0.0f),
-        Vertex( 0.5f,  0.5f, 0.0f, 1.0f, 0.0f),
-        Vertex( 0.5f, -0.5f, 0.0f, 1.0f, 1.0f),
+        Vertex(-0.5f, -0.5f, -0.5f, 0.0f, 1.0f), // Front bottom left
+        Vertex(-0.5f,  0.5f, -0.5f, 0.0f, 0.0f), // Front top left
+        Vertex( 0.5f,  0.5f, -0.5f, 1.0f, 0.0f), // Front top right
+        Vertex( 0.5f, -0.5f, -0.5f, 1.0f, 1.0f), // Front bottom right
+        
+        Vertex(-0.5f, -0.5f, 0.5f, 0.0f, 1.0f), // Back  bottom left
+        Vertex(-0.5f,  0.5f, 0.5f, 0.0f, 0.0f), // Back top left
+        Vertex( 0.5f,  0.5f, 0.5f, 1.0f, 0.0f), // Back top right
+        Vertex( 0.5f, -0.5f, 0.5f, 1.0f, 1.0f), // Back bottom right
     };
 
     // Load vertex data
@@ -341,8 +336,18 @@ bool Graphics::initializeScene() {
     ONFAILHRLOG(hr, "Failed to create vertex buffer.", false);
 
     DWORD indices[] = {
-        0, 1, 2,
-        0, 2, 3,
+        0, 1, 2, // front
+        0, 2, 3, // front
+        4, 7, 6, // back
+        4, 6, 5, // back
+        3, 2, 6, // right
+        3, 6, 7, // right
+        4, 5, 1, // left
+        4, 1, 0, // left
+        1, 5, 6, // top
+        1, 6, 2, // top
+        0, 3, 7, // bottom
+        0, 7, 4, // bottom
     };
 
     // Load index data
@@ -354,6 +359,9 @@ bool Graphics::initializeScene() {
     ONFAILHRLOG(hr, "Failed to create wic texture from file", false);
 
     hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
+    ONFAILHRLOG(hr, "Failed to create wic texture from file", false);
+
+    hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
     ONFAILHRLOG(hr, "Failed to create wic texture from file", false);
 
     // Initialize constant buffer(s)
