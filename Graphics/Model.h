@@ -26,12 +26,12 @@ namespace ModelNamespace {
                                                        size_t index, 
                                                        aiTextureType textureType);
         std::vector<Texture> LoadMaterialTextures(aiMaterial* pMaterial, aiTextureType textureType, const aiScene* pScene);
+        int getTextureIndex(aiString *pStr);
         
         std::vector<Mesh> meshes;
         ID3D11Device* device = nullptr;
         ID3D11DeviceContext* deviceContext = nullptr;
         ConstantBuffer<CB_VS_vertexshader> *cb_vs_vertexshader = nullptr;
         std::string directory = "";
-
-    };
+     };
 }
