@@ -4,12 +4,10 @@ using namespace ModelNamespace;
 
 bool Model::initialize(const std::string& filePath, 
                             ID3D11Device* device,
-                            ID3D11DeviceContext* deviceContext, 
-                            ID3D11ShaderResourceView* texture, 
+                            ID3D11DeviceContext* deviceContext,
                             ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
     this->device = device;
     this->deviceContext = deviceContext;
-    this->texture = texture;
     this->cb_vs_vertexshader = &cb_vs_vertexshader;
 
     try {
@@ -25,16 +23,11 @@ bool Model::initialize(const std::string& filePath,
     return true; 
 }
 
-void Model::setTexture(ID3D11ShaderResourceView* texture) {
-    this->texture = texture;
-}
-
 void Model::draw(const XMMATRIX& worldMatrix, const XMMATRIX& viewProjectionMatrix) {
     cb_vs_vertexshader->data.mat = worldMatrix * viewProjectionMatrix;
     cb_vs_vertexshader->data.mat = XMMatrixTranspose(cb_vs_vertexshader->data.mat);
     cb_vs_vertexshader->applyChanges();
     deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader->GetAddressOf());
-    deviceContext->PSSetShaderResources(0, 1, &texture);
 
     for (size_t i = 0; i < meshes.size(); i++) {
         meshes[i].draw();
@@ -90,5 +83,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
         }
     }
 
-    return Mesh(device, deviceContext, vertices, indices);
+    std::vector<Texture> textures;
+    textures.push_back(Texture(device, Colors::UnloadedTextureColor, aiTextureType::aiTextureType_DIFFUSE));
+
+    return Mesh(device, deviceContext, vertices, indices, textures);
 }

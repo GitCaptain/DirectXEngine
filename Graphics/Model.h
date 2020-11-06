@@ -13,10 +13,8 @@ namespace ModelNamespace {
     public:
         bool initialize(const std::string& filePath,
                         ID3D11Device *device, 
-                        ID3D11DeviceContext *deviceContext, 
-                        ID3D11ShaderResourceView *texture, 
+                        ID3D11DeviceContext *deviceContext,
                         ConstantBuffer<CB_VS_vertexshader> &cb_vs_vertexshader);
-        void setTexture(ID3D11ShaderResourceView *texture);
         void draw(const XMMATRIX& worldMatrix, const XMMATRIX &viewProjectionMatrix);
 
     private:
@@ -28,7 +26,6 @@ namespace ModelNamespace {
         ID3D11Device* device = nullptr;
         ID3D11DeviceContext* deviceContext = nullptr;
         ConstantBuffer<CB_VS_vertexshader> *cb_vs_vertexshader = nullptr;
-        ID3D11ShaderResourceView* texture = nullptr;
 
     };
 }

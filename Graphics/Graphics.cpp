@@ -175,39 +175,39 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         hr = device->CreateRasterizerState(&rasterizerDescCullFront, rasterizerStateCullFront.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state for cull front.");
 
-// Create blend state
-D3D11_BLEND_DESC blendDesc;
-ZeroMemory(&blendDesc, sizeof(blendDesc));
+        // Create blend state
+        D3D11_BLEND_DESC blendDesc;
+        ZeroMemory(&blendDesc, sizeof(blendDesc));
 
-D3D11_RENDER_TARGET_BLEND_DESC rtbd;
-ZeroMemory(&rtbd, sizeof(rtbd));
+        D3D11_RENDER_TARGET_BLEND_DESC rtbd;
+        ZeroMemory(&rtbd, sizeof(rtbd));
 
-rtbd.BlendEnable = true;
-rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
-rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
-rtbd.BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
-rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
-rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
+        rtbd.BlendEnable = true;
+        rtbd.SrcBlend = D3D11_BLEND::D3D11_BLEND_SRC_ALPHA;
+        rtbd.DestBlend = D3D11_BLEND::D3D11_BLEND_INV_SRC_ALPHA;
+        rtbd.BlendOp = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+        rtbd.SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+        rtbd.DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ZERO;
+        rtbd.BlendOpAlpha = D3D11_BLEND_OP::D3D11_BLEND_OP_ADD;
+        rtbd.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE::D3D11_COLOR_WRITE_ENABLE_ALL;
 
-blendDesc.RenderTarget[0] = rtbd;
+        blendDesc.RenderTarget[0] = rtbd;
 
-hr = device->CreateBlendState(&blendDesc, blendState.GetAddressOf());
-COM_ERROR_IF_FAILED(hr, "Failed to create blend state");
+        hr = device->CreateBlendState(&blendDesc, blendState.GetAddressOf());
+        COM_ERROR_IF_FAILED(hr, "Failed to create blend state");
 
 
-spriteBatch = std::make_unique<DirectX::SpriteBatch>(deviceContext.Get());
-spriteFont = std::make_unique<DirectX::SpriteFont>(device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
+        spriteBatch = std::make_unique<DirectX::SpriteBatch>(deviceContext.Get());
+        spriteFont = std::make_unique<DirectX::SpriteFont>(device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
 
-// Create sampler description for sampler state
-CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
-sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-// Create sampler state
-hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
-COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
+        // Create sampler description for sampler state
+        CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
+        sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+        sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+        sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        // Create sampler state
+        hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
+        COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
@@ -275,7 +275,7 @@ bool Graphics::initializeScene() {
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_pixelshader constant buffer.");
 
         // Initialize Model(s)
-        if(!gameObject.initialize("Data\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), pavementTexture.Get(), cb_vs_vertexshader)){
+        if(!gameObject.initialize("Data\\Objects\\Samples\\blue_cube_notexture.fbx", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
             return false;
         }
 
