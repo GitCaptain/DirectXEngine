@@ -1,12 +1,12 @@
 #include "COMException.h"
-#include "StringConverter.h"
+#include "StringHelper.h"
 
 COMException::COMException(HRESULT hr, const std::string& msg, const std::string& file, const std::string& function, int line) {
     _com_error error(hr);
-    whatmsg = L"Msg: " + StringConverter::stringToWide(std::string(msg)) + L"\n";
+    whatmsg = L"Msg: " + StringHelper::stringToWide(std::string(msg)) + L"\n";
     whatmsg += error.ErrorMessage();
-    whatmsg += L"\nFile: " + StringConverter::stringToWide(file);
-    whatmsg += L"\nFunction: " + StringConverter::stringToWide(function);
+    whatmsg += L"\nFile: " + StringHelper::stringToWide(file);
+    whatmsg += L"\nFunction: " + StringHelper::stringToWide(function);
     whatmsg += L"\nLine: " + std::to_wstring(line) + L"\n";
 }
 

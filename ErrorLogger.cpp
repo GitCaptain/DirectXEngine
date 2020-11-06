@@ -1,6 +1,6 @@
 #include <comdef.h>
 #include "ErrorLogger.h"
-#include "StringConverter.h"
+#include "StringHelper.h"
 
 void ErrorLogger::log(const std::string& message) {
     std::string error_message = "Error: " + message;
@@ -8,7 +8,7 @@ void ErrorLogger::log(const std::string& message) {
 }
 
 void ErrorLogger::log(HRESULT hr, const std::string& message) {
-    log(hr, StringConverter::stringToWide(message));
+    log(hr, StringHelper::stringToWide(message));
 }
 
 void ErrorLogger::log(HRESULT hr, const std::wstring& message) {

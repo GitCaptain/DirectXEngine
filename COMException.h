@@ -1,7 +1,7 @@
 #pragma once
 
 #include <comdef.h>
-#include "StringConverter.h"
+#include "StringHelper.h"
 
 #define COM_ERROR_IF_FAILED( hr, msg ) if( FAILED( hr ) ){ throw COMException( hr, msg, __FILE__, __FUNCTION__, __LINE__ ); }
 

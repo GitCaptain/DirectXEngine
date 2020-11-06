@@ -23,6 +23,8 @@ public:
             UINT width,
             UINT height, 
             aiTextureType type);
+    Texture(ID3D11Device* device, const std::string& filePath, aiTextureType type);
+
     aiTextureType getType();
     ID3D11ShaderResourceView* getTextureResourceView();
     ID3D11ShaderResourceView** getTextureResourceViewAddress();

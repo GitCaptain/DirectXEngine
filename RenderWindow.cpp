@@ -1,5 +1,5 @@
 #include "WindowContainer.h"
-#include "StringConverter.h"
+#include "StringHelper.h"
 
 bool RenderWindow::initialize(WindowContainer* pWindowContainer, 
                               HINSTANCE hInstance, 
@@ -9,9 +9,9 @@ bool RenderWindow::initialize(WindowContainer* pWindowContainer,
                               int height) {
     this->hInstance = hInstance;
     this->windowTitle = windowTitle;
-    windowTitleWide = StringConverter::stringToWide(windowTitle).c_str();
+    windowTitleWide = StringHelper::stringToWide(windowTitle).c_str();
     this->windowClass = windowClass;
-    windowClassWide = StringConverter::stringToWide(windowClass).c_str();
+    windowClassWide = StringHelper::stringToWide(windowClass).c_str();
     this->width = width;
     this->height = height;
 

@@ -48,9 +48,6 @@
     <ClCompile Include="Engine.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="StringConverter.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
     <ClCompile Include="WindowContainer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -120,11 +117,11 @@
     <ClCompile Include="Graphics\Texture.cpp">
       <Filter>Исходные файлы\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="StringHelper.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="StringConverter.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
     <ClInclude Include="ErrorLogger.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
@@ -220,6 +217,9 @@
     </ClInclude>
     <ClInclude Include="Graphics\Texture.h">
       <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="StringHelper.h">
+      <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

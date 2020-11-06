@@ -1,3 +1,6 @@
+
+#include <WICTextureLoader.h>
+#include <DDSTextureLoader.h>
 #include "Texture.h"
 #include "../ErrorLogger.h"
 
@@ -11,6 +14,22 @@ Texture::Texture(ID3D11Device* device,
                  UINT height, 
                  aiTextureType type) {
     initializeColorTexture(device, colorData, width, height, type);
+}
+
+Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureType type) {
+
+    this->type = type;
+    HRESULT hr;
+    if (StringHelper::getfileExtension(filePath) == "dds") {
+        hr = DirectX::CreateDDSTextureFromFile(device, StringHelper::stringToWide(filePath).c_str(), texture.GetAddressOf(), textureView.GetAddressOf());
+    }
+    else {
+        hr = DirectX::CreateWICTextureFromFile(device, StringHelper::stringToWide(filePath).c_str(), texture.GetAddressOf(), textureView.GetAddressOf());
+    }
+    if (FAILED(hr)) {
+        initialize1x1ColorTexture(device, Colors::UnloadedTextureColor, type);
+    }
+    return;
 }
 
 aiTextureType Texture::getType() {

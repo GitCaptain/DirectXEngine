@@ -19,14 +19,19 @@ namespace ModelNamespace {
 
     private:
         bool loadModel(const std::string& filePath);
-        void processNode(aiNode* node, const aiScene* scene);
+        void processNode(aiNode* node, const aiScene *scene);
         Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+        TextureStorageType determineTextureStorageType(const aiScene *pScene, 
+                                                       aiMaterial *pMaterial, 
+                                                       size_t index, 
+                                                       aiTextureType textureType);
         std::vector<Texture> LoadMaterialTextures(aiMaterial* pMaterial, aiTextureType textureType, const aiScene* pScene);
         
         std::vector<Mesh> meshes;
         ID3D11Device* device = nullptr;
         ID3D11DeviceContext* deviceContext = nullptr;
         ConstantBuffer<CB_VS_vertexshader> *cb_vs_vertexshader = nullptr;
+        std::string directory = "";
 
     };
 }
