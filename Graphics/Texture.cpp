@@ -32,6 +32,12 @@ Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureTyp
     return;
 }
 
+Texture::Texture(ID3D11Device* device, const uint8_t* pData, size_t size, aiTextureType type) {
+    this->type = type;
+    HRESULT hr = DirectX::CreateWICTextureFromMemory(device, pData, size, texture.GetAddressOf(), textureView.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create Texture from memory");
+}
+
 aiTextureType Texture::getType() {
     return type;
 }

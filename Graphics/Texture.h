@@ -24,6 +24,7 @@ public:
             UINT height, 
             aiTextureType type);
     Texture(ID3D11Device* device, const std::string& filePath, aiTextureType type);
+    Texture(ID3D11Device* device, const uint8_t* pData, size_t size, aiTextureType type);
 
     aiTextureType getType();
     ID3D11ShaderResourceView* getTextureResourceView();

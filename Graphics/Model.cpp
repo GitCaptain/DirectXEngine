@@ -170,6 +170,13 @@ std::vector<Texture> ModelNamespace::Model::LoadMaterialTextures(aiMaterial* pMa
             pMaterial->GetTexture(textureType, i, &path);
             TextureStorageType storageType = determineTextureStorageType(pScene, pMaterial, i, textureType);
             switch (storageType) {
+                case TextureStorageType::EmbeddedCompressed: {
+                    const aiTexture* pTexture = pScene->GetEmbeddedTexture(path.C_Str());
+                    materialTextures.emplace_back(device,
+                                                  reinterpret_cast<const uint8_t*>(pTexture->pcData),
+                                                  pTexture->mWidth, // actual size in bytes 
+                                                  textureType);
+                }
                 case TextureStorageType::Disk: {
                     std::string fileName = directory + '\\' + path.C_Str();
                     materialTextures.emplace_back(device, fileName, textureType);

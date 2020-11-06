@@ -275,7 +275,7 @@ bool Graphics::initializeScene() {
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_pixelshader constant buffer.");
 
         // Initialize Model(s)
-        if(!gameObject.initialize("Data\\Objects\\Nanosuit\\Nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
+        if(!gameObject.initialize("Data\\Objects\\Samples\\orange_embeddedtexture.fbx", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
             return false;
         }
 
