@@ -83,8 +83,35 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
         }
     }
 
-    std::vector<Texture> textures;
-    textures.push_back(Texture(device, Colors::UnloadedTextureColor, aiTextureType::aiTextureType_DIFFUSE));
+    aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+    std::vector<Texture> textures = LoadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, scene);
 
     return Mesh(device, deviceContext, vertices, indices, textures);
+}
+
+std::vector<Texture> ModelNamespace::Model::LoadMaterialTextures(aiMaterial* pMaterial, aiTextureType textureType, const aiScene* pScene) {
+    std::vector<Texture> materialTextures;
+    TextureStorageType storageType = TextureStorageType::Invalid;
+    unsigned int textureCount = pMaterial->GetTextureCount(textureType);
+
+    if (textureCount == 0) { // no textures =>
+        storageType = TextureStorageType::None;
+        aiColor3D aiColor(0.0f, 0.0f, 0.0f);
+        switch (textureType) {
+        case aiTextureType_DIFFUSE:
+            pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor);
+            if (aiColor.IsBlack()) { // in case of black color, we use grey
+                materialTextures.emplace_back(device, Colors::UnloadedTextureColor, textureType);
+            }
+            else {
+                materialTextures.emplace_back(device, Colors::Color(aiColor.r*255, aiColor.g * 255, aiColor.b*255), textureType);
+            }
+            return materialTextures;
+        }
+    }
+    else {
+        materialTextures.emplace_back(device, Colors::UnhandledTextureColor, aiTextureType::aiTextureType_DIFFUSE);
+    }
+
+    return materialTextures;
 }

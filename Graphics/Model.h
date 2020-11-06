@@ -21,7 +21,8 @@ namespace ModelNamespace {
         bool loadModel(const std::string& filePath);
         void processNode(aiNode* node, const aiScene* scene);
         Mesh processMesh(aiMesh *mesh, const aiScene *scene);
-
+        std::vector<Texture> LoadMaterialTextures(aiMaterial* pMaterial, aiTextureType textureType, const aiScene* pScene);
+        
         std::vector<Mesh> meshes;
         ID3D11Device* device = nullptr;
         ID3D11DeviceContext* deviceContext = nullptr;

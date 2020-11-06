@@ -5,7 +5,7 @@
 #include <assimp/material.h>
 #include "Color.h"
 
-enum class TexuteStorageType {
+enum class TextureStorageType {
     Invalid,
     None,
     EmbeddedIndexCompressed,
