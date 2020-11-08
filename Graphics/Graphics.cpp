@@ -35,6 +35,9 @@ void Graphics::renderFrame() {
     cb_ps_light.data.dynamicLightColor = light.lightColor;
     cb_ps_light.data.dynamicLightStrength = light.lightStrength;
     cb_ps_light.data.dynamicLightPosition = light.getPositionFloat3();
+    cb_ps_light.data.dynamicLightAttenuation_a = light.attenuation_a;
+    cb_ps_light.data.dynamicLightAttenuation_b = light.attenuation_b;
+    cb_ps_light.data.dynamicLightAttenuation_c = light.attenuation_c;
 
     cb_ps_light.applyChanges();
     deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
@@ -83,6 +86,9 @@ void Graphics::renderFrame() {
     ImGui::Begin("Light Controls");
     ImGui::DragFloat3("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01, 0.0f, 1.0f);
     ImGui::DragFloat("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
     ImGui::End();
     // Assemble Together Draw data
     ImGui::Render();

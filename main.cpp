@@ -10,7 +10,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ONFAILHRLOG(hr, "Failed to call CoInitialize", -1);
 
 	Engine engine;
-	if (engine.initialize(hInstance, "Engine", "Window", 800, 600)) {
+	if (engine.initialize(hInstance, "Engine", "Window", 1280, 720)) {
 		while (engine.processMessages()) {
 			engine.Update();
 			engine.renderFrame();
