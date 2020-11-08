@@ -8,12 +8,6 @@ namespace GameObjectNamespace {
     class GameObject {
 
     public:
-        bool initialize(const std::string& filePath,
-            ID3D11Device* device,
-            ID3D11DeviceContext* deviceContext,
-            ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader);
-        void draw(const XMMATRIX& viewProjectionMatrix);
-
         const XMVECTOR& getPositionVector() const;
         const XMFLOAT3& getPositionFloat3() const;
         const XMVECTOR& getRotationVector() const;
@@ -38,11 +32,11 @@ namespace GameObjectNamespace {
         void adjustRotation(float x, float y, float z);
         void setLookAtPos(XMFLOAT3 lookAtPos);
 
-    private:
-        void updateWorldMatrix();
-        
-        Model model;
-        XMMATRIX worldMatrix = XMMatrixIdentity();
+        virtual ~GameObject() = default;
+
+    protected:
+
+        virtual void updateMatrix();
 
         XMVECTOR posVector;
         XMVECTOR rotVector;

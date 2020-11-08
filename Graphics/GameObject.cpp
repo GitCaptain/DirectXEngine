@@ -2,35 +2,6 @@
 
 using namespace GameObjectNamespace;
 
-bool GameObject::initialize(const std::string& filePath,
-                                 ID3D11Device* device,
-                                 ID3D11DeviceContext* deviceContext,
-                                 ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
-    
-    if (!model.initialize(filePath, device, deviceContext, cb_vs_vertexshader)) {
-        return false;
-    }
-    
-    setPosition(0.0f, 0.0f, 0.0f);
-    setRotation(0.0f, 0.0f, 0.0f);
-    updateWorldMatrix();
-
-    return true;
-}
-
-void GameObject::draw(const XMMATRIX& viewProjectionMatrix) {
-    model.draw(worldMatrix, viewProjectionMatrix);
-}
-
-void GameObject::updateWorldMatrix() {
-    worldMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z) * XMMatrixTranslation(pos.x, pos.y, pos.z);
-    XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, rot.y, 0.0f);
-    vecForward = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
-    vecBackward = XMVector3TransformCoord(DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
-    vecLeft = XMVector3TransformCoord(DEFAULT_LEFT_VECTOR, vecRotationMatrix);
-    vecRight = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
-}
-
 const XMVECTOR& GameObject::getPositionVector() const {
     return posVector;
 }
@@ -66,26 +37,26 @@ const XMVECTOR& GameObject::getRightVector() {
 void GameObject::setPosition(const XMVECTOR& pos) {
     XMStoreFloat3(&this->pos, pos);
     posVector = pos;
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::setPosition(const XMFLOAT3& pos) {
     this->pos = pos;
     posVector = XMLoadFloat3(&this->pos);
-    updateWorldMatrix();
+    updateMatrix();
 
 }
 
 void GameObject::setPosition(float x, float y, float z) {
     pos = XMFLOAT3(x, y, z);
     posVector = XMLoadFloat3(&pos);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::adjustPosition(const XMVECTOR& pos) {
     posVector += pos;
     XMStoreFloat3(&this->pos, posVector);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::adjustPosition(const XMFLOAT3& pos) {
@@ -93,7 +64,7 @@ void GameObject::adjustPosition(const XMFLOAT3& pos) {
     this->pos.y += pos.y;
     this->pos.z += pos.z;
     posVector = XMLoadFloat3(&this->pos);
-    this->updateWorldMatrix();
+    this->updateMatrix();
 }
 
 void GameObject::adjustPosition(float x, float y, float z) {
@@ -101,31 +72,31 @@ void GameObject::adjustPosition(float x, float y, float z) {
     pos.y += y;
     pos.z += z;
     posVector = XMLoadFloat3(&pos);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::setRotation(const XMVECTOR& rot) {
     rotVector = rot;
     XMStoreFloat3(&this->rot, rot);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::setRotation(const XMFLOAT3& rot) {
     this->rot = rot;
     rotVector = XMLoadFloat3(&this->rot);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::setRotation(float x, float y, float z) {
     rot = XMFLOAT3(x, y, z);
     rotVector = XMLoadFloat3(&rot);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::adjustRotation(const XMVECTOR& rot) {
     rotVector += rot;
     XMStoreFloat3(&this->rot, rotVector);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::adjustRotation(const XMFLOAT3& rot) {
@@ -133,7 +104,7 @@ void GameObject::adjustRotation(const XMFLOAT3& rot) {
     this->rot.y += rot.y;
     this->rot.z += rot.z;
     rotVector = XMLoadFloat3(&this->rot);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::adjustRotation(float x, float y, float z) {
@@ -141,7 +112,7 @@ void GameObject::adjustRotation(float x, float y, float z) {
     rot.y += y;
     rot.z += z;
     rotVector = XMLoadFloat3(&this->rot);
-    updateWorldMatrix();
+    updateMatrix();
 }
 
 void GameObject::setLookAtPos(XMFLOAT3 lookAtPos) {
@@ -171,4 +142,8 @@ void GameObject::setLookAtPos(XMFLOAT3 lookAtPos) {
 
     setRotation(pitch, yaw, 0.0f);
 
+}
+
+void GameObject::updateMatrix() {
+    assert("updateMatrix must be overriden" && 0);
 }

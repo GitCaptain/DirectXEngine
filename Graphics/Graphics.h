@@ -5,7 +5,7 @@
 #include <WICTextureLoader.h> 
 #include "AdapterReader.h"
 #include "Shaders.h"
-#include "GameObject.h"
+#include "RenderableGameObject.h"
 #include "Camera.h"
 #include "../Timer.h"
 
@@ -20,7 +20,7 @@ public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
     Camera::Camera& const getCamera();
-    GameObjectNamespace::GameObject gameObject;
+    GameObjectNamespace::RenderableGameObject gameObject;
 
 private:
     bool initializeDirectX(HWND hwnd);

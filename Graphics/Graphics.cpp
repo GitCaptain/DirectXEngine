@@ -282,7 +282,7 @@ bool Graphics::initializeScene() {
         gameObject.setPosition(2.0f, 0.0f, 0.0f);
 
         camera.setPosition(0.0f, 0.0f, -2.0f);
-        camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
+        camera.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
