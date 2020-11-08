@@ -9,6 +9,8 @@
 #include "../Timer.h"
 #include "RenderableGameObject.h"
 #include "Light.h"
+#include "Camera2D.h"
+#include "Sprite.h"
 
 #ifdef ENABLE_IMGUI
 #include "ImGUI/imgui.h"
@@ -20,7 +22,11 @@ class Graphics {
 public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
-    Camera::Camera3D& const getCamera();
+    // TODO: fix that we have direct access to 2D camera
+    // but for 3D we have getter
+    Camera::Camera3D& const getCamera3D();
+    Camera::Camera2D camera2D;
+    GameObjectNamespace::Sprite sprite;
     GameObjectNamespace::RenderableGameObject gameObject;
     Light light;
 
@@ -35,9 +41,12 @@ private:
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 
     VertexShader vertexShader;
+    VertexShader vertexShader_2d;
     PixelShader pixelShader;
+    PixelShader pixelShader_2d;
     PixelShader pixelShader_nolight;
 
+    ConstantBuffer<CB_VS_vertexshader_2d> cb_vs_vertexshader_2d; 
     ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader; 
     ConstantBuffer<CB_PS_light> cb_ps_light; 
     
@@ -60,5 +69,5 @@ private:
     int windowWidth = 800;
     int windowHeight = 600;
     Timer fpsTimer; 
-    Camera::Camera3D camera;
+    Camera::Camera3D camera3D;
 };

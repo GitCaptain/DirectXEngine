@@ -56,13 +56,19 @@ void Graphics::renderFrame() {
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     
     { // Pavement cube
-        gameObject.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
+        gameObject.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
     }
 
     { // TODO: take multiption out
         deviceContext->PSSetShader(pixelShader_nolight.getShader(), nullptr, 0);
-        light.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
+        light.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
     }
+
+    deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
+    deviceContext->PSSetShader(pixelShader_2d.getShader(), nullptr, 0);
+    deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
+
+    sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
 
     //Draw text
     static int fpsCounter = 0;
@@ -100,8 +106,8 @@ void Graphics::renderFrame() {
     swapChain->Present(vsync, 0);
 }
 
-Camera::Camera3D& const Graphics::getCamera() {
-    return camera;
+Camera::Camera3D& const Graphics::getCamera3D() {
+    return camera3D;
 }
 
 bool Graphics::initializeDirectX(HWND hwnd) {
@@ -258,15 +264,31 @@ bool Graphics::initializeShaders() {
 #endif
     }
 
-    D3D11_INPUT_ELEMENT_DESC layout[] = {
+    // 2d shaders 
+    D3D11_INPUT_ELEMENT_DESC layout2D[] = {
+        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+        {"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
+    };
+
+    UINT numElements2D = ARRAYSIZE(layout2D);
+
+    if (!vertexShader_2d.initialize(device, shaderFolder + L"vertexshader_2d.cso", layout2D, numElements2D)) {
+        return false;
+    }
+
+    if (!pixelShader_2d.initialize(device, shaderFolder + L"pixelshader_2d.cso")) {
+        return false;
+    }
+    // 3d shaders
+    D3D11_INPUT_ELEMENT_DESC layout3D[] = {
         {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
 
-    UINT numElements = ARRAYSIZE(layout);
+    UINT numElements = ARRAYSIZE(layout3D);
 
-    if (!vertexShader.initialize(device, shaderFolder + L"vertexshader.cso", layout, numElements)) {
+    if (!vertexShader.initialize(device, shaderFolder + L"vertexshader.cso", layout3D, numElements)) {
         return false;
     }
 
@@ -294,6 +316,9 @@ bool Graphics::initializeScene() {
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
 
         // Initialize constant buffer(s)
+        hr = cb_vs_vertexshader_2d.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader 2d constant buffer.");
+
         hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
 
@@ -312,10 +337,16 @@ bool Graphics::initializeScene() {
             return false;
         }
 
+        if (!sprite.initialize(device.Get(), deviceContext.Get(), 256, 256, "Data/textures/sprite_256x256.png", cb_vs_vertexshader_2d)) {
+            return false;
+        }
+
+        camera2D.setProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
+
         gameObject.setPosition(2.0f, 0.0f, 0.0f);
 
-        camera.setPosition(0.0f, 0.0f, -2.0f);
-        camera.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
+        camera3D.setPosition(0.0f, 0.0f, -2.0f);
+        camera3D.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);

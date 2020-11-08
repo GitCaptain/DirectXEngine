@@ -23,7 +23,7 @@ const XMMATRIX& Camera2D::getWorldMatrix() const {
 }
 
 void Camera::Camera2D::updateMatrix() {
-    XMMATRIX translationOffsetMatrix = XMMatrixTranslation(-pos.x, -pos.y, 0.0f);
+    XMMATRIX translationOffsetMatrix = XMMatrixTranslation(-pos.x, -pos.y, 0.0f); //z component irrelevant for 2d camera
     XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
     worldMatrix = camRotationMatrix * translationOffsetMatrix;
 }

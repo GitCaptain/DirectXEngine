@@ -33,7 +33,7 @@ void Engine::Update() {
         auto me = mouse.readEvent();
         if (mouse.isRightDown()) {
             if (me.getType() == Mouse::MouseEvent::EventType::RAW_MOVE) {
-                gfx.getCamera().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
+                gfx.getCamera3D().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
             }
         }
     }
@@ -52,29 +52,29 @@ void Engine::Update() {
     
 
     if (keyboard.isKeyPressed('W')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getForwardVector() * cameraSpeed * cameraSpeedMultiplyer * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getForwardVector() * cameraSpeed * cameraSpeedMultiplyer * dt);
     }
     if (keyboard.isKeyPressed('S')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getBackwardVector() * cameraSpeed * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getBackwardVector() * cameraSpeed * dt);
     }
     if (keyboard.isKeyPressed('A')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getLeftVector() * cameraSpeed * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getLeftVector() * cameraSpeed * dt);
     }
     if (keyboard.isKeyPressed('D')) {
-        gfx.getCamera().adjustPosition(gfx.getCamera().getRightVector() * cameraSpeed * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getRightVector() * cameraSpeed * dt);
     }
     if (keyboard.isKeyPressed(VK_SPACE)) {
-        gfx.getCamera().adjustPosition(0.0f, cameraSpeed * dt, 0.0f);
+        gfx.getCamera3D().adjustPosition(0.0f, cameraSpeed * dt, 0.0f);
     }
     if (keyboard.isKeyPressed(VK_CONTROL)) {
-        gfx.getCamera().adjustPosition(0.0f, - cameraSpeed * dt, 0.0f);
+        gfx.getCamera3D().adjustPosition(0.0f, - cameraSpeed * dt, 0.0f);
     }
 
     if (keyboard.isKeyPressed('C')) {
-        DirectX::XMVECTOR lightPosition = gfx.getCamera().getPositionVector();
-        lightPosition += gfx.getCamera().getForwardVector();
+        DirectX::XMVECTOR lightPosition = gfx.getCamera3D().getPositionVector();
+        lightPosition += gfx.getCamera3D().getForwardVector();
         gfx.light.setPosition(lightPosition);
-        gfx.light.setRotation(gfx.getCamera().getRotationFloat3());
+        gfx.light.setRotation(gfx.getCamera3D().getRotationFloat3());
     }
 }
 

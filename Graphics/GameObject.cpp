@@ -99,6 +99,13 @@ void GameObject::adjustRotation(float x, float y, float z) {
     updateMatrix();
 }
 
+void GameObject::setScale(float xScale, float yScale, float zScale) {
+    scale.x = xScale;
+    scale.y = yScale;
+    scale.z = zScale;
+    updateMatrix();
+}
+
 void GameObject::updateMatrix() {
     assert("updateMatrix must be overriden" && 0);
 }

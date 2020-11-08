@@ -26,6 +26,8 @@ namespace GameObjectNamespace {
         void adjustRotation(const XMFLOAT3& rot);
         void adjustRotation(float x, float y, float z);
 
+        void setScale(float xScale, float yScale, float zScale = 1.0f);
+
         virtual ~GameObject() = default;
 
     protected:
@@ -36,5 +38,7 @@ namespace GameObjectNamespace {
         XMVECTOR rotVector;
         XMFLOAT3 pos;
         XMFLOAT3 rot;
+
+        XMFLOAT3 scale;
     };
 }
