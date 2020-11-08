@@ -41,12 +41,11 @@ void Engine::Update() {
     // have to use it for directx::vector multiplications
     // it seems ugly, but its quick workaround for now
     using DirectX::operator*;
-    gfx.gameObject.adjustRotation(0.0f, 0.001f * dt, 0.0f);
     const float cameraSpeed = 0.005f;
     float cameraSpeedMultiplyer = 1.0f;
 
     if (keyboard.isKeyPressed(VK_SHIFT)) {
-        cameraSpeedMultiplyer *= 2;
+        cameraSpeedMultiplyer *= 50;
     }
     
 

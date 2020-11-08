@@ -19,8 +19,8 @@ namespace ModelNamespace {
 
     private:
         bool loadModel(const std::string& filePath);
-        void processNode(aiNode* node, const aiScene *scene);
-        Mesh processMesh(aiMesh *mesh, const aiScene *scene);
+        void processNode(aiNode* node, const aiScene *scene, const XMMATRIX &parentTransformMatrix);
+        Mesh processMesh(aiMesh *mesh, const aiScene *scene, const XMMATRIX &transformMatrix);
         TextureStorageType determineTextureStorageType(const aiScene *pScene, 
                                                        aiMaterial *pMaterial, 
                                                        size_t index, 

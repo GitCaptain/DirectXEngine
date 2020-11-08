@@ -24,12 +24,13 @@ bool Model::initialize(const std::string& filePath,
 }
 
 void Model::draw(const XMMATRIX& worldMatrix, const XMMATRIX& viewProjectionMatrix) {
-    cb_vs_vertexshader->data.mat = worldMatrix * viewProjectionMatrix;
-    cb_vs_vertexshader->data.mat = XMMatrixTranspose(cb_vs_vertexshader->data.mat);
-    cb_vs_vertexshader->applyChanges();
+
     deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader->GetAddressOf());
 
     for (size_t i = 0; i < meshes.size(); i++) {
+        cb_vs_vertexshader->data.mat = meshes[i].getTransformMatrix() * worldMatrix * viewProjectionMatrix;
+        cb_vs_vertexshader->data.mat = XMMatrixTranspose(cb_vs_vertexshader->data.mat);
+        cb_vs_vertexshader->applyChanges();
         meshes[i].draw();
     }
 }
@@ -45,23 +46,26 @@ bool Model::loadModel(const std::string& filePath) {
         return false;
     }
 
-    processNode(pScene->mRootNode, pScene);
+    processNode(pScene->mRootNode, pScene, XMMatrixIdentity());
 
     return true;
 }
 
-void Model::processNode(aiNode* node, const aiScene* scene) {
+void Model::processNode(aiNode* node, const aiScene* scene, const XMMATRIX& parentTransformMatrix) {
+    
+    XMMATRIX nodeTransformMatrix = XMMatrixTranspose(XMMATRIX(&node->mTransformation.a1)) * parentTransformMatrix;
+
     for (size_t i = 0; i < node->mNumMeshes; i++) {
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-        meshes.push_back(processMesh(mesh, scene));
+        meshes.push_back(processMesh(mesh, scene, nodeTransformMatrix));
     }
 
     for (size_t i = 0; i < node->mNumChildren; i++) {
-        processNode(node->mChildren[i], scene);
+        processNode(node->mChildren[i], scene, nodeTransformMatrix);
     }
 }
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& transformMatrix) {
     std::vector<Vertex> vertices;
     std::vector<DWORD> indices;
     for (size_t i = 0; i < mesh->mNumVertices; i++) {
@@ -89,7 +93,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     std::vector<Texture> textures = LoadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, scene);
 
-    return Mesh(device, deviceContext, vertices, indices, textures);
+    return Mesh(device, deviceContext, vertices, indices, textures, transformMatrix);
 }
 
 TextureStorageType ModelNamespace::Model::determineTextureStorageType(const aiScene* pScene, 

@@ -275,14 +275,14 @@ bool Graphics::initializeScene() {
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_pixelshader constant buffer.");
 
         // Initialize Model(s)
-        if(!gameObject.initialize("Data\\Objects\\Samples\\person_embeddedindexed.blend", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
+        if(!gameObject.initialize("Data\\Objects\\Samples\\dodge_challenger.fbx ", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
             return false;
         }
 
         gameObject.setPosition(2.0f, 0.0f, 0.0f);
 
         camera.setPosition(0.0f, 0.0f, -2.0f);
-        camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 1000.0f);
+        camera.SetProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
