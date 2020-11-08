@@ -28,8 +28,10 @@ void Model::draw(const XMMATRIX& worldMatrix, const XMMATRIX& viewProjectionMatr
     deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader->GetAddressOf());
 
     for (size_t i = 0; i < meshes.size(); i++) {
-        cb_vs_vertexshader->data.mat = meshes[i].getTransformMatrix() * worldMatrix * viewProjectionMatrix;
-        cb_vs_vertexshader->data.mat = XMMatrixTranspose(cb_vs_vertexshader->data.mat);
+        // TODO: I removed XMMATRIX transpose from here to vertexshader.
+        // have to figure out what is better for performance
+        cb_vs_vertexshader->data.worldViewProjectionMatrix= meshes[i].getTransformMatrix() * worldMatrix * viewProjectionMatrix;
+        cb_vs_vertexshader->data.worldMatrix = meshes[i].getTransformMatrix() * worldMatrix;
         cb_vs_vertexshader->applyChanges();
         meshes[i].draw();
     }
@@ -73,6 +75,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
         vertex.pos.x = mesh->mVertices[i].x;
         vertex.pos.y = mesh->mVertices[i].y;
         vertex.pos.z = mesh->mVertices[i].z;
+
+        vertex.normal.x = mesh->mNormals[i].x;
+        vertex.normal.y = mesh->mNormals[i].y;
+        vertex.normal.z = mesh->mNormals[i].z;
 
         // TODO: what if mesh doesn't have a texture?
         if (mesh->mTextureCoords[0]) {

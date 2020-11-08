@@ -4,12 +4,13 @@
 
 
 /*
-Constant buffers must be 16 bytes aligned
+    Note: Constant buffers must be 16 bytes aligned
 */
 
 
 struct CB_VS_vertexshader {
-    DirectX::XMMATRIX mat;
+    DirectX::XMMATRIX worldViewProjectionMatrix;
+    DirectX::XMMATRIX worldMatrix;
 };
 
 struct CB_PS_light {
