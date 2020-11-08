@@ -13,10 +13,10 @@ namespace GameObjectNamespace {
         const XMVECTOR& getRotationVector() const;
         const XMFLOAT3& getRotationFloat3() const;
 
-        const XMVECTOR& getForwardVector();
-        const XMVECTOR& getBackwardVector();
-        const XMVECTOR& getLeftVector();
-        const XMVECTOR& getRightVector();
+        const XMVECTOR& getForwardVector(bool omitY = false);
+        const XMVECTOR& getBackwardVector(bool omitY = false);
+        const XMVECTOR& getLeftVector(bool omitY = false);
+        const XMVECTOR& getRightVector(bool omitY = false);
 
         void setPosition(const XMVECTOR& pos);
         void setPosition(const XMFLOAT3& pos);
@@ -37,6 +37,7 @@ namespace GameObjectNamespace {
     protected:
 
         virtual void updateMatrix();
+        void updateDirectionVectors();
 
         XMVECTOR posVector;
         XMVECTOR rotVector;
@@ -53,5 +54,10 @@ namespace GameObjectNamespace {
         XMVECTOR vecBackward;
         XMVECTOR vecLeft;
         XMVECTOR vecRight;
+
+        XMVECTOR vecForward_noY;
+        XMVECTOR vecBackward_noY;
+        XMVECTOR vecLeft_noY;
+        XMVECTOR vecRight_noY;
     };
 }

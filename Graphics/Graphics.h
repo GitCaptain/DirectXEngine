@@ -5,9 +5,10 @@
 #include <WICTextureLoader.h> 
 #include "AdapterReader.h"
 #include "Shaders.h"
-#include "RenderableGameObject.h"
 #include "Camera.h"
 #include "../Timer.h"
+#include "RenderableGameObject.h"
+#include "Light.h"
 
 #ifdef ENABLE_IMGUI
 #include "ImGUI/imgui.h"
@@ -21,6 +22,7 @@ public:
     void renderFrame();
     Camera::Camera& const getCamera();
     GameObjectNamespace::RenderableGameObject gameObject;
+    Light light;
 
 private:
     bool initializeDirectX(HWND hwnd);
@@ -34,6 +36,8 @@ private:
 
     VertexShader vertexShader;
     PixelShader pixelShader;
+    PixelShader pixelShader_nolight;
+
     ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader; 
     ConstantBuffer<CB_PS_light> cb_ps_light; 
     

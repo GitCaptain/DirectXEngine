@@ -41,6 +41,7 @@ void Engine::Update() {
     // have to use it for directx::vector multiplications
     // it seems ugly, but its quick workaround for now
     using DirectX::operator*;
+    using DirectX::operator+=;
     const float cameraSpeed = 0.005f;
     float cameraSpeedMultiplyer = 1.0f;
 
@@ -67,6 +68,13 @@ void Engine::Update() {
     }
     if (keyboard.isKeyPressed(VK_CONTROL)) {
         gfx.getCamera().adjustPosition(0.0f, - cameraSpeed * dt, 0.0f);
+    }
+
+    if (keyboard.isKeyPressed('C')) {
+        DirectX::XMVECTOR lightPosition = gfx.getCamera().getPositionVector();
+        lightPosition += gfx.getCamera().getForwardVector();
+        gfx.light.setPosition(lightPosition);
+        gfx.light.setRotation(gfx.getCamera().getRotationFloat3());
     }
 }
 

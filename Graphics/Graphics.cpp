@@ -32,6 +32,10 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 
 void Graphics::renderFrame() {
 
+    cb_ps_light.data.dynamicLightColor = light.lightColor;
+    cb_ps_light.data.dynamicLightStrength = light.lightStrength;
+    cb_ps_light.data.dynamicLightPosition = light.getPositionFloat3();
+
     cb_ps_light.applyChanges();
     deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
 
@@ -50,6 +54,11 @@ void Graphics::renderFrame() {
     
     { // Pavement cube
         gameObject.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
+    }
+
+    { // TODO: take multiption out
+        deviceContext->PSSetShader(pixelShader_nolight.getShader(), nullptr, 0);
+        light.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
     }
 
     //Draw text
@@ -259,6 +268,10 @@ bool Graphics::initializeShaders() {
         return false;
     }
 
+    if (!pixelShader_nolight.initialize(device, shaderFolder + L"pixelShader_nolight.cso")) {
+        return false;
+    }
+
     return true;
 }
 
@@ -285,7 +298,11 @@ bool Graphics::initializeScene() {
         cb_ps_light.data.ambientLightStrength = 1.0f;
 
         // Initialize Model(s)
-        if(!gameObject.initialize("Data\\Objects\\Samples\\dodge_challenger.fbx ", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
+        if(!gameObject.initialize("Data\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
+            return false;
+        }
+
+        if (!light.initialize(device.Get(), deviceContext.Get(), cb_vs_vertexshader)) {
             return false;
         }
 

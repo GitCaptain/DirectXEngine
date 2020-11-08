@@ -37,9 +37,5 @@ void Camera::Camera::updateMatrix() {
     // rebuild view matrix
     viewMatrix = XMMatrixLookAtLH(posVector, camTarget, upDir);
 
-    XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(0.0f, rot.y, 0.0f);
-    vecForward = XMVector3Transform(DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
-    vecBackward = XMVector3Transform(DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
-    vecLeft = XMVector3Transform(DEFAULT_LEFT_VECTOR, vecRotationMatrix);
-    vecRight = XMVector3Transform(DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
+    updateDirectionVectors();
 }

@@ -123,6 +123,9 @@
     <ClCompile Include="Graphics\RenderableGameObject.cpp">
       <Filter>Исходные файлы\Graphics</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Light.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorLogger.h">
@@ -227,12 +230,18 @@
     <ClInclude Include="Graphics\RenderableGameObject.h">
       <Filter>Файлы заголовков\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="Graphics\Light.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="vertexshader.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="pixelshader.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
+    <FxCompile Include="pixelshader_nolight.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
   </ItemGroup>

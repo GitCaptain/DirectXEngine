@@ -18,19 +18,31 @@ const XMFLOAT3& GameObject::getRotationFloat3() const {
     return rot;
 }
 
-const XMVECTOR& GameObject::getForwardVector() {
+const XMVECTOR& GameObject::getForwardVector(bool omitY) {
+    if (omitY) {
+        return vecForward_noY;
+    }
     return vecForward;
 }
 
-const XMVECTOR& GameObject::getBackwardVector() {
+const XMVECTOR& GameObject::getBackwardVector(bool omitY) {
+    if (omitY) {
+        return vecBackward_noY;
+    }
     return vecBackward;
 }
 
-const XMVECTOR& GameObject::getLeftVector() {
+const XMVECTOR& GameObject::getLeftVector(bool omitY) {
+    if (omitY) {
+        return vecLeft_noY;
+    }
     return vecLeft;
 }
 
-const XMVECTOR& GameObject::getRightVector() {
+const XMVECTOR& GameObject::getRightVector(bool omitY) {
+    if (omitY) {
+        return vecRight_noY;
+    }
     return vecRight;
 }
 
@@ -146,4 +158,18 @@ void GameObject::setLookAtPos(XMFLOAT3 lookAtPos) {
 
 void GameObject::updateMatrix() {
     assert("updateMatrix must be overriden" && 0);
+}
+
+void GameObjectNamespace::GameObject::updateDirectionVectors() {
+    XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, 0.0f);
+    vecForward = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
+    vecBackward = XMVector3TransformCoord(DEFAULT_BACKWARD_VECTOR, vecRotationMatrix);
+    vecLeft = XMVector3TransformCoord(DEFAULT_LEFT_VECTOR, vecRotationMatrix);
+    vecRight = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, vecRotationMatrix);
+
+    XMMATRIX vecRotationMatrixNoY = XMMatrixRotationRollPitchYaw(rot.x, rot.y, 0.0f);
+    vecForward_noY = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, vecRotationMatrixNoY);
+    vecBackward_noY = XMVector3TransformCoord(DEFAULT_BACKWARD_VECTOR, vecRotationMatrixNoY);
+    vecLeft_noY = XMVector3TransformCoord(DEFAULT_LEFT_VECTOR, vecRotationMatrixNoY);
+    vecRight_noY = XMVector3TransformCoord(DEFAULT_RIGHT_VECTOR, vecRotationMatrixNoY);
 }
