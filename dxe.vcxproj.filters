@@ -274,5 +274,8 @@
     <FxCompile Include="vertexshader_2d.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
+    <FxCompile Include="pixelshader_2d_discard.hlsl">
+      <Filter>Файлы ресурсов</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

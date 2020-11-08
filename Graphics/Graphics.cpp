@@ -52,11 +52,18 @@ void Graphics::renderFrame() {
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
+    // sprite mask
+    deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
+    deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
+    deviceContext->PSSetShader(pixelShader_2d_discard.getShader(), nullptr, 0); // we don't want to draw our mask
+    deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
+    sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
+
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
 
-    deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+    deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
 
     { // Pavement cube
         gameObject.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
@@ -78,18 +85,6 @@ void Graphics::renderFrame() {
     }
     spriteBatch->Begin(); 
     spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
-    spriteBatch->End();
-
-    // sprite mask
-    deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
-    deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
-    deviceContext->PSSetShader(nullptr, nullptr, 0); // we don't want to draw our mask
-    deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
-    sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
-
-    // red text
-    spriteBatch->Begin(DirectX::SpriteSortMode_Deferred, nullptr, nullptr, depthStencilState_applyMask.Get());
-    spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::Red, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
 
 #ifdef ENABLE_IMGUI
@@ -324,6 +319,11 @@ bool Graphics::initializeShaders() {
     if (!pixelShader_2d.initialize(device, shaderFolder + L"pixelshader_2d.cso")) {
         return false;
     }
+
+    if (!pixelShader_2d_discard.initialize(device, shaderFolder + L"pixelshader_2d_discard.cso")) {
+        return false;
+    }
+
     // 3d shaders
     D3D11_INPUT_ELEMENT_DESC layout3D[] = {
         {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -381,14 +381,14 @@ bool Graphics::initializeScene() {
         if (!light.initialize(device.Get(), deviceContext.Get(), cb_vs_vertexshader)) {
             return false;
         }
-
-        if (!sprite.initialize(device.Get(), deviceContext.Get(), 256, 256, "Data/textures/sprite_256x256.png", cb_vs_vertexshader_2d)) {
+        // TODO: FIX: when load anything from broken path,
+        // the engine just crush silently, need to make the crush reason more clear
+        if (!sprite.initialize(device.Get(), deviceContext.Get(), 256, 256, "Data/textures/circle.png", cb_vs_vertexshader_2d)) {
             return false;
         }
 
-        sprite.setPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
-        sprite.setScale(24, 24, 0.0f);
-
+        sprite.setPosition(DirectX::XMFLOAT3(windowWidth/2 - sprite.getWidth()/2, windowHeight/2 - sprite.getHeight()/2, 0.0f));
+        
         camera2D.setProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 
         gameObject.setPosition(2.0f, 0.0f, 0.0f);

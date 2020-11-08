@@ -44,11 +44,6 @@ void Engine::Update() {
     using DirectX::operator+=;
 
     gfx.gameObject.adjustRotation(0.0f, 0.001f * dt, 0.0f);
-    gfx.sprite.adjustPosition(0.1f * dt, 0.0f, 0.0f);
-
-    if (gfx.sprite.getPositionFloat3().x > 160.0f) {
-        gfx.sprite.setPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
-    }
 
     const float camera3DSpeed = 0.005f;
     float camera3DSpeedMultiplyer = 1.0f;

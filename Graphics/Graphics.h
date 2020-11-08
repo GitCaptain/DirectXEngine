@@ -44,6 +44,7 @@ private:
     VertexShader vertexShader_2d;
     PixelShader pixelShader;
     PixelShader pixelShader_2d;
+    PixelShader pixelShader_2d_discard;
     PixelShader pixelShader_nolight;
 
     ConstantBuffer<CB_VS_vertexshader_2d> cb_vs_vertexshader_2d; 
