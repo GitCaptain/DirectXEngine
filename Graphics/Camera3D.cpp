@@ -1,8 +1,8 @@
-#include "Camera.h"
+#include "Camera3D.h"
 
-using namespace DirectX;
+using namespace Camera;
 
-Camera::Camera::Camera() {
+Camera3D::Camera3D() {
     pos = XMFLOAT3(0.0f, 0.0f, 0.0f);
     posVector = XMLoadFloat3(&pos);
     rot = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -10,21 +10,21 @@ Camera::Camera::Camera() {
     updateMatrix();
 }
 
-void Camera::Camera::setProjectionValues(float fovDegrees, float aspectRatio, float nearZ, float farZ) {
+void Camera3D::setProjectionValues(float fovDegrees, float aspectRatio, float nearZ, float farZ) {
     float fovRadians = (fovDegrees / 360.0f) * XM_2PI;
     projectionMatrix = XMMatrixPerspectiveFovLH(fovRadians, aspectRatio, nearZ, farZ);
 }
 
-const XMMATRIX& Camera::Camera::getViewMatrix() const {
+const XMMATRIX& Camera3D::getViewMatrix() const {
     return viewMatrix;
 }
 
-const XMMATRIX& Camera::Camera::getProjectionMatrix() const {
+const XMMATRIX& Camera3D::getProjectionMatrix() const {
     return projectionMatrix;
 }
 
 // updates view matrix and movement vectors
-void Camera::Camera::updateMatrix() {
+void Camera3D::updateMatrix() {
 
     //calculate camera rotation matrix
     XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);

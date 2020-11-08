@@ -1,10 +1,10 @@
 #pragma once
 
-#include "GameObject.h"
+#include "GameObject3D.h"
 
 namespace GameObjectNamespace {
 
-    class RenderableGameObject: public GameObject {
+    class RenderableGameObject: public GameObject3D {
 
     public:
         bool initialize(const std::string& filePath,

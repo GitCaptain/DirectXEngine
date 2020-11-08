@@ -75,9 +75,6 @@
     <ClCompile Include="Graphics\IndexBuffer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Camera.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
@@ -126,6 +123,18 @@
     <ClCompile Include="Graphics\Light.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\GameObject2D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\GameObject3D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Camera3D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Camera2D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorLogger.h">
@@ -171,9 +180,6 @@
       <Filter>Файлы заголовков\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\ConstantBuffer.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Camera.h">
       <Filter>Файлы заголовков\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
@@ -231,6 +237,18 @@
       <Filter>Файлы заголовков\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Light.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GameObject2D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\GameObject3D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Camera3D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Camera2D.h">
       <Filter>Файлы заголовков\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

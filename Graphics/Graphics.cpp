@@ -100,7 +100,7 @@ void Graphics::renderFrame() {
     swapChain->Present(vsync, 0);
 }
 
-Camera::Camera& const Graphics::getCamera() {
+Camera::Camera3D& const Graphics::getCamera() {
     return camera;
 }
 

@@ -5,7 +5,7 @@
 #include <WICTextureLoader.h> 
 #include "AdapterReader.h"
 #include "Shaders.h"
-#include "Camera.h"
+#include "Camera3D.h"
 #include "../Timer.h"
 #include "RenderableGameObject.h"
 #include "Light.h"
@@ -20,7 +20,7 @@ class Graphics {
 public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
-    Camera::Camera& const getCamera();
+    Camera::Camera3D& const getCamera();
     GameObjectNamespace::RenderableGameObject gameObject;
     Light light;
 
@@ -60,5 +60,5 @@ private:
     int windowWidth = 800;
     int windowHeight = 600;
     Timer fpsTimer; 
-    Camera::Camera camera;
+    Camera::Camera3D camera;
 };

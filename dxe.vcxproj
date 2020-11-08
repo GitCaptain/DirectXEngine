@@ -74,21 +74,25 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\x86\Debug;$(SolutionDir)libs\Any;$(LibraryPath);</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\Any;$(SolutionDir)libs\x86\Release;$(LibraryPath);</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\x64\Debug;$(SolutionDir)libs\Any;$(LibraryPath)</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\Any;$(SolutionDir)libs\x64\Release;$(LibraryPath)</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -96,6 +100,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -115,6 +120,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -130,6 +136,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -145,6 +152,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -155,10 +163,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Graphics\Camera2D.cpp" />
+    <ClCompile Include="Graphics\GameObject2D.cpp" />
+    <ClCompile Include="Graphics\GameObject3D.cpp" />
     <ClCompile Include="Graphics\Color.cpp" />
     <ClCompile Include="COMException.cpp" />
     <ClCompile Include="Graphics\GameObject.cpp" />
-    <ClCompile Include="Graphics\Camera.cpp" />
+    <ClCompile Include="Graphics\Camera3D.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="ErrorLogger.cpp" />
     <ClCompile Include="Graphics\AdapterReader.cpp" />
@@ -186,10 +197,13 @@
     <ClCompile Include="WindowContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Graphics\Camera2D.h" />
+    <ClInclude Include="Graphics\GameObject2D.h" />
+    <ClInclude Include="Graphics\GameObject3D.h" />
     <ClInclude Include="Graphics\Color.h" />
     <ClInclude Include="COMException.h" />
     <ClInclude Include="Graphics\GameObject.h" />
-    <ClInclude Include="Graphics\Camera.h" />
+    <ClInclude Include="Graphics\Camera3D.h" />
     <ClInclude Include="Graphics\ConstantBuffer.h" />
     <ClInclude Include="Graphics\ConstantBufferTypes.h" />
     <ClInclude Include="Engine.h" />
