@@ -42,8 +42,16 @@ void Engine::Update() {
     // it seems ugly, but its quick workaround for now
     using DirectX::operator*;
     using DirectX::operator+=;
-    const float cameraSpeed = 0.005f;
-    float cameraSpeedMultiplyer = 1.0f;
+
+    gfx.gameObject.adjustRotation(0.0f, 0.001f * dt, 0.0f);
+    gfx.sprite.adjustPosition(0.1f * dt, 0.0f, 0.0f);
+
+    if (gfx.sprite.getPositionFloat3().x > 160.0f) {
+        gfx.sprite.setPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
+    }
+
+    const float camera3DSpeed = 0.005f;
+    float camera3DSpeedMultiplyer = 1.0f;
 
     if (keyboard.isKeyPressed(VK_SHIFT)) {
         //cameraSpeedMultiplyer *= 50;
@@ -52,22 +60,22 @@ void Engine::Update() {
     
 
     if (keyboard.isKeyPressed('W')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getForwardVector() * cameraSpeed * cameraSpeedMultiplyer * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getForwardVector() * camera3DSpeed * camera3DSpeedMultiplyer * dt);
     }
     if (keyboard.isKeyPressed('S')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getBackwardVector() * cameraSpeed * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getBackwardVector() * camera3DSpeed * dt);
     }
     if (keyboard.isKeyPressed('A')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getLeftVector() * cameraSpeed * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getLeftVector() * camera3DSpeed * dt);
     }
     if (keyboard.isKeyPressed('D')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getRightVector() * cameraSpeed * dt);
+        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getRightVector() * camera3DSpeed * dt);
     }
     if (keyboard.isKeyPressed(VK_SPACE)) {
-        gfx.getCamera3D().adjustPosition(0.0f, cameraSpeed * dt, 0.0f);
+        gfx.getCamera3D().adjustPosition(0.0f, camera3DSpeed * dt, 0.0f);
     }
     if (keyboard.isKeyPressed(VK_CONTROL)) {
-        gfx.getCamera3D().adjustPosition(0.0f, - cameraSpeed * dt, 0.0f);
+        gfx.getCamera3D().adjustPosition(0.0f, - camera3DSpeed * dt, 0.0f);
     }
 
     if (keyboard.isKeyPressed('C')) {

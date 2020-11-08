@@ -51,18 +51,12 @@ void Graphics::renderFrame() {
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
-    
-    deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
-    deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
-    deviceContext->PSSetShader(pixelShader_2d.getShader(), nullptr, 0);
-    deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
-    sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
 
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
 
-    deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
+    deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
     { // Pavement cube
         gameObject.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
@@ -84,6 +78,18 @@ void Graphics::renderFrame() {
     }
     spriteBatch->Begin(); 
     spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+    spriteBatch->End();
+
+    // sprite mask
+    deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
+    deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
+    deviceContext->PSSetShader(nullptr, nullptr, 0); // we don't want to draw our mask
+    deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
+    sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
+
+    // red text
+    spriteBatch->Begin(DirectX::SpriteSortMode_Deferred, nullptr, nullptr, depthStencilState_applyMask.Get());
+    spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::Red, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
 
 #ifdef ENABLE_IMGUI
@@ -380,7 +386,8 @@ bool Graphics::initializeScene() {
             return false;
         }
 
-        sprite.setPosition(DirectX::XMFLOAT3(windowWidth /2 - sprite.getWidth() /2, windowHeight/2 - sprite.getHeight() /2, 0.0f));
+        sprite.setPosition(DirectX::XMFLOAT3(0.0f, 0.0f, 0.0f));
+        sprite.setScale(24, 24, 0.0f);
 
         camera2D.setProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 
