@@ -31,6 +31,10 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 }
 
 void Graphics::renderFrame() {
+
+    cb_ps_light.applyChanges();
+    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
+
     float bgcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0); 
@@ -67,7 +71,9 @@ void Graphics::renderFrame() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
     // create imgui test window
-    ImGui::Begin("Settings");
+    ImGui::Begin("Light Controls");
+    ImGui::DragFloat3("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01, 0.0f, 1.0f);
     ImGui::End();
     // Assemble Together Draw data
     ImGui::Render();
@@ -271,8 +277,11 @@ bool Graphics::initializeScene() {
         hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
 
-        hr = cb_ps_pixelshader.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_pixelshader constant buffer.");
+        hr = cb_ps_light.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_light constant buffer.");
+
+        cb_ps_light.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+        cb_ps_light.data.ambientLightStrength = 1.0f;
 
         // Initialize Model(s)
         if(!gameObject.initialize("Data\\Objects\\Samples\\dodge_challenger.fbx ", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){

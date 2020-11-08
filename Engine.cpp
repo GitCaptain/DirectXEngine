@@ -45,7 +45,8 @@ void Engine::Update() {
     float cameraSpeedMultiplyer = 1.0f;
 
     if (keyboard.isKeyPressed(VK_SHIFT)) {
-        cameraSpeedMultiplyer *= 50;
+        //cameraSpeedMultiplyer *= 50;
+        dt *= 50;
     }
     
 
