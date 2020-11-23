@@ -36,6 +36,7 @@ private:
     bool initializeScene();
 
     Microsoft::WRL::ComPtr<ID3D11Device> device;
+    std::wstring deviceDescription;
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
@@ -63,6 +64,8 @@ private:
 
     std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
     std::unique_ptr<DirectX::SpriteFont> spriteFont;
+    size_t fontSize = 16;
+    size_t spaceSize = 4;
 
     Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pinkTexture;

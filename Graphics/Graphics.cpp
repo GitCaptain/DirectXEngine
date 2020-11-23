@@ -85,6 +85,7 @@ void Graphics::renderFrame() {
     }
     spriteBatch->Begin(); 
     spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+    spriteFont->DrawString(spriteBatch.get(), deviceDescription.c_str(), DirectX::XMFLOAT2(0, fontSize + spaceSize), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
 
 #ifdef ENABLE_IMGUI
@@ -126,6 +127,8 @@ bool Graphics::initializeDirectX(HWND hwnd) {
                 bestAdapter = const_cast<AdapterData*>(&adp);
             }
         }
+
+        deviceDescription = bestAdapter->description.Description;
 
         DXGI_SWAP_CHAIN_DESC scd;
         ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
@@ -263,10 +266,8 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         hr = device->CreateBlendState(&blendDesc, blendState.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create blend state");
 
-
         spriteBatch = std::make_unique<DirectX::SpriteBatch>(deviceContext.Get());
         spriteFont = std::make_unique<DirectX::SpriteFont>(device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
-
         // Create sampler description for sampler state
         CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
         sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
