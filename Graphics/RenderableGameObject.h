@@ -2,7 +2,7 @@
 
 #include "GameObject3D.h"
 
-namespace GameObjectNamespace {
+namespace NGraphics { 
 
     class RenderableGameObject: public GameObject3D {
 

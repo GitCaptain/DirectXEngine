@@ -1,9 +1,9 @@
 #pragma once
 #include "Model.h"
 
-namespace GameObjectNamespace {
+namespace NGraphics {
 
-    using namespace ModelNamespace;
+    using namespace DirectX;
 
     class GameObject {
 

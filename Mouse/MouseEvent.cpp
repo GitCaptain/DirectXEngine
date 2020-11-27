@@ -1,6 +1,6 @@
 #include "MouseEvent.h"
 
-using namespace Mouse;
+using namespace NMouse;
 
 MouseEvent::MouseEvent(): eType(EventType::Invalid), x(0), y(0) {}
 

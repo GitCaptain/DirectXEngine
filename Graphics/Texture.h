@@ -17,9 +17,9 @@ enum class TextureStorageType {
 
 class Texture {
 public:
-    Texture(ID3D11Device *device, const Colors::Color &color, aiTextureType type);
+    Texture(ID3D11Device *device, const NGraphics::Color &color, aiTextureType type);
     Texture(ID3D11Device* device, 
-            const Colors::Color *colorData, 
+            const NGraphics::Color *colorData, 
             UINT width,
             UINT height, 
             aiTextureType type);
@@ -32,10 +32,10 @@ public:
 
 private:
     void initialize1x1ColorTexture(ID3D11Device* device, 
-                                   const Colors::Color &colorData, 
+                                   const NGraphics::Color &colorData, 
                                    aiTextureType type);
     void initializeColorTexture(ID3D11Device* device,
-                                const Colors::Color* colorData,
+                                const NGraphics::Color* colorData,
                                 UINT width,
                                 UINT height,
                                 aiTextureType type);

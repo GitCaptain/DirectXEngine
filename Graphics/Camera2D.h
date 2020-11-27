@@ -2,11 +2,11 @@
 
 #include "GameObject2D.h"
 
-namespace Camera {
+namespace NGraphics {
     
     using namespace DirectX;
 
-    class Camera2D : public GameObjectNamespace::GameObject2D {
+    class Camera2D : public GameObject2D {
     
     public:
         Camera2D();

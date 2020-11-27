@@ -4,11 +4,11 @@
 #include <limits>
 #include <vector>
 
-namespace Keyboard {
+namespace NKeyboard {
 
-    class KeyboardClass {
+    class Keyboard {
     public:
-        KeyboardClass();
+        Keyboard();
         bool isKeyPressed(const key_type keycode);
         bool isKeyBufferEmpty();
         bool isCharBufferEmpty();

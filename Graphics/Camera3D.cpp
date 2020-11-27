@@ -1,6 +1,6 @@
 #include "Camera3D.h"
 
-using namespace Camera;
+using namespace NGraphics;
 
 Camera3D::Camera3D() {
     pos = XMFLOAT3(0.0f, 0.0f, 0.0f);

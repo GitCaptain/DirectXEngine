@@ -6,14 +6,14 @@
 #include "Graphics/Graphics.h"
 
 class WindowContainer {
-    using key_type = Keyboard::key_type;
+    using key_type = NKeyboard::key_type;
 
 public:
     WindowContainer();
     LRESULT windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 protected:
     RenderWindow renderWindow;
-    Keyboard::KeyboardClass keyboard;
-    Mouse::MouseClass mouse;
-    Graphics gfx;
+    NKeyboard::Keyboard keyboard;
+    NMouse::Mouse mouse;
+    NGraphics::Graphics gfx;
 };

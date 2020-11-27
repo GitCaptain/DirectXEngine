@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Colors {
+namespace NGraphics {
 
     using BYTE = unsigned char;
 

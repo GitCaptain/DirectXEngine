@@ -1,6 +1,6 @@
 #include "GameObject3D.h"
 
-using namespace GameObjectNamespace;
+using namespace NGraphics;
 
 void GameObject3D::setLookAtPos(XMFLOAT3 lookAtPos) {
     // veirfy that look at pos is not the same as camera pos. 

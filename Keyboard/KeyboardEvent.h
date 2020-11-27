@@ -1,5 +1,5 @@
 #pragma once
-namespace Keyboard {
+namespace NKeyboard {
 
     using key_type = unsigned char;
 

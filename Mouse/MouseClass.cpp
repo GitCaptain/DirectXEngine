@@ -1,90 +1,90 @@
 #include "MouseClass.h"
 
-using namespace Mouse;
+using namespace NMouse;
 
-void MouseClass::onLeftPressed(int x, int y) {
+void Mouse::onLeftPressed(int x, int y) {
     leftDown = true;
     MouseEvent me{ MouseEvent::EventType::LPress, x, y };
     eventBuffer.push(me);
 }
 
-void MouseClass::onLeftReleased(int x, int y) {
+void Mouse::onLeftReleased(int x, int y) {
     leftDown = false;
     MouseEvent me{ MouseEvent::EventType::LRelease, x, y };
     eventBuffer.push(me);
 }
 
-void MouseClass::onRightPressed(int x, int y) {
+void Mouse::onRightPressed(int x, int y) {
     rightDown = true;
     MouseEvent me{ MouseEvent::EventType::RPress, x, y };
     eventBuffer.push(me);
 }
 
-void MouseClass::onRightReleased(int x, int y) {
+void Mouse::onRightReleased(int x, int y) {
     rightDown = false;
     MouseEvent me{ MouseEvent::EventType::RRelease, x, y };
     eventBuffer.push(me);
 }
 
-void MouseClass::onMiddlePressed(int x, int y) {
+void Mouse::onMiddlePressed(int x, int y) {
     middleDown = true;
     MouseEvent me{ MouseEvent::EventType::MPress, x, y };
     eventBuffer.push(me);
 }
 
-void MouseClass::onMiddleReleased(int x, int y) {
+void Mouse::onMiddleReleased(int x, int y) {
     rightDown = false;
     MouseEvent me{ MouseEvent::EventType::MRelease, x, y };
     eventBuffer.push(me);
 }
 
-void MouseClass::onWheelUp(int x, int y) {
+void Mouse::onWheelUp(int x, int y) {
     eventBuffer.push(MouseEvent{ MouseEvent::EventType::WheelUp, x, y });
 }
 
-void MouseClass::onWheelDown(int x, int y) {
+void Mouse::onWheelDown(int x, int y) {
     eventBuffer.push(MouseEvent{ MouseEvent::EventType::WheelDown, x, y });
 }
 
-void MouseClass::onMouseMove(int x, int y) {
+void Mouse::onMouseMove(int x, int y) {
     this->x = x;
     this->y = y;
     eventBuffer.push(MouseEvent{ MouseEvent::EventType::Move, x, y });
 }
 
-void Mouse::MouseClass::onMouseMoveRaw(int x, int y) {
+void NMouse::Mouse::onMouseMoveRaw(int x, int y) {
     eventBuffer.push(MouseEvent{ MouseEvent::EventType::RAW_MOVE, x, y });
 }
 
-bool MouseClass::isLeftDown() {
+bool Mouse::isLeftDown() {
     return leftDown;
 }
 
-bool MouseClass::isMiddleDown() {
+bool Mouse::isMiddleDown() {
     return middleDown;
 }
 
-bool MouseClass::isRightDown() {
+bool Mouse::isRightDown() {
     return rightDown;
 }
 
-int MouseClass::getPosX() {
+int Mouse::getPosX() {
     return x;
 }
 
-int MouseClass::getPosY() {
+int Mouse::getPosY() {
     return y;
 }
 
-MousePoint MouseClass::getPos() {
+MousePoint Mouse::getPos() {
     return MousePoint(x, y);
 }
 
-bool MouseClass::isEventBufferEmpty() {
+bool Mouse::isEventBufferEmpty() {
     return eventBuffer.empty();
 }
 
-MouseEvent MouseClass::readEvent() {
+MouseEvent Mouse::readEvent() {
     if (isEventBufferEmpty()) {
         return MouseEvent();
     }

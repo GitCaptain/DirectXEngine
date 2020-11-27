@@ -1,6 +1,6 @@
 #include "Model.h"
 
-using namespace ModelNamespace;
+using namespace NGraphics;
 
 bool Model::initialize(const std::string& filePath, 
                             ID3D11Device* device,
@@ -102,7 +102,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
     return Mesh(device, deviceContext, vertices, indices, textures, transformMatrix);
 }
 
-TextureStorageType ModelNamespace::Model::determineTextureStorageType(const aiScene* pScene, 
+TextureStorageType Model::determineTextureStorageType(const aiScene* pScene, 
                                                                       aiMaterial* pMaterial, 
                                                                       size_t index, 
                                                                       aiTextureType textureType) {
@@ -151,7 +151,7 @@ TextureStorageType ModelNamespace::Model::determineTextureStorageType(const aiSc
     return TextureStorageType::None;
 } 
 
-std::vector<Texture> ModelNamespace::Model::LoadMaterialTextures(aiMaterial* pMaterial, 
+std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* pMaterial, 
                                                                  aiTextureType textureType, 
                                                                  const aiScene* pScene) {
     std::vector<Texture> materialTextures;
@@ -165,10 +165,10 @@ std::vector<Texture> ModelNamespace::Model::LoadMaterialTextures(aiMaterial* pMa
             case aiTextureType_DIFFUSE: {
                 pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor);
                 if (aiColor.IsBlack()) { // in case of black color, we use grey
-                    materialTextures.emplace_back(device, Colors::UnloadedTextureColor, textureType);
+                    materialTextures.emplace_back(device, UnloadedTextureColor, textureType);
                 }
                 else {
-                    materialTextures.emplace_back(device, Colors::Color(aiColor.r * 255, aiColor.g * 255, aiColor.b * 255), textureType);
+                    materialTextures.emplace_back(device, Color(aiColor.r * 255, aiColor.g * 255, aiColor.b * 255), textureType);
                 }
                 return materialTextures;
             }
@@ -206,13 +206,13 @@ std::vector<Texture> ModelNamespace::Model::LoadMaterialTextures(aiMaterial* pMa
     }
 
     if (materialTextures.empty()) {
-        materialTextures.emplace_back(device, Colors::UnhandledTextureColor, aiTextureType::aiTextureType_DIFFUSE);
+        materialTextures.emplace_back(device, UnhandledTextureColor, aiTextureType::aiTextureType_DIFFUSE);
     }
 
     return materialTextures;
 }
 
-int ModelNamespace::Model::getTextureIndex(aiString* pStr) {
+int Model::getTextureIndex(aiString* pStr) {
     assert(pStr->length >= 2);
     return atoi(&pStr->C_Str()[1]);
 }

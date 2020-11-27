@@ -2,7 +2,7 @@
 
 #include "GameObject.h"
 
-namespace GameObjectNamespace {
+namespace NGraphics {
 
     class GameObject2D: public GameObject {
     };

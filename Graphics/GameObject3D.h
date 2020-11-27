@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
-namespace GameObjectNamespace {
+namespace NGraphics {
     class GameObject3D : public GameObject {
     public:
 

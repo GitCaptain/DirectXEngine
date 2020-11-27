@@ -2,27 +2,27 @@
 
 #include "KeyboardClass.h"
 
-using namespace Keyboard;
+using namespace NKeyboard;
 
-KeyboardClass::KeyboardClass() {
+Keyboard::Keyboard() {
     for (int i = 0; i < keyStatesSize; i++) {
         keyStates[i] = false;
     }
 }
 
-bool KeyboardClass::isKeyPressed(const key_type keycode) {
+bool Keyboard::isKeyPressed(const key_type keycode) {
     return keyStates[keycode];
 }
 
-bool KeyboardClass::isKeyBufferEmpty() {
+bool Keyboard::isKeyBufferEmpty() {
     return keyBuffer.empty();
 }
 
-bool KeyboardClass::isCharBufferEmpty() {
+bool Keyboard::isCharBufferEmpty() {
     return charBuffer.empty();
 }
 
-KeyboardEvent KeyboardClass::readKey() {
+KeyboardEvent Keyboard::readKey() {
     if (isKeyBufferEmpty()) {
         return KeyboardEvent();
     }
@@ -31,7 +31,7 @@ KeyboardEvent KeyboardClass::readKey() {
     return e;
 }
 
-unsigned char KeyboardClass::readChar() {
+unsigned char Keyboard::readChar() {
     if (isCharBufferEmpty()) {
         return 0u;
     }
@@ -40,40 +40,40 @@ unsigned char KeyboardClass::readChar() {
     return chr;
 }
 
-void KeyboardClass::onKeyPressed(const key_type key) {
+void Keyboard::onKeyPressed(const key_type key) {
     keyStates[key] = true;
     keyBuffer.push(KeyboardEvent(KeyboardEvent::EventType::Press, key));
 }
 
-void KeyboardClass::onKeyReleased(const key_type key) {
+void Keyboard::onKeyReleased(const key_type key) {
     keyStates[key] = false;
     keyBuffer.push(KeyboardEvent(KeyboardEvent::EventType::Release, key));
 }
 
-void KeyboardClass::onChar(const key_type key) {
+void Keyboard::onChar(const key_type key) {
     charBuffer.push(key);
 }
 
-void KeyboardClass::enableAutoRepeatKeys() {
+void Keyboard::enableAutoRepeatKeys() {
     autoRepeatKeys = true;
 }
 
-void KeyboardClass::DisableAutoRepeatKeys() {
+void Keyboard::DisableAutoRepeatKeys() {
     autoRepeatKeys = false;
 }
 
-void KeyboardClass::enableAutoRepeatChars() {
+void Keyboard::enableAutoRepeatChars() {
     autoRepeatChars = true;
 }
 
-void KeyboardClass::DisableAutoRepeatChars() {
+void Keyboard::DisableAutoRepeatChars() {
     autoRepeatChars = false;
 }
 
-bool KeyboardClass::isKeysAutoRepeat() {
+bool Keyboard::isKeysAutoRepeat() {
     return autoRepeatKeys;
 }
 
-bool KeyboardClass::isCharsAutoRepeat() {
+bool Keyboard::isCharsAutoRepeat() {
     return autoRepeatChars;
 }

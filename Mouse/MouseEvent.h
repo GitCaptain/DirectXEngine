@@ -1,6 +1,6 @@
 #pragma once
 
-namespace Mouse {
+namespace NMouse {
     struct MousePoint {
         MousePoint() = default;
         MousePoint(int x, int y) : x(x), y(y) {}

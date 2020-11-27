@@ -1,6 +1,6 @@
 #include "RenderableGameObject.h"
 
-using namespace GameObjectNamespace;
+using namespace NGraphics;
 
 bool RenderableGameObject::initialize(const std::string& filePath,
     ID3D11Device* device,

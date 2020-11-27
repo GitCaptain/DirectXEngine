@@ -1,5 +1,7 @@
 #include "Graphics.h"
 
+using namespace NGraphics;
+
 bool Graphics::initialize(HWND hwnd, int width, int height) {
     
     windowHeight = height;
@@ -111,7 +113,7 @@ void Graphics::renderFrame() {
     swapChain->Present(vsync, 0);
 }
 
-Camera::Camera3D& const Graphics::getCamera3D() {
+Camera3D& const Graphics::getCamera3D() {
     return camera3D;
 }
 
@@ -288,7 +290,6 @@ bool Graphics::initializeShaders() {
 
     std::wstring shaderFolder = L"";
 
-#pragma region DetermineShaderPath
     if (IsDebuggerPresent() == TRUE) {
 #ifdef _DEBUG
 #ifdef _WIN64

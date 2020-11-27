@@ -1,6 +1,6 @@
 #include "Color.h"
 
-using namespace Colors;
+using namespace NGraphics;
 
 Color::Color(): color(0) {}
 
@@ -31,34 +31,34 @@ bool Color::operator!=(const Color& other) const {
     return color != other.color;
 }
 
-constexpr BYTE Colors::Color::getR() const {
+constexpr BYTE Color::getR() const {
     return rgba[R];
 }
 
-void Colors::Color::setR(BYTE r) {
+void Color::setR(BYTE r) {
     rgba[R] = r;
 }
 
-constexpr BYTE Colors::Color::getG() const {
+constexpr BYTE Color::getG() const {
     return rgba[G];
 }
 
-void Colors::Color::setG(BYTE g) {
+void Color::setG(BYTE g) {
     rgba[G] = g;
 }
 
-constexpr BYTE Colors::Color::getB() const {
+constexpr BYTE Color::getB() const {
     return rgba[B];
 }
 
-void Colors::Color::setB(BYTE b) {
+void Color::setB(BYTE b) {
     rgba[B] = b;
 }
 
-constexpr BYTE Colors::Color::getA() const {
+constexpr BYTE Color::getA() const {
     return rgba[A];
 }
 
-void Colors::Color::setA(BYTE a) {
+void Color::setA(BYTE a) {
     rgba[A] = a;
 }

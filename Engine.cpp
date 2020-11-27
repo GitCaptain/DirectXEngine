@@ -32,7 +32,7 @@ void Engine::Update() {
     while (!mouse.isEventBufferEmpty()) {
         auto me = mouse.readEvent();
         if (mouse.isRightDown()) {
-            if (me.getType() == Mouse::MouseEvent::EventType::RAW_MOVE) {
+            if (me.getType() == NMouse::MouseEvent::EventType::RAW_MOVE) {
                 gfx.getCamera3D().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
             }
         }

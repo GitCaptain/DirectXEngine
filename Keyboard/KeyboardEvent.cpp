@@ -1,7 +1,7 @@
 #pragma once
 #include "KeyboardEvent.h"
 
-using namespace Keyboard;
+using namespace NKeyboard;
 
 KeyboardEvent::KeyboardEvent() : eType(EventType::Invalid), key(0u) {}
 

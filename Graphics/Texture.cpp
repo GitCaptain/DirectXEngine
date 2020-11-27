@@ -4,12 +4,12 @@
 #include "Texture.h"
 #include "../ErrorLogger.h"
 
-Texture::Texture(ID3D11Device* device, const Colors::Color& color, aiTextureType type) {
+Texture::Texture(ID3D11Device* device, const NGraphics::Color& color, aiTextureType type) {
     initialize1x1ColorTexture(device, color, type);
 }
 
 Texture::Texture(ID3D11Device* device, 
-                 const Colors::Color* colorData,
+                 const NGraphics::Color* colorData,
                  UINT width, 
                  UINT height, 
                  aiTextureType type) {
@@ -27,7 +27,7 @@ Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureTyp
         hr = DirectX::CreateWICTextureFromFile(device, StringHelper::stringToWide(filePath).c_str(), texture.GetAddressOf(), textureView.GetAddressOf());
     }
     if (FAILED(hr)) {
-        initialize1x1ColorTexture(device, Colors::UnloadedTextureColor, type);
+        initialize1x1ColorTexture(device, NGraphics::UnloadedTextureColor, type);
     }
     return;
 }
@@ -51,13 +51,13 @@ ID3D11ShaderResourceView** Texture::getTextureResourceViewAddress() {
 }
 
 void Texture::initialize1x1ColorTexture(ID3D11Device* device, 
-                                        const Colors::Color& colorData, 
+                                        const NGraphics::Color& colorData, 
                                         aiTextureType type) {
     initializeColorTexture(device, &colorData, 1, 1, type);
 }
 
 void Texture::initializeColorTexture(ID3D11Device* device,
-                                     const Colors::Color* colorData,
+                                     const NGraphics::Color* colorData,
                                      UINT width,
                                      UINT height,
                                      aiTextureType type) {
@@ -66,7 +66,7 @@ void Texture::initializeColorTexture(ID3D11Device* device,
     ID3D11Texture2D *p2DTexture = nullptr;
     D3D11_SUBRESOURCE_DATA initialData{};
     initialData.pSysMem = colorData;
-    initialData.SysMemPitch = width * sizeof(Colors::Color);
+    initialData.SysMemPitch = width * sizeof(NGraphics::Color);
     HRESULT hr = device->CreateTexture2D(&textureDesc, &initialData, &p2DTexture);
     COM_ERROR_IF_FAILED(hr, "Failed to initialize texture from color data.");
     texture = static_cast<ID3D11Texture2D*>(p2DTexture);

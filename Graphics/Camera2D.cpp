@@ -1,6 +1,6 @@
 #include "Camera2D.h"
 
-using namespace Camera;
+using namespace NGraphics;
 
 Camera2D::Camera2D() {
     pos = XMFLOAT3(0.0f, 0.0f, 0.0f);
@@ -22,7 +22,7 @@ const XMMATRIX& Camera2D::getWorldMatrix() const {
     return worldMatrix;
 }
 
-void Camera::Camera2D::updateMatrix() {
+void Camera2D::updateMatrix() {
     XMMATRIX translationOffsetMatrix = XMMatrixTranslation(-pos.x, -pos.y, 0.0f); //z component irrelevant for 2d camera
     XMMATRIX camRotationMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z);
     worldMatrix = camRotationMatrix * translationOffsetMatrix;

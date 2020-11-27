@@ -3,8 +3,8 @@
 #include "MouseEvent.h"
 #include <queue>
 
-namespace Mouse {
-    class MouseClass {
+namespace NMouse {
+    class Mouse {
     public:
         void onLeftPressed(int x, int y);
         void onLeftReleased(int x, int y);
