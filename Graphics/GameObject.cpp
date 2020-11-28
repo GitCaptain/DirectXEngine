@@ -105,7 +105,3 @@ void GameObject::setScale(float xScale, float yScale, float zScale) {
     scale.z = zScale;
     updateMatrix();
 }
-
-void GameObject::updateMatrix() {
-    assert("updateMatrix must be overriden" && 0);
-}

@@ -8,6 +8,10 @@ namespace NGraphics {
     class GameObject {
 
     public:
+
+        GameObject() = default;
+        virtual ~GameObject() = default;
+
         const XMVECTOR& getPositionVector() const;
         const XMFLOAT3& getPositionFloat3() const;
         const XMVECTOR& getRotationVector() const;
@@ -28,11 +32,9 @@ namespace NGraphics {
 
         void setScale(float xScale, float yScale, float zScale = 1.0f);
 
-        virtual ~GameObject() = default;
-
     protected:
 
-        virtual void updateMatrix();
+        virtual void updateMatrix() = 0;
 
         XMVECTOR posVector;
         XMVECTOR rotVector;

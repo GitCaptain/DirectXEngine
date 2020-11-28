@@ -4,7 +4,8 @@
 namespace NGraphics {
     class GameObject3D : public GameObject {
     public:
-
+        GameObject3D() = default;
+        virtual ~GameObject3D() = default;
         void setLookAtPos(XMFLOAT3 lookAtPos);
         const XMVECTOR& getForwardVector(bool omitY = false);
         const XMVECTOR& getBackwardVector(bool omitY = false);
@@ -12,6 +13,7 @@ namespace NGraphics {
         const XMVECTOR& getRightVector(bool omitY = false);
 
     protected:
+        virtual void updateMatrix() override = 0;
         void updateDirectionVectors();
         const XMVECTOR DEFAULT_FORWARD_VECTOR = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
         const XMVECTOR DEFAULT_BACKWARD_VECTOR = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
