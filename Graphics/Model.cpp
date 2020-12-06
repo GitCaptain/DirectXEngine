@@ -30,7 +30,7 @@ void Model::draw(const XMMATRIX& worldMatrix, const XMMATRIX& viewProjectionMatr
     for (size_t i = 0; i < meshes.size(); i++) {
         // TODO: I removed XMMATRIX transpose from here to vertexshader.
         // have to figure out what is better for performance
-        cb_vs_vertexshader->data.worldViewProjectionMatrix= meshes[i].getTransformMatrix() * worldMatrix * viewProjectionMatrix;
+        cb_vs_vertexshader->data.worldViewProjectionMatrix = meshes[i].getTransformMatrix() * worldMatrix * viewProjectionMatrix;
         cb_vs_vertexshader->data.worldMatrix = meshes[i].getTransformMatrix() * worldMatrix;
         cb_vs_vertexshader->applyChanges();
         meshes[i].draw();

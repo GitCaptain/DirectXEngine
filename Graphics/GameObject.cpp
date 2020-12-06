@@ -105,3 +105,7 @@ void GameObject::setScale(float xScale, float yScale, float zScale) {
     scale.z = zScale;
     updateMatrix();
 }
+
+GameObject::game_object_type GameObject::getGameObjectType() {
+    return game_object_type::TYPE_BASE;
+}

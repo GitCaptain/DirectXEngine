@@ -1,19 +1,24 @@
 #pragma once
 
 #include "GameObject3D.h"
-#include "interfaces/IRenderable.h"
+#include "RenderableObject3D.h"
 
 namespace NGraphics { 
 
-    class RenderableGameObject: public GameObject3D, public IRenderable {
+    class RenderableGameObject3D: public GameObject3D, public RenderableObject3D {
 
     public:
+        RenderableGameObject3D() = default;
+        virtual ~RenderableGameObject3D() = default;
+        
         bool initialize(const std::string& filePath,
             ID3D11Device* device,
             ID3D11DeviceContext* deviceContext,
             ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader);
+
         void draw(const XMMATRIX& viewProjectionMatrix) override;
-    
+        void prepare(ID3D11DeviceContext* deviceContext) override;
+
     protected:
         void updateMatrix() override;
 

@@ -12,6 +12,8 @@ namespace NGraphics {
         const XMVECTOR& getLeftVector(bool omitY = false);
         const XMVECTOR& getRightVector(bool omitY = false);
 
+        game_object_type getGameObjectType() override;
+
     protected:
         virtual void updateMatrix() override = 0;
         void updateDirectionVectors();

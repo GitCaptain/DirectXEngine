@@ -1,10 +1,13 @@
 #pragma once
+
+#include <DirectXMath.h>
 #include <d3d11.h>
 
-// TODO: maybe ot useful
 class IRenderable {
 protected:
     IRenderable() = default;
     virtual ~IRenderable() = default;
-    virtual void draw(const DirectX::XMMATRIX& viewProjectionMatrix) = 0;
+public:
+    virtual void draw(const DirectX::XMMATRIX&) = 0;
+    virtual void prepare(ID3D11DeviceContext*) = 0;
 };

@@ -43,7 +43,7 @@ void Engine::Update() {
     using DirectX::operator*;
     using DirectX::operator+=;
 
-    gfx.gameObject.adjustRotation(0.0f, 0.001f * dt, 0.0f);
+    gfx.nanosuit.adjustRotation(0.0f, 0.001f * dt, 0.0f);
 
     const float camera3DSpeed = 0.005f;
     float camera3DSpeedMultiplyer = 1.0f;

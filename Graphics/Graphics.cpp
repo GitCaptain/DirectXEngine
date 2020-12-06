@@ -3,10 +3,11 @@
 using namespace NGraphics;
 
 bool Graphics::initialize(HWND hwnd, int width, int height) {
-    
+
     windowHeight = height;
     windowWidth = width;
     fpsTimer.startTimer();
+    
     if (!initializeDirectX(hwnd)) {
         return false;
     }
@@ -18,6 +19,13 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     if (!initializeScene()) {
         return false;
     }
+
+    if (!fRenderer.initialize(device.Get(), deviceContext.Get(), swapChain.Get(), renderTargetView.Get())) {
+        return false;
+    }
+
+    fRenderer.setObjects(renderableGameObjects);
+    renderableGameObjects.push_back(&light);
 
 #ifdef ENABLE_IMGUI
     // setup ImGUI
@@ -34,47 +42,40 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 
 void Graphics::renderFrame() {
 
-    cb_ps_light.data.dynamicLightColor = light.lightColor;
-    cb_ps_light.data.dynamicLightStrength = light.lightStrength;
-    cb_ps_light.data.dynamicLightPosition = light.getPositionFloat3();
-    cb_ps_light.data.dynamicLightAttenuation_a = light.attenuation_a;
-    cb_ps_light.data.dynamicLightAttenuation_b = light.attenuation_b;
-    cb_ps_light.data.dynamicLightAttenuation_c = light.attenuation_c;
-
-    cb_ps_light.applyChanges();
-    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
-
     float bgcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0); 
-    
+
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     deviceContext->RSSetState(rasterizerState.Get());
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
-    // sprite mask
-    deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
-    deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
-    deviceContext->PSSetShader(pixelShader_2d_discard.getShader(), nullptr, 0); // we don't want to draw our mask
-    deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
-    sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
+    // sprite mask 
+    //deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
+    //deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
+    //deviceContext->PSSetShader(pixelShader_2d_discard.getShader(), nullptr, 0); // we don't want to draw our mask
+    //deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
+    //sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
 
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
 
-    deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
+    //deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
 
-    { // Pavement cube
-        gameObject.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
+#ifdef ENABLE_IMGUI
+    // start dear imgui frame
+    ImGui_ImplDX11_NewFrame();
+    ImGui_ImplWin32_NewFrame();
+    ImGui::NewFrame();
+#endif
+    {
+        nanosuit.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
     }
 
-    { // TODO: take multiption out
-        deviceContext->PSSetShader(pixelShader_nolight.getShader(), nullptr, 0);
-        light.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
-    }
+    fRenderer.renderFrame(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
 
     //Draw text
     static int fpsCounter = 0;
@@ -91,18 +92,6 @@ void Graphics::renderFrame() {
     spriteBatch->End();
 
 #ifdef ENABLE_IMGUI
-    // start dear imgui frame
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-    // create imgui test window
-    ImGui::Begin("Light Controls");
-    ImGui::DragFloat3("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
-    ImGui::End();
     // Assemble Together Draw data
     ImGui::Render();
     // render draw data
@@ -199,13 +188,12 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_drawMask(D3D11_DEFAULT);
         depthStencilDesc_drawMask.DepthEnable = FALSE;
         depthStencilDesc_drawMask.StencilEnable = TRUE;
-        
+
         depthStencilDesc_drawMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
         depthStencilDesc_drawMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
         depthStencilDesc_drawMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
         depthStencilDesc_drawMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
 
-        
         depthStencilDesc_drawMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
         depthStencilDesc_drawMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
         depthStencilDesc_drawMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
@@ -222,7 +210,6 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         depthStencilDesc_applyMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
         depthStencilDesc_applyMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
         depthStencilDesc_applyMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
 
         depthStencilDesc_applyMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
         depthStencilDesc_applyMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
@@ -343,10 +330,6 @@ bool Graphics::initializeShaders() {
         return false;
     }
 
-    if (!pixelShader_nolight.initialize(device, shaderFolder + L"pixelShader_nolight.cso")) {
-        return false;
-    }
-
     return true;
 }
 
@@ -369,16 +352,11 @@ bool Graphics::initializeScene() {
         hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
 
-        hr = cb_ps_light.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_light constant buffer.");
-
-        cb_ps_light.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-        cb_ps_light.data.ambientLightStrength = 1.0f;
-
         // Initialize Model(s)
-        if(!gameObject.initialize("Data\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
+        if(!nanosuit.initialize("Data\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
             return false;
         }
+
 
         if (!light.initialize(device.Get(), deviceContext.Get(), cb_vs_vertexshader)) {
             return false;
@@ -393,7 +371,7 @@ bool Graphics::initializeScene() {
         
         camera2D.setProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 
-        gameObject.setPosition(2.0f, 0.0f, 0.0f);
+        nanosuit.setPosition(2.0f, 0.0f, 0.0f);
 
         camera3D.setPosition(0.0f, 0.0f, -2.0f);
         camera3D.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);

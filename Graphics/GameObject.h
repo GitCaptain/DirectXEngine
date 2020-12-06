@@ -9,6 +9,12 @@ namespace NGraphics {
 
     public:
 
+        enum class game_object_type {
+            TYPE_BASE,
+            TYPE_2D,
+            TYPE_3D,
+        };
+
         GameObject() = default;
         virtual ~GameObject() = default;
 
@@ -31,6 +37,8 @@ namespace NGraphics {
         void adjustRotation(float x, float y, float z);
 
         void setScale(float xScale, float yScale, float zScale = 1.0f);
+
+        virtual game_object_type getGameObjectType();
 
     protected:
 

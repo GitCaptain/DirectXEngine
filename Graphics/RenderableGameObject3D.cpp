@@ -1,8 +1,8 @@
-#include "RenderableGameObject.h"
+#include "RenderableGameObject3D.h"
 
 using namespace NGraphics;
 
-bool RenderableGameObject::initialize(const std::string& filePath,
+bool RenderableGameObject3D::initialize(const std::string& filePath,
     ID3D11Device* device,
     ID3D11DeviceContext* deviceContext,
     ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
@@ -18,11 +18,15 @@ bool RenderableGameObject::initialize(const std::string& filePath,
     return true;
 }
 
-void RenderableGameObject::draw(const XMMATRIX& viewProjectionMatrix) {
+void RenderableGameObject3D::draw(const XMMATRIX& viewProjectionMatrix) {
     model.draw(worldMatrix, viewProjectionMatrix);
 }
 
-void RenderableGameObject::updateMatrix() {
+void NGraphics::RenderableGameObject3D::prepare(ID3D11DeviceContext* deviceContext) {
+    
+}
+
+void RenderableGameObject3D::updateMatrix() {
     worldMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z) * XMMatrixTranslation(pos.x, pos.y, pos.z);
     updateDirectionVectors();
 }

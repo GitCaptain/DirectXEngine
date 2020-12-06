@@ -58,6 +58,10 @@ const XMVECTOR& GameObject3D::getRightVector(bool omitY) {
     return vecRight;
 }
 
+GameObject::game_object_type GameObject3D::getGameObjectType() {
+    return game_object_type::TYPE_3D;
+}
+
 void GameObject3D::updateDirectionVectors() {
     XMMATRIX vecRotationMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, 0.0f);
     vecForward = XMVector3TransformCoord(DEFAULT_FORWARD_VECTOR, vecRotationMatrix);
