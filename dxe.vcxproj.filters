@@ -13,18 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Исходные файлы\Keyboard">
-      <UniqueIdentifier>{a6224bdc-ed97-47a5-9f7d-c30e03264a40}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы заголовков\Keyboard">
-      <UniqueIdentifier>{95936e24-3340-4c30-815c-886e864ed3f4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Исходные файлы\Mouse">
-      <UniqueIdentifier>{3f33ddab-f444-4036-b5f5-bd2b1baa8996}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Файлы заголовков\Mouse">
-      <UniqueIdentifier>{fc72e19e-938b-4a90-93fb-1e9413a20572}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Исходные файлы\Graphics">
       <UniqueIdentifier>{e91814cc-5478-4fe8-b3bb-ef6bd3bee37e}</UniqueIdentifier>
     </Filter>
@@ -40,6 +28,24 @@
     <Filter Include="Файлы заголовков\Graphics\Interfaces">
       <UniqueIdentifier>{f748d578-6ac6-43cb-84b2-6d101bfc1e88}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Файлы заголовков\HID">
+      <UniqueIdentifier>{58fa0348-b695-429d-933b-ea0cbc9142f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\HID\Mouse">
+      <UniqueIdentifier>{fc72e19e-938b-4a90-93fb-1e9413a20572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы заголовков\HID\Keyboard">
+      <UniqueIdentifier>{95936e24-3340-4c30-815c-886e864ed3f4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\HID">
+      <UniqueIdentifier>{fe83447b-66b2-4999-a32e-8aa71b15e66d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\HID\Mouse">
+      <UniqueIdentifier>{3f33ddab-f444-4036-b5f5-bd2b1baa8996}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Исходные файлы\HID\Keyboard">
+      <UniqueIdentifier>{a6224bdc-ed97-47a5-9f7d-c30e03264a40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ErrorLogger.cpp">
@@ -53,18 +59,6 @@
     </ClCompile>
     <ClCompile Include="WindowContainer.cpp">
       <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard\KeyboardClass.cpp">
-      <Filter>Файлы заголовков\Keyboard</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard\KeyboardEvent.cpp">
-      <Filter>Файлы заголовков\Keyboard</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse\MouseClass.cpp">
-      <Filter>Файлы заголовков\Mouse</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse\MouseEvent.cpp">
-      <Filter>Файлы заголовков\Mouse</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\Graphics.cpp">
       <Filter>Исходные файлы\Graphics</Filter>
@@ -103,9 +97,6 @@
       <Filter>Исходные файлы\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="StringHelper.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Light.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
     <ClCompile Include="Graphics\GameObject2D.cpp">
@@ -150,6 +141,21 @@
     <ClCompile Include="Graphics\ImGUI\imgui_widgets.cpp">
       <Filter>Исходные файлы\Graphics\ImGUI</Filter>
     </ClCompile>
+    <ClCompile Include="Graphics\Light.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="HID\Keyboard\KeyboardClass.cpp">
+      <Filter>Исходные файлы\HID\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="HID\Keyboard\KeyboardEvent.cpp">
+      <Filter>Исходные файлы\HID\Keyboard</Filter>
+    </ClCompile>
+    <ClCompile Include="HID\Mouse\MouseClass.cpp">
+      <Filter>Исходные файлы\HID\Mouse</Filter>
+    </ClCompile>
+    <ClCompile Include="HID\Mouse\MouseEvent.cpp">
+      <Filter>Исходные файлы\HID\Mouse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ErrorLogger.h">
@@ -163,18 +169,6 @@
     </ClInclude>
     <ClInclude Include="WindowContainer.h">
       <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard\KeyboardClass.h">
-      <Filter>Исходные файлы\Keyboard</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard\KeyboardEvent.h">
-      <Filter>Исходные файлы\Keyboard</Filter>
-    </ClInclude>
-    <ClInclude Include="Mouse\MouseClass.h">
-      <Filter>Исходные файлы\Mouse</Filter>
-    </ClInclude>
-    <ClInclude Include="Mouse\MouseEvent.h">
-      <Filter>Исходные файлы\Mouse</Filter>
     </ClInclude>
     <ClInclude Include="Graphics\Graphics.h">
       <Filter>Файлы заголовков\Graphics</Filter>
@@ -286,6 +280,18 @@
     </ClInclude>
     <ClInclude Include="Graphics\ImGUI\ImGUIW.h">
       <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="HID\Keyboard\KeyboardClass.h">
+      <Filter>Файлы заголовков\HID\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="HID\Keyboard\KeyboardEvent.h">
+      <Filter>Файлы заголовков\HID\Keyboard</Filter>
+    </ClInclude>
+    <ClInclude Include="HID\Mouse\MouseClass.h">
+      <Filter>Файлы заголовков\HID\Mouse</Filter>
+    </ClInclude>
+    <ClInclude Include="HID\Mouse\MouseEvent.h">
+      <Filter>Файлы заголовков\HID\Mouse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
