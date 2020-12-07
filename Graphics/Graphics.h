@@ -27,12 +27,19 @@ namespace NGraphics {
         Sprite sprite;
         RenderableGameObject3D nanosuit;
         Light light;
+        void onWindowResize(UINT width, UINT height);
+        bool isInitialized();
 
     private:
         bool initializeDirectX(HWND hwnd);
         bool initializeShaders();
         bool initializeScene();
-        void initializeResources();
+        void createDeviceAndSwapChain(HWND hwnd);
+        void createDepthStencilBufferAndView();
+        void updateCamera();
+        void createDepthStencilStates();
+        void createAndSetViewport();
+        float getAspectRatio();
 
         ForwardRenderer fRenderer;
         std::vector<IRenderable*> renderableGameObjects;
@@ -74,6 +81,10 @@ namespace NGraphics {
 
         int windowWidth = 800;
         int windowHeight = 600;
+        float yFov = 45;
+        float nearZ = 0.1;
+        float farZ = 3000;
+        bool initialized = false;
         Timer fpsTimer;
         Camera3D camera3D;
     };

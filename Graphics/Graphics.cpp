@@ -1,5 +1,11 @@
 #include "Graphics.h"
 
+#define SaveReset(buffer) { \
+            if ((buffer).Get() != nullptr){\
+                (buffer).Reset(); \
+            } \
+        }
+
 using namespace NGraphics;
 
 bool Graphics::initialize(HWND hwnd, int width, int height) {
@@ -23,7 +29,7 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     if (!fRenderer.initialize(device.Get(), deviceContext.Get(), swapChain.Get(), renderTargetView.Get())) {
         return false;
     }
-
+    
     fRenderer.setObjects(renderableGameObjects);
     renderableGameObjects.push_back(&light);
 
@@ -36,6 +42,8 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     ImGui_ImplDX11_Init(device.Get(), deviceContext.Get());
     ImGui::StyleColorsDark();
 #endif
+
+    initialized = true;
 
     return true;
 }
@@ -71,6 +79,16 @@ void Graphics::renderFrame() {
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
 #endif
+
+#ifdef ENABLE_IMGUI
+    // create imgui test window
+    ImGui::Begin("Video controls");
+    ImGui::DragFloat("fov", &yFov, 1, 1.0f, 180.0f);
+    ImGui::DragFloat("nearZ", &nearZ, 0.1, 0.1f, 10);
+    ImGui::DragFloat("farZ", &farZ, 10, 10, 50000.0f);
+    ImGui::End();
+#endif
+    updateCamera();
     {
         nanosuit.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
     }
@@ -106,126 +124,63 @@ Camera3D& const Graphics::getCamera3D() {
     return camera3D;
 }
 
+void Graphics::onWindowResize(UINT width, UINT height) {
+
+    if (!initialized) {
+        return;
+    }
+
+    SaveReset(renderTargetView);
+    SaveReset(depthStencilView);
+    SaveReset(depthStencilBuffer);
+
+    windowWidth = width;
+    windowHeight = height;
+    
+    // update swapChain and renderTargetView directly
+    DXGI_SWAP_CHAIN_DESC swapChainDesc;
+    ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
+    swapChain.Get()->GetDesc(&swapChainDesc);
+    swapChain->ResizeBuffers(swapChainDesc.BufferCount,
+                             width, height,
+                             swapChainDesc.BufferDesc.Format,
+                             swapChainDesc.Flags);
+    
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+    HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
+    COM_ERROR_IF_FAILED(hr, "GetBuffer failed.");
+
+    hr = device->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
+    ONFAILHRLOG(hr, "Can't create render target view for resized ");
+    backBuffer.Reset();
+
+    // update other resources through functions
+    createDepthStencilBufferAndView();
+
+    deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+
+    createAndSetViewport();
+    updateCamera();
+}
+
+bool Graphics::isInitialized() {
+    return initialized;
+}
+
 bool Graphics::initializeDirectX(HWND hwnd) {
     try {
-        auto adapters = AdapterReader::getAdapters();
-        ONFAILLOG(adapters.empty(), "No DXGI Adapters found.", false);
 
-        // take adapter with maximum video memory
-        auto bestAdapter = &adapters[0];
-        for (const auto& adp : adapters) {
-            if (adp.description.DedicatedVideoMemory > bestAdapter->description.DedicatedVideoMemory) {
-                bestAdapter = const_cast<AdapterData*>(&adp);
-            }
-        }
+        createDeviceAndSwapChain(hwnd);
+        
+        createDepthStencilBufferAndView();
 
-        deviceDescription = bestAdapter->description.Description;
+        createDepthStencilStates();
 
-        DXGI_SWAP_CHAIN_DESC scd;
-        ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
-
-        scd.BufferDesc.Width = windowWidth;
-        scd.BufferDesc.Height = windowHeight;
-        // TODO: set real numerator and denominator
-        scd.BufferDesc.RefreshRate.Numerator = 60;
-        scd.BufferDesc.RefreshRate.Denominator = 1;
-        scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-        scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
-
-        scd.SampleDesc.Count = 1;
-        scd.SampleDesc.Quality = 0;
-
-        scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
-        scd.BufferCount = 1;
-
-        scd.OutputWindow = hwnd;
-        scd.Windowed = TRUE;
-        scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-        scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
-
-        HRESULT hr = D3D11CreateDeviceAndSwapChain(bestAdapter->pAdapter,
-            D3D_DRIVER_TYPE_UNKNOWN,
-            nullptr,
-            0,
-            nullptr,
-            0,
-            D3D11_SDK_VERSION,
-            &scd,
-            swapChain.GetAddressOf(),
-            device.GetAddressOf(),
-            nullptr,
-            deviceContext.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create device and swapchain.");
-
-        Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-        hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
-        COM_ERROR_IF_FAILED(hr, "GetBuffer failed.");
-
-        hr = device->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create render target view.");
-
-        // Describe our depth/stencil buffer
-        CD3D11_TEXTURE2D_DESC depthStencilTextureDesc(DXGI_FORMAT_D24_UNORM_S8_UINT, windowWidth, windowHeight);
-        depthStencilTextureDesc.MipLevels = 1;
-        depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-
-        hr = device->CreateTexture2D(&depthStencilTextureDesc, nullptr, depthStencilBuffer.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil buffer.");
-
-        hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
-
-        deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
-
-        // Create depth stencil state
-        CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
-        depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
-        hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
-
-        CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_drawMask(D3D11_DEFAULT);
-        depthStencilDesc_drawMask.DepthEnable = FALSE;
-        depthStencilDesc_drawMask.StencilEnable = TRUE;
-
-        depthStencilDesc_drawMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-        depthStencilDesc_drawMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-        depthStencilDesc_drawMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
-        depthStencilDesc_drawMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR_SAT;
-
-        hr = device->CreateDepthStencilState(&depthStencilDesc_drawMask, depthStencilState_drawMask.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for drawing mask.");
-
-        CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_applyMask(D3D11_DEFAULT);
-        depthStencilDesc_applyMask.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-        depthStencilDesc_applyMask.StencilEnable = TRUE;
-
-        depthStencilDesc_applyMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-        depthStencilDesc_applyMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-        depthStencilDesc_applyMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
-        depthStencilDesc_applyMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-        hr = device->CreateDepthStencilState(&depthStencilDesc_applyMask, depthStencilState_applyMask.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for applying mask.");
-
-        // create and set viewoport
-        CD3D11_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight));  
-        deviceContext->RSSetViewports(1, &viewport);
+        createAndSetViewport();
 
         // Create rasterizer state
         CD3D11_RASTERIZER_DESC rasterizerDesc(D3D11_DEFAULT);
-        hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf());
+        HRESULT hr = device->CreateRasterizerState(&rasterizerDesc, rasterizerState.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
 
         // Create rasterizer state for culling front
@@ -257,14 +212,18 @@ bool Graphics::initializeDirectX(HWND hwnd) {
 
         spriteBatch = std::make_unique<DirectX::SpriteBatch>(deviceContext.Get());
         spriteFont = std::make_unique<DirectX::SpriteFont>(device.Get(), L"Data\\Fonts\\comic_sans_ms_16.spritefont");
+       
         // Create sampler description for sampler state
         CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
         sampDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
         sampDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
         sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+        
         // Create sampler state
         hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
+
+        deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
@@ -374,11 +333,148 @@ bool Graphics::initializeScene() {
         nanosuit.setPosition(2.0f, 0.0f, 0.0f);
 
         camera3D.setPosition(0.0f, 0.0f, -2.0f);
-        camera3D.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
+        camera3D.setProjectionValues(yFov, getAspectRatio(), nearZ, farZ);
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
         return false;
     }
     return true;
+}
+
+float Graphics::getAspectRatio() {
+    return static_cast<float>(windowWidth) / static_cast<float>(windowHeight);
+}
+
+void Graphics::createDeviceAndSwapChain(HWND hwnd) {
+
+    auto adapters = AdapterReader::getAdapters();
+    ONFAILLOG(adapters.empty(), "No DXGI Adapters found.");
+
+    // take adapter with maximum video memory
+    auto bestAdapter = &adapters[0];
+    for (const auto& adp : adapters) {
+        if (adp.description.DedicatedVideoMemory > bestAdapter->description.DedicatedVideoMemory) {
+            bestAdapter = const_cast<AdapterData*>(&adp);
+        }
+    }
+
+    deviceDescription = bestAdapter->description.Description;
+
+    DXGI_SWAP_CHAIN_DESC scd;
+    ZeroMemory(&scd, sizeof(DXGI_SWAP_CHAIN_DESC));
+
+    scd.BufferDesc.Width = windowWidth;
+    scd.BufferDesc.Height = windowHeight;
+    // TODO: set real numerator and denominator
+    scd.BufferDesc.RefreshRate.Numerator = 60;
+    scd.BufferDesc.RefreshRate.Denominator = 1;
+    scd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    scd.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+    scd.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+
+    scd.SampleDesc.Count = 1;
+    scd.SampleDesc.Quality = 0;
+
+    scd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
+    scd.BufferCount = 1;
+
+    scd.OutputWindow = hwnd;
+    scd.Windowed = TRUE;
+    scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+    scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+
+    HRESULT hr = D3D11CreateDeviceAndSwapChain(bestAdapter->pAdapter,
+        D3D_DRIVER_TYPE_UNKNOWN,
+        nullptr,
+        0,
+        nullptr,
+        0,
+        D3D11_SDK_VERSION,
+        &scd,
+        swapChain.GetAddressOf(),
+        device.GetAddressOf(),
+        nullptr,
+        deviceContext.GetAddressOf());
+
+    COM_ERROR_IF_FAILED(hr, "Failed to create device and swapchain.");
+
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+    hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(backBuffer.GetAddressOf()));
+    COM_ERROR_IF_FAILED(hr, "GetBuffer failed.");
+    
+    renderTargetView.Reset();
+    hr = device->CreateRenderTargetView(backBuffer.Get(), nullptr, renderTargetView.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create render target view.");
+}
+
+void Graphics::createDepthStencilBufferAndView() {
+    
+    // Describe our depth/stencil buffer
+    CD3D11_TEXTURE2D_DESC depthStencilTextureDesc(DXGI_FORMAT_D24_UNORM_S8_UINT, windowWidth, windowHeight);
+    depthStencilTextureDesc.MipLevels = 1;
+    depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+    HRESULT hr = device->CreateTexture2D(&depthStencilTextureDesc, nullptr, depthStencilBuffer.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil buffer.");
+
+    hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, depthStencilView.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
+    
+}
+
+void Graphics::updateCamera() {
+    camera3D.setProjectionValues(yFov, getAspectRatio(), nearZ, farZ);
+}
+
+void Graphics::createDepthStencilStates() {
+    // Create depth stencil state
+    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
+    depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+    
+    depthStencilState.Reset();
+    HRESULT hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
+
+    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_drawMask(D3D11_DEFAULT);
+    depthStencilDesc_drawMask.DepthEnable = FALSE;
+    depthStencilDesc_drawMask.StencilEnable = TRUE;
+
+    depthStencilDesc_drawMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+    depthStencilDesc_drawMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_drawMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_drawMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+
+    depthStencilDesc_drawMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
+    depthStencilDesc_drawMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_drawMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_drawMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR_SAT;
+    depthStencilState_drawMask.Reset();
+    hr = device->CreateDepthStencilState(&depthStencilDesc_drawMask, depthStencilState_drawMask.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for drawing mask.");
+
+    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_applyMask(D3D11_DEFAULT);
+    depthStencilDesc_applyMask.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+    depthStencilDesc_applyMask.StencilEnable = TRUE;
+
+    depthStencilDesc_applyMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+    depthStencilDesc_applyMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_applyMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_applyMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+
+    depthStencilDesc_applyMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
+    depthStencilDesc_applyMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_applyMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    depthStencilDesc_applyMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    
+    depthStencilState_applyMask.Reset();
+    hr = device->CreateDepthStencilState(&depthStencilDesc_applyMask, depthStencilState_applyMask.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for applying mask.");
+}
+
+void Graphics::createAndSetViewport() {
+
+    // create and set viewoport
+    CD3D11_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight));
+    deviceContext->RSSetViewports(1, &viewport);
 }

@@ -5,9 +5,11 @@
 class WindowContainer;
 
 class RenderWindow {
+
 public:
     bool initialize(WindowContainer *pWindowContainer, HINSTANCE hInstance, std::string windowTitle, std::string windowClass, int width, int height);
     bool processMessages();
+    void onWindowResize(UINT width, UINT height);
     HWND getHWND() const;
     ~RenderWindow();
 

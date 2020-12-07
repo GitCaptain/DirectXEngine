@@ -10,10 +10,14 @@ class WindowContainer {
 
 public:
     WindowContainer();
+    virtual ~WindowContainer() = default;
     LRESULT windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
 protected:
     RenderWindow renderWindow;
     NKeyboard::Keyboard keyboard;
     NMouse::Mouse mouse;
     NGraphics::Graphics gfx;
+    int height = 0; // redefine in child classes
+    int width = 0;  // redefine in child classes
 };

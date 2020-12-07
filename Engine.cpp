@@ -2,6 +2,9 @@
 
 bool Engine::initialize(HINSTANCE hInstance, std::string windowTitle, std::string windowClass, int width, int height) {
     
+    this->height = height;
+    this->width = width;
+    
     timer.startTimer();
     if (!renderWindow.initialize(this, hInstance, windowTitle, windowClass, width, height)) {
         return false;

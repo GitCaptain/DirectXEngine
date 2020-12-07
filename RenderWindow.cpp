@@ -1,7 +1,7 @@
 #include "WindowContainer.h"
 #include "StringHelper.h"
 
-bool RenderWindow::initialize(WindowContainer* pWindowContainer, 
+bool RenderWindow::initialize(WindowContainer* pWindowContainer,
                               HINSTANCE hInstance, 
                               std::string windowTitle, 
                               std::string windowClass, 
@@ -31,7 +31,7 @@ bool RenderWindow::initialize(WindowContainer* pWindowContainer,
     handle = CreateWindowEx(0,
         windowClassWide.c_str(),
         windowTitleWide.c_str(),
-        WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+        WS_CAPTION | WS_SYSMENU | WS_SIZEBOX | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_BORDER,
         wr.left, wr.top, 
         wr.right - wr.left, wr.bottom - wr.top,
         nullptr,
@@ -67,6 +67,12 @@ bool RenderWindow::processMessages() {
     }
 
     return true;
+}
+
+void RenderWindow::onWindowResize(UINT width, UINT height) {
+    // now this do nothing, except update width/height values
+    this->width = width;
+    this->height = height;
 }
 
 HWND RenderWindow::getHWND() const {

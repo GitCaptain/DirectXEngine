@@ -6,6 +6,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_ LPWSTR lpCmdLine,
 	_In_ int nCmdShow) {
 
+	// init com pointers
 	HRESULT hr = CoInitialize(nullptr);
 	ONFAILHRLOG(hr, "Failed to call CoInitialize", -1);
 
@@ -19,5 +20,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	else {
 		OutputDebugStringA("Fuck\n");
 	}
+
+	CoUninitialize();
+
 	return 0; 
 }
