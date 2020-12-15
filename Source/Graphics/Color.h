@@ -26,7 +26,7 @@ namespace NGraphics {
         void setA(BYTE a);
 
     private:
-
+        
         enum rgba_order{R, G, B, A};
         union {
             BYTE rgba[4];

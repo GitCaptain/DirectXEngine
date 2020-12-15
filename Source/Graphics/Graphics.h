@@ -16,6 +16,10 @@
 
 namespace NGraphics {
 
+    //class GraphicsDescription {
+
+    //};
+
     class Graphics {
     public:
         bool initialize(HWND hwnd, int width, int height);

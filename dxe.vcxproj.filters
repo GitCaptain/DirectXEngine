@@ -51,255 +51,255 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ErrorLogger.cpp">
+    <ClCompile Include="Source\WindowContainer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="RenderWindow.cpp">
+    <ClCompile Include="Source\StringHelper.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Engine.cpp">
+    <ClCompile Include="Source\Timer.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="WindowContainer.cpp">
+    <ClCompile Include="Source\RenderWindow.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Graphics.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\AdapterReader.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Shaders.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\IndexBuffer.cpp">
+    <ClCompile Include="Source\main.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Timer.cpp">
+    <ClCompile Include="Source\ErrorLogger.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="COMException.cpp">
+    <ClCompile Include="Source\Engine.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Model.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Source\COMException.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Mesh.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\GameObject.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Color.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Texture.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="StringHelper.cpp">
-      <Filter>Исходные файлы</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\GameObject2D.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\GameObject3D.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Camera3D.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Camera2D.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\RenderableObject2D.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\RenderableGameObject3D.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\RenderableObject3D.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\ForwardRenderer.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Sprite.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\ImGUI\imgui.cpp">
-      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\ImGUI\imgui_impl_dx11.cpp">
-      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\ImGUI\imgui_draw.cpp">
-      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\ImGUI\imgui_impl_win32.cpp">
-      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\ImGUI\imgui_widgets.cpp">
-      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Light.cpp">
-      <Filter>Исходные файлы\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="HID\Keyboard\KeyboardClass.cpp">
+    <ClCompile Include="Source\HID\Keyboard\KeyboardClass.cpp">
       <Filter>Исходные файлы\HID\Keyboard</Filter>
     </ClCompile>
-    <ClCompile Include="HID\Keyboard\KeyboardEvent.cpp">
+    <ClCompile Include="Source\HID\Keyboard\KeyboardEvent.cpp">
       <Filter>Исходные файлы\HID\Keyboard</Filter>
     </ClCompile>
-    <ClCompile Include="HID\Mouse\MouseClass.cpp">
+    <ClCompile Include="Source\HID\Mouse\MouseClass.cpp">
       <Filter>Исходные файлы\HID\Mouse</Filter>
     </ClCompile>
-    <ClCompile Include="HID\Mouse\MouseEvent.cpp">
+    <ClCompile Include="Source\HID\Mouse\MouseEvent.cpp">
       <Filter>Исходные файлы\HID\Mouse</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\DeferredRenderer.cpp">
+    <ClCompile Include="Source\Graphics\ImGUI\imgui.cpp">
+      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_draw.cpp">
+      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_impl_dx11.cpp">
+      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_impl_win32.cpp">
+      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_widgets.cpp">
+      <Filter>Исходные файлы\Graphics\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\AdapterReader.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Camera2D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Camera3D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Color.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\DeferredRenderer.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\ForwardRenderer.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\GameObject.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\GameObject2D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\GameObject3D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Graphics.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\IndexBuffer.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Light.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Mesh.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Model.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\RenderableGameObject3D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\RenderableObject2D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\RenderableObject3D.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Shaders.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Sprite.cpp">
+      <Filter>Исходные файлы\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Graphics\Texture.cpp">
       <Filter>Исходные файлы\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ErrorLogger.h">
+    <ClInclude Include="Source\WindowContainer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="RenderWindow.h">
+    <ClInclude Include="Source\Timer.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Engine.h">
+    <ClInclude Include="Source\StringHelper.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="WindowContainer.h">
+    <ClInclude Include="Source\RenderWindow.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Graphics.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\AdapterReader.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Vertex.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\VertexBuffer.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\IndexBuffer.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ConstantBufferTypes.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ConstantBuffer.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Timer.h">
+    <ClInclude Include="Source\ErrorLogger.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="COMException.h">
+    <ClInclude Include="Source\Engine.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Model.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Mesh.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\GameObject.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Color.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Texture.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHelper.h">
+    <ClInclude Include="Source\COMException.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Light.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\GameObject2D.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\GameObject3D.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Camera3D.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Camera2D.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Sprite.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ForwardRenderer.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\interfaces\IRenderable.h">
-      <Filter>Файлы заголовков\Graphics\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\RenderableGameObject3D.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\RenderableObject2D.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\RenderableObject3D.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Shaders.h">
-      <Filter>Файлы заголовков\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\interfaces\IResourceMaster.h">
-      <Filter>Файлы заголовков\Graphics\Interfaces</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imgui.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imconfig.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imgui_impl_dx11.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imgui_impl_win32.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imgui_internal.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imstb_rectpack.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imstb_textedit.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\imstb_truetype.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\ImGUI\ImGUIW.h">
-      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
-    </ClInclude>
-    <ClInclude Include="HID\Keyboard\KeyboardClass.h">
+    <ClInclude Include="Source\HID\Keyboard\KeyboardClass.h">
       <Filter>Файлы заголовков\HID\Keyboard</Filter>
     </ClInclude>
-    <ClInclude Include="HID\Keyboard\KeyboardEvent.h">
+    <ClInclude Include="Source\HID\Keyboard\KeyboardEvent.h">
       <Filter>Файлы заголовков\HID\Keyboard</Filter>
     </ClInclude>
-    <ClInclude Include="HID\Mouse\MouseClass.h">
+    <ClInclude Include="Source\HID\Mouse\MouseClass.h">
       <Filter>Файлы заголовков\HID\Mouse</Filter>
     </ClInclude>
-    <ClInclude Include="HID\Mouse\MouseEvent.h">
+    <ClInclude Include="Source\HID\Mouse\MouseEvent.h">
       <Filter>Файлы заголовков\HID\Mouse</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\DeferredRenderer.h">
+    <ClInclude Include="Source\Graphics\ImGUI\imconfig.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\imgui.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\imgui_impl_dx11.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\imgui_impl_win32.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\imgui_internal.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\ImGUIW.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\imstb_rectpack.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\imstb_textedit.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ImGUI\imstb_truetype.h">
+      <Filter>Файлы заголовков\Graphics\ImGui</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\interfaces\IRenderable.h">
+      <Filter>Файлы заголовков\Graphics\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\interfaces\IResourceMaster.h">
+      <Filter>Файлы заголовков\Graphics\Interfaces</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\AdapterReader.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Camera2D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Camera3D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Color.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ConstantBuffer.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ConstantBufferTypes.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\DeferredRenderer.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\ForwardRenderer.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GameObject.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GameObject2D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\GameObject3D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Graphics.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\IndexBuffer.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Light.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Mesh.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Model.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\RenderableGameObject3D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\RenderableObject2D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\RenderableObject3D.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Shaders.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Sprite.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Texture.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\Vertex.h">
+      <Filter>Файлы заголовков\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Graphics\VertexBuffer.h">
       <Filter>Файлы заголовков\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

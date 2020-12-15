@@ -72,25 +72,25 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Source\includes\assimp;$(SolutionDir)Source\includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\x86\Debug;$(SolutionDir)libs\Any;$(LibraryPath);</LibraryPath>
     <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Source\includes\assimp;$(SolutionDir)Source\includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\Any;$(SolutionDir)libs\x86\Release;$(LibraryPath);</LibraryPath>
     <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Source\includes\assimp;$(SolutionDir)Source\includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\x64\Debug;$(SolutionDir)libs\Any;$(LibraryPath)</LibraryPath>
     <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)includes\assimp;$(SolutionDir)includes;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)Source\includes\assimp;$(SolutionDir)Source\includes;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)libs\Any;$(SolutionDir)libs\x64\Release;$(LibraryPath)</LibraryPath>
     <MultiProcFXC>true</MultiProcFXC>
   </PropertyGroup>
@@ -111,6 +111,9 @@
       <Command>
       </Command>
     </PreBuildEvent>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -129,6 +132,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;DirectXTK.lib;DXGI.lib;D3DCompiler.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -143,6 +149,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;DirectXTK.lib;DXGI.lib;D3DCompiler.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -161,93 +170,96 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;DirectXTK.lib;DXGI.lib;D3DCompiler.lib;assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Graphics\DeferredRenderer.cpp" />
-    <ClCompile Include="Graphics\ForwardRenderer.cpp" />
-    <ClCompile Include="Graphics\Camera2D.cpp" />
-    <ClCompile Include="Graphics\GameObject2D.cpp" />
-    <ClCompile Include="Graphics\GameObject3D.cpp" />
-    <ClCompile Include="Graphics\Color.cpp" />
-    <ClCompile Include="COMException.cpp" />
-    <ClCompile Include="Graphics\GameObject.cpp" />
-    <ClCompile Include="Graphics\Camera3D.cpp" />
-    <ClCompile Include="Engine.cpp" />
-    <ClCompile Include="ErrorLogger.cpp" />
-    <ClCompile Include="Graphics\AdapterReader.cpp" />
-    <ClCompile Include="Graphics\Graphics.cpp" />
-    <ClCompile Include="Graphics\ImGUI\imgui.cpp" />
-    <ClCompile Include="Graphics\ImGUI\imgui_draw.cpp" />
-    <ClCompile Include="Graphics\ImGUI\imgui_impl_dx11.cpp" />
-    <ClCompile Include="Graphics\ImGUI\imgui_impl_win32.cpp" />
-    <ClCompile Include="Graphics\ImGUI\imgui_widgets.cpp" />
-    <ClCompile Include="Graphics\IndexBuffer.cpp" />
-    <ClCompile Include="Graphics\RenderableObject3D.cpp" />
-    <ClCompile Include="Graphics\Shaders.cpp" />
-    <ClCompile Include="HID\Keyboard\KeyboardClass.cpp" />
-    <ClCompile Include="HID\Keyboard\KeyboardEvent.cpp" />
-    <ClCompile Include="Graphics\Light.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Graphics\Model.cpp" />
-    <ClCompile Include="Graphics\Mesh.cpp" />
-    <ClCompile Include="HID\Mouse\MouseClass.cpp" />
-    <ClCompile Include="HID\Mouse\MouseEvent.cpp" />
-    <ClCompile Include="Graphics\RenderableGameObject3D.cpp" />
-    <ClCompile Include="Graphics\RenderableObject2D.cpp" />
-    <ClCompile Include="RenderWindow.cpp" />
-    <ClCompile Include="Graphics\Sprite.cpp" />
-    <ClCompile Include="StringHelper.cpp" />
-    <ClCompile Include="Graphics\Texture.cpp" />
-    <ClCompile Include="Timer.cpp" />
-    <ClCompile Include="WindowContainer.cpp" />
+    <ClCompile Include="Source\Graphics\DeferredRenderer.cpp" />
+    <ClCompile Include="Source\Graphics\ForwardRenderer.cpp" />
+    <ClCompile Include="Source\Graphics\Camera2D.cpp" />
+    <ClCompile Include="Source\Graphics\GameObject2D.cpp" />
+    <ClCompile Include="Source\Graphics\GameObject3D.cpp" />
+    <ClCompile Include="Source\Graphics\Color.cpp" />
+    <ClCompile Include="Source\COMException.cpp" />
+    <ClCompile Include="Source\Graphics\GameObject.cpp" />
+    <ClCompile Include="Source\Graphics\Camera3D.cpp" />
+    <ClCompile Include="Source\Engine.cpp" />
+    <ClCompile Include="Source\ErrorLogger.cpp" />
+    <ClCompile Include="Source\Graphics\AdapterReader.cpp" />
+    <ClCompile Include="Source\Graphics\Graphics.cpp" />
+    <ClCompile Include="Source\Graphics\ImGUI\imgui.cpp" />
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_draw.cpp" />
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_impl_dx11.cpp" />
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_impl_win32.cpp" />
+    <ClCompile Include="Source\Graphics\ImGUI\imgui_widgets.cpp" />
+    <ClCompile Include="Source\Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Source\Graphics\RenderableObject3D.cpp" />
+    <ClCompile Include="Source\Graphics\Shaders.cpp" />
+    <ClCompile Include="Source\HID\Keyboard\KeyboardClass.cpp" />
+    <ClCompile Include="Source\HID\Keyboard\KeyboardEvent.cpp" />
+    <ClCompile Include="Source\Graphics\Light.cpp" />
+    <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\Graphics\Model.cpp" />
+    <ClCompile Include="Source\Graphics\Mesh.cpp" />
+    <ClCompile Include="Source\HID\Mouse\MouseClass.cpp" />
+    <ClCompile Include="Source\HID\Mouse\MouseEvent.cpp" />
+    <ClCompile Include="Source\Graphics\RenderableGameObject3D.cpp" />
+    <ClCompile Include="Source\Graphics\RenderableObject2D.cpp" />
+    <ClCompile Include="Source\RenderWindow.cpp" />
+    <ClCompile Include="Source\Graphics\Sprite.cpp" />
+    <ClCompile Include="Source\StringHelper.cpp" />
+    <ClCompile Include="Source\Graphics\Texture.cpp" />
+    <ClCompile Include="Source\Timer.cpp" />
+    <ClCompile Include="Source\WindowContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Graphics\DeferredRenderer.h" />
-    <ClInclude Include="Graphics\ForwardRenderer.h" />
-    <ClInclude Include="Graphics\Camera2D.h" />
-    <ClInclude Include="Graphics\GameObject2D.h" />
-    <ClInclude Include="Graphics\GameObject3D.h" />
-    <ClInclude Include="Graphics\Color.h" />
-    <ClInclude Include="COMException.h" />
-    <ClInclude Include="Graphics\GameObject.h" />
-    <ClInclude Include="Graphics\Camera3D.h" />
-    <ClInclude Include="Graphics\ConstantBuffer.h" />
-    <ClInclude Include="Graphics\ConstantBufferTypes.h" />
-    <ClInclude Include="Engine.h" />
-    <ClInclude Include="ErrorLogger.h" />
-    <ClInclude Include="Graphics\AdapterReader.h" />
-    <ClInclude Include="Graphics\Graphics.h" />
-    <ClInclude Include="Graphics\ImGUI\imconfig.h" />
-    <ClInclude Include="Graphics\ImGUI\imgui.h" />
-    <ClInclude Include="Graphics\ImGUI\imgui_impl_dx11.h" />
-    <ClInclude Include="Graphics\ImGUI\imgui_impl_win32.h" />
-    <ClInclude Include="Graphics\ImGUI\imgui_internal.h" />
-    <ClInclude Include="Graphics\ImGUI\imstb_rectpack.h" />
-    <ClInclude Include="Graphics\ImGUI\imstb_textedit.h" />
-    <ClInclude Include="Graphics\ImGUI\imstb_truetype.h" />
-    <ClInclude Include="Graphics\RenderableObject2D.h" />
-    <ClInclude Include="Graphics\RenderableObject3D.h" />
-    <ClInclude Include="Graphics\Shaders.h" />
-    <ClInclude Include="Graphics\Vertex.h" />
-    <ClInclude Include="Graphics\IndexBuffer.h" />
-    <ClInclude Include="Graphics\interfaces\IRenderable.h" />
-    <ClInclude Include="Graphics\ImGUI\ImGUIW.h" />
-    <ClInclude Include="HID\Keyboard\KeyboardClass.h" />
-    <ClInclude Include="HID\Keyboard\KeyboardEvent.h" />
-    <ClInclude Include="Graphics\Model.h" />
-    <ClInclude Include="Graphics\Mesh.h" />
-    <ClInclude Include="Graphics\Light.h" />
-    <ClInclude Include="HID\Mouse\MouseClass.h" />
-    <ClInclude Include="HID\Mouse\MouseEvent.h" />
-    <ClInclude Include="Graphics\RenderableGameObject3D.h" />
-    <ClInclude Include="RenderWindow.h" />
-    <ClInclude Include="Graphics\Sprite.h" />
-    <ClInclude Include="Graphics\interfaces\IResourceMaster.h" />
-    <ClInclude Include="StringHelper.h" />
-    <ClInclude Include="Graphics\VertexBuffer.h" />
-    <ClInclude Include="Graphics\Texture.h" />
-    <ClInclude Include="Timer.h" />
-    <ClInclude Include="WindowContainer.h" />
+    <ClInclude Include="Source\Graphics\DeferredRenderer.h" />
+    <ClInclude Include="Source\Graphics\ForwardRenderer.h" />
+    <ClInclude Include="Source\Graphics\Camera2D.h" />
+    <ClInclude Include="Source\Graphics\GameObject2D.h" />
+    <ClInclude Include="Source\Graphics\GameObject3D.h" />
+    <ClInclude Include="Source\Graphics\Color.h" />
+    <ClInclude Include="Source\COMException.h" />
+    <ClInclude Include="Source\Graphics\GameObject.h" />
+    <ClInclude Include="Source\Graphics\Camera3D.h" />
+    <ClInclude Include="Source\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Source\Graphics\ConstantBufferTypes.h" />
+    <ClInclude Include="Source\Engine.h" />
+    <ClInclude Include="Source\ErrorLogger.h" />
+    <ClInclude Include="Source\Graphics\AdapterReader.h" />
+    <ClInclude Include="Source\Graphics\Graphics.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imconfig.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imgui.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imgui_impl_dx11.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imgui_impl_win32.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imgui_internal.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imstb_rectpack.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imstb_textedit.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\imstb_truetype.h" />
+    <ClInclude Include="Source\Graphics\RenderableObject2D.h" />
+    <ClInclude Include="Source\Graphics\RenderableObject3D.h" />
+    <ClInclude Include="Source\Graphics\Shaders.h" />
+    <ClInclude Include="Source\Graphics\Vertex.h" />
+    <ClInclude Include="Source\Graphics\IndexBuffer.h" />
+    <ClInclude Include="Source\Graphics\interfaces\IRenderable.h" />
+    <ClInclude Include="Source\Graphics\ImGUI\ImGUIW.h" />
+    <ClInclude Include="Source\HID\Keyboard\KeyboardClass.h" />
+    <ClInclude Include="Source\HID\Keyboard\KeyboardEvent.h" />
+    <ClInclude Include="Source\Graphics\Model.h" />
+    <ClInclude Include="Source\Graphics\Mesh.h" />
+    <ClInclude Include="Source\Graphics\Light.h" />
+    <ClInclude Include="Source\HID\Mouse\MouseClass.h" />
+    <ClInclude Include="Source\HID\Mouse\MouseEvent.h" />
+    <ClInclude Include="Source\Graphics\RenderableGameObject3D.h" />
+    <ClInclude Include="Source\RenderWindow.h" />
+    <ClInclude Include="Source\Graphics\Sprite.h" />
+    <ClInclude Include="Source\Graphics\interfaces\IResourceMaster.h" />
+    <ClInclude Include="Source\StringHelper.h" />
+    <ClInclude Include="Source\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Source\Graphics\Texture.h" />
+    <ClInclude Include="Source\Timer.h" />
+    <ClInclude Include="Source\WindowContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\pixelshader.hlsl">

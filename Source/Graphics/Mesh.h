@@ -20,7 +20,7 @@ public:
     Mesh(const Mesh &mesh) = default;
     void draw();
     const DirectX::XMMATRIX& getTransformMatrix();
-
+    
 private:
     VertexBuffer<Vertex3D> vertexBuffer;
     IndexBuffer indexBuffer;
