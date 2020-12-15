@@ -9,7 +9,7 @@
 
 
 struct CB_VS_vertexshader {
-    DirectX::XMMATRIX worldViewProjectionMatrix;
+    DirectX::XMMATRIX viewProjectionMatrix;
     DirectX::XMMATRIX worldMatrix;
 };
 

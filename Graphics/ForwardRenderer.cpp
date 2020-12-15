@@ -1,14 +1,7 @@
 #include "ForwardRenderer.h"
 
-bool ForwardRenderer::initialize(ID3D11Device* device, 
-                                 ID3D11DeviceContext* deviceContext, 
-                                 IDXGISwapChain* swapChain, 
-                                 ID3D11RenderTargetView* renderTargetView) {
-    
-    this->device = device;
+bool ForwardRenderer::initialize(ID3D11DeviceContext* deviceContext) {
     this->deviceContext = deviceContext;
-    this->swapChain = swapChain;
-    this->renderTargetView = renderTargetView;
     return true;
 }
 

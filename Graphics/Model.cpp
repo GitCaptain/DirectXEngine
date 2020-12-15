@@ -30,7 +30,7 @@ void Model::draw(const XMMATRIX& worldMatrix, const XMMATRIX& viewProjectionMatr
     for (size_t i = 0; i < meshes.size(); i++) {
         // TODO: I removed XMMATRIX transpose from here to vertexshader.
         // have to figure out what is better for performance
-        cb_vs_vertexshader->data.worldViewProjectionMatrix = meshes[i].getTransformMatrix() * worldMatrix * viewProjectionMatrix;
+        cb_vs_vertexshader->data.viewProjectionMatrix = viewProjectionMatrix;
         cb_vs_vertexshader->data.worldMatrix = meshes[i].getTransformMatrix() * worldMatrix;
         cb_vs_vertexshader->applyChanges();
         meshes[i].draw();
@@ -103,9 +103,9 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
 }
 
 TextureStorageType Model::determineTextureStorageType(const aiScene* pScene, 
-                                                                      aiMaterial* pMaterial, 
-                                                                      size_t index, 
-                                                                      aiTextureType textureType) {
+                                                      aiMaterial* pMaterial, 
+                                                      size_t index, 
+                                                      aiTextureType textureType) {
     
     if (pMaterial->GetTextureCount(textureType) == 0) {
         // we shouldn't get here
@@ -155,6 +155,7 @@ std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* pMaterial,
                                                                  aiTextureType textureType, 
                                                                  const aiScene* pScene) {
     std::vector<Texture> materialTextures;
+    
     TextureStorageType storageType = TextureStorageType::Invalid;
     unsigned int textureCount = pMaterial->GetTextureCount(textureType);
 
@@ -164,7 +165,7 @@ std::vector<Texture> Model::LoadMaterialTextures(aiMaterial* pMaterial,
         switch (textureType) {
             case aiTextureType_DIFFUSE: {
                 pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor);
-                if (aiColor.IsBlack()) { // in case of black color, we use grey
+                if (aiColor.IsBlack()) { // in case of black color (unloaded), we use grey
                     materialTextures.emplace_back(device, UnloadedTextureColor, textureType);
                 }
                 else {

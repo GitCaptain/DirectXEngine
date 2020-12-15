@@ -1,7 +1,7 @@
 #include "Graphics.h"
 
-#define SaveReset(buffer) { \
-            if ((buffer).Get() != nullptr){\
+#define SaveResetCOM(buffer) { \
+            if ((buffer).Get() != nullptr){ \
                 (buffer).Reset(); \
             } \
         }
@@ -26,7 +26,7 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
         return false;
     }
 
-    if (!fRenderer.initialize(device.Get(), deviceContext.Get(), swapChain.Get(), renderTargetView.Get())) {
+    if (!fRenderer.initialize(deviceContext.Get())) {
         return false;
     }
     
@@ -88,11 +88,10 @@ void Graphics::renderFrame() {
     ImGui::DragFloat("farZ", &farZ, 10, 10, 50000.0f);
     ImGui::End();
 #endif
+    
     updateCamera();
-    {
-        nanosuit.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
-    }
 
+    nanosuit.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
     fRenderer.renderFrame(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
 
     //Draw text
@@ -130,9 +129,9 @@ void Graphics::onWindowResize(UINT width, UINT height) {
         return;
     }
 
-    SaveReset(renderTargetView);
-    SaveReset(depthStencilView);
-    SaveReset(depthStencilBuffer);
+    SaveResetCOM(renderTargetView);
+    SaveResetCOM(depthStencilView);
+    SaveResetCOM(depthStencilBuffer);
 
     windowWidth = width;
     windowHeight = height;

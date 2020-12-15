@@ -341,3 +341,9 @@ healthchecksdb
 
 # DirectXTK libs
 !libs/**
+
+# ImGui ini
+imgui.ini
+
+# ??
+dna.txt

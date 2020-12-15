@@ -9,7 +9,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// init com pointers
 	HRESULT hr = CoInitialize(nullptr);
 	ONFAILHRLOG(hr, "Failed to call CoInitialize", -1);
-
+	
 	Engine engine;
 	if (engine.initialize(hInstance, "Engine", "Window", 1280, 720)) {
 		while (engine.processMessages()) {

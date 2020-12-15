@@ -38,9 +38,9 @@ float4 main(PS_INPUT input) : SV_TARGET {
 
 	float distanceToLight = distance(dynamicLightPosition, input.inWorldPosition);
     
-	float attenuationFactor = 1 / (dynamicLightAttenuation_a + 
-                                   dynamicLightAttenuation_b * distanceToLight + 
-                                   dynamicLightAttenuation_c * pow(distanceToLight, 2));
+	float attenuationFactor = 1.0 / (dynamicLightAttenuation_a + 
+                                     dynamicLightAttenuation_b * distanceToLight + 
+                                     dynamicLightAttenuation_c * pow(distanceToLight, 2));
     
 	diffuseLightIntensity *= attenuationFactor;
     
