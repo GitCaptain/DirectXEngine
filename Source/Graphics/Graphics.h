@@ -61,7 +61,7 @@ namespace NGraphics {
         PixelShader pixelShader_2d_discard;
         
         ConstantBuffer<CB_VS_vertexshader_2d> cb_vs_vertexshader_2d;
-        ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
+        ConstantBuffer<CB_VS_m_world_viewprojeciton> cb_vs_vertexshader;
         
         Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
         Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;

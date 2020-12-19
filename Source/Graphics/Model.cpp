@@ -5,7 +5,7 @@ using namespace NGraphics;
 bool Model::initialize(const std::string& filePath, 
                             ID3D11Device* device,
                             ID3D11DeviceContext* deviceContext,
-                            ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
+                            ConstantBuffer<CB_VS_m_world_viewprojeciton>& cb_vs_vertexshader) {
     this->device = device;
     this->deviceContext = deviceContext;
     this->cb_vs_vertexshader = &cb_vs_vertexshader;

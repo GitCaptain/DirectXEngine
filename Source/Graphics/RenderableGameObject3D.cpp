@@ -5,7 +5,7 @@ using namespace NGraphics;
 bool RenderableGameObject3D::initialize(const std::string& filePath,
     ID3D11Device* device,
     ID3D11DeviceContext* deviceContext,
-    ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
+    ConstantBuffer<CB_VS_m_world_viewprojeciton>& cb_vs_vertexshader) {
 
     if (!model.initialize(filePath, device, deviceContext, cb_vs_vertexshader)) {
         return false;

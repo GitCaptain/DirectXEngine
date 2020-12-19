@@ -90,8 +90,10 @@ void Graphics::renderFrame() {
 #endif
     
     updateCamera();
-
     nanosuit.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
+    // TODO: light set its own shader, 
+    // so now we have to draw it last
+    // need to remove this dependency
     fRenderer.renderFrame(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
 
     //Draw text

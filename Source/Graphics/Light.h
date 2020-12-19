@@ -6,7 +6,7 @@
 
 class Light : public NGraphics::RenderableGameObject3D {
 public:
-    bool initialize(ID3D11Device *device, ID3D11DeviceContext *deviceContext, ConstantBuffer<CB_VS_vertexshader> &cb_vs_vertexshader);
+    bool initialize(ID3D11Device *device, ID3D11DeviceContext *deviceContext, ConstantBuffer<CB_VS_m_world_viewprojeciton> &cb_vs_vertexshader);
     
     void prepare(ID3D11DeviceContext* deviceContext) override;
     void draw(const DirectX::XMMATRIX& viewProjectionMatrix) override;

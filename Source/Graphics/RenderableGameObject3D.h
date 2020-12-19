@@ -14,7 +14,7 @@ namespace NGraphics {
         bool initialize(const std::string& filePath,
             ID3D11Device* device,
             ID3D11DeviceContext* deviceContext,
-            ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader);
+            ConstantBuffer<CB_VS_m_world_viewprojeciton>& cb_vs_vertexshader);
 
         void draw(const XMMATRIX& viewProjectionMatrix) override;
         void prepare(ID3D11DeviceContext* deviceContext) override;

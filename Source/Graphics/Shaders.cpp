@@ -14,7 +14,10 @@ bool VertexShader::initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
         return false;
     }
 
-    hr = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, shader.GetAddressOf());
+    hr = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), 
+                                    shaderBuffer->GetBufferSize(), 
+                                    nullptr, 
+                                    shader.GetAddressOf());
 
     if (FAILED(hr)) {
         std::wstring errorMsg = L"Failed to create vertex shader: ";
@@ -22,7 +25,6 @@ bool VertexShader::initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
         ErrorLogger::log(hr, errorMsg);
         return false;
     }
-
 
     hr = device->CreateInputLayout(layoutDescription,
                                    numElements,
@@ -34,7 +36,6 @@ bool VertexShader::initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
         ErrorLogger::log(hr, "Failed to create input layout.");
         return false;
     }
-
 
     return true;
 }

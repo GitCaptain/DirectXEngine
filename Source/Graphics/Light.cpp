@@ -1,7 +1,7 @@
 #include "Light.h"
 #include <wrl/client.h>
 
-bool Light::initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
+bool Light::initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ConstantBuffer<CB_VS_m_world_viewprojeciton>& cb_vs_vertexshader) {
     
     if (!RenderableGameObject3D::initialize("Data/Objects/light.fbx", 
                                             device, 
