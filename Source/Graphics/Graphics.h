@@ -30,6 +30,7 @@ namespace NGraphics {
         Camera2D camera2D;
         Sprite sprite;
         RenderableGameObject3D nanosuit;
+        int lightsCnt = 1;
         Light light;
         void onWindowResize(UINT width, UINT height);
         bool isInitialized();
@@ -59,9 +60,13 @@ namespace NGraphics {
         PixelShader pixelShader;
         PixelShader pixelShader_2d;
         PixelShader pixelShader_2d_discard;
-        
+        PixelShader pixelShader_nolight;
+
         ConstantBuffer<CB_VS_vertexshader_2d> cb_vs_vertexshader_2d;
         ConstantBuffer<CB_VS_m_world_viewprojeciton> cb_vs_vertexshader;
+        ConstantBuffer<CB_PS_light_per_frame> cb_ps_light_frame;
+        ConstantBuffer<CB_PS_light_per_obj> cb_ps_light_obj;
+        
         
         Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
         Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
@@ -90,6 +95,7 @@ namespace NGraphics {
         float farZ = 3000;
         bool initialized = false;
         Timer fpsTimer;
+        Timer globalTimer;
         Camera3D camera3D;
     };
 }

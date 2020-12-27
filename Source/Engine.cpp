@@ -79,8 +79,8 @@ void Engine::Update() {
     if (keyboard.isKeyPressed('C')) {
         DirectX::XMVECTOR lightPosition = gfx.getCamera3D().getPositionVector();
         lightPosition += gfx.getCamera3D().getForwardVector();
-        gfx.light.setPosition(lightPosition);
-        gfx.light.setRotation(gfx.getCamera3D().getRotationFloat3());
+        gfx.nanosuit.setPosition(lightPosition);
+        gfx.nanosuit.setRotation(gfx.getCamera3D().getRotationFloat3());
     }
 }
 

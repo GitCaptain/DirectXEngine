@@ -3,33 +3,34 @@ cbuffer MatrixBuffer {
     matrix viewProjectionMatrix;
 };
 
-struct VS_Input {
-    float4 position : POSITION;
-    float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
+struct VS_INPUT {
+    float3 inPos : POSITION;
+    float2 inTexCoord : TEXCOORD;
+    float3 inNormal : NORMAL;
 };
 
-struct VS_Output {
-    float4 position : SV_POSITION;
-    float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
+struct VS_OUTPUT {
+    float4 outPosition : SV_POSITION;
+    float2 outTexCoord : TEXCOORD;
+    float3 outNormal : NORMAL;
+    float3 outWorldPosition : WORLD_POSITION;
 };
 
-VS_Output main(VS_Input input) {
-    VS_Output output;
+VS_OUTPUT main(VS_INPUT input) {
+    VS_OUTPUT output;
     
-    // Change the position vector to be 4 units for proper matrix calculations.
-    input.position.w = 1.0f;
-
     float4x4 wvpMatrix = worldMatrix * viewProjectionMatrix;
     // Calculate the position of the vertex against the world, view, and projection matrices.
-    output.position = mul(input.position, wvpMatrix);
+    output.outPosition = mul(float4(input.inPos, 1.0f), wvpMatrix);
+    
+    // Calculate the position of the vertex against the world matrix for the pixel shader.
+    output.outWorldPosition = mul(float4(input.inPos, 1.0f), worldMatrix);
     
     // Store the texture coordinates for the pixel shader.
-    output.tex = input.tex;
+    output.outTexCoord = input.inTexCoord;
     
     // Calculate the normal vector against the world matrix only.
-    output.normal = normalize(mul(input.normal, (float3x3) worldMatrix));
+    output.outNormal = normalize(mul(input.inNormal, (float3x3) worldMatrix));
 
     return output;
 }

@@ -18,8 +18,4 @@ public:
     float attenuation_a = 1.0f;
     float attenuation_b = 0.1f;
     float attenuation_c = 0.1f;
-
-private:
-    ConstantBuffer<CB_PS_light> cb_ps_light;
-    PixelShader pixelShader_nolight;
 };

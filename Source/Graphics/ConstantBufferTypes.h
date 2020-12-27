@@ -8,7 +8,7 @@
 */
 
 
-struct CB_VS_vertexshader {
+struct CB_VS_m_world_viewprojeciton {
     DirectX::XMMATRIX viewProjectionMatrix;
     DirectX::XMMATRIX worldMatrix;
 };
@@ -17,16 +17,28 @@ struct CB_VS_vertexshader_2d {
     DirectX::XMMATRIX worldViewProjectionMatrix;
 };
 
-struct CB_PS_light {
+
+// if you change MAXIMUM_LIGHTS here
+// you also have to change it in constant buffer 
+// for your pixel shader and recompile it!
+constexpr int MAXIMUM_LIGHTS = 16;
+
+struct CB_PS_light_per_frame {
+    DirectX::XMFLOAT3 dynamicLightColor[MAXIMUM_LIGHTS];
+    float dynamicLightStrength[MAXIMUM_LIGHTS];
+
+    DirectX::XMFLOAT3 dynamicLightPosition[MAXIMUM_LIGHTS];
+
     DirectX::XMFLOAT3 ambientLightColor;
     float ambientLightStrength;
 
-    DirectX::XMFLOAT3 dynamicLightColor;
-    float dynamicLightStrength;
+    float dynamicLightAttenuation_a; // make this variables
+    float dynamicLightAttenuation_b; // common for all lights for now
+    float dynamicLightAttenuation_c; // maybe changed in future
+    
+    int lightsCnt;
+};
 
-    DirectX::XMFLOAT3 dynamicLightPosition;
-
-    float dynamicLightAttenuation_a;
-    float dynamicLightAttenuation_b;
-    float dynamicLightAttenuation_c;
+struct CB_PS_light_per_obj {
+    bool lightSource;
 };

@@ -46,7 +46,13 @@
     <Filter Include="Исходные файлы\HID\Keyboard">
       <UniqueIdentifier>{a6224bdc-ed97-47a5-9f7d-c30e03264a40}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Файлы ресурсов\deferredRenderer">
+    <Filter Include="Файлы ресурсов\Source files">
+      <UniqueIdentifier>{548aae5b-cb13-49e2-9635-72a881832854}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы ресурсов\Header files">
+      <UniqueIdentifier>{44b8bf0e-904a-4554-beb5-053036c62eec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Файлы ресурсов\Source files\deferredRenderer">
       <UniqueIdentifier>{633759aa-b36d-445f-bca0-0c68e2c1f384}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -304,35 +310,40 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Resources\pixelshader_nolight.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\pixelshader_2d.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\pixelshader_2d_discard.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\pixelshader.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\vertexshader_2d.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\vertexshader.hlsl">
-      <Filter>Файлы ресурсов</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\deferredRenderer\PS_fill_gBuffer.hlsl">
-      <Filter>Файлы ресурсов\deferredRenderer</Filter>
+      <Filter>Файлы ресурсов\Source files\deferredRenderer</Filter>
     </FxCompile>
     <FxCompile Include="Resources\deferredRenderer\PS_use_gBuffer.hlsl">
-      <Filter>Файлы ресурсов\deferredRenderer</Filter>
+      <Filter>Файлы ресурсов\Source files\deferredRenderer</Filter>
     </FxCompile>
     <FxCompile Include="Resources\deferredRenderer\VS_use_gBuffer.hlsl">
-      <Filter>Файлы ресурсов\deferredRenderer</Filter>
+      <Filter>Файлы ресурсов\Source files\deferredRenderer</Filter>
     </FxCompile>
     <FxCompile Include="Resources\deferredRenderer\VS_fill_gBuffer.hlsl">
-      <Filter>Файлы ресурсов\deferredRenderer</Filter>
+      <Filter>Файлы ресурсов\Source files\deferredRenderer</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\pixelshader.hlsl">
+      <Filter>Файлы ресурсов\Source files</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\pixelshader_2d.hlsl">
+      <Filter>Файлы ресурсов\Source files</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\pixelshader_2d_discard.hlsl">
+      <Filter>Файлы ресурсов\Source files</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\vertexshader.hlsl">
+      <Filter>Файлы ресурсов\Source files</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\pixelshader_nolight.hlsl">
+      <Filter>Файлы ресурсов\Source files</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\vertexshader_2d.hlsl">
+      <Filter>Файлы ресурсов\Source files</Filter>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\CB_light.hlsli">
+      <Filter>Файлы ресурсов\Header files</Filter>
+    </None>
   </ItemGroup>
 </Project>
