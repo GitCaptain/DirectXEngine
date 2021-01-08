@@ -334,10 +334,10 @@
     <FxCompile Include="Resources\vertexshader.hlsl">
       <Filter>Файлы ресурсов\Source files</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\pixelshader_nolight.hlsl">
+    <FxCompile Include="Resources\vertexshader_2d.hlsl">
       <Filter>Файлы ресурсов\Source files</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\vertexshader_2d.hlsl">
+    <FxCompile Include="Resources\pixelshader_nolight.hlsl">
       <Filter>Файлы ресурсов\Source files</Filter>
     </FxCompile>
   </ItemGroup>

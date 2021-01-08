@@ -1,56 +1,43 @@
-
-// if you change variable here
-// you also must change it ConstantBufferTypes
-// and recompile it!
-#define MAXIMUM_LIGHTS 16 / 4
-/*
-// per frame buffers
-cbuffer light_frame : register(b0) {
-    float3 dynamicLightColor[MAXIMUM_LIGHTS];
-    float dynamicLightStrength[MAXIMUM_LIGHTS];
-    
-    float3 dynamicLightPosition[MAXIMUM_LIGHTS];
-    
-    float3 ambientLightColor;
-    float ambientLightStrength;
-    
-    float dynamicLightAttenuation_a;
-    float dynamicLightAttenuation_b;
-    float dynamicLightAttenuation_c;
-    
-    int lightsCnt;
-}
-
 // per object buffers
 cbuffer light_object : register(b1) {
     bool lightSource;
 }
-*/
 
-// texture size is 3 * MAXIMUM_LIGHTS
-// first row: lightsCnt, ambientLightColor, ambientLightStrength, attenuations
-// second row: dinamycLightColor + Strength
-// third row: dynamicLightPosition
-Texture2D lightInfo: Texture : register(t1);
-SamplerState lightSampler : Sampler : register(s1);
+// texture size is 3 * lightsCnt
+// zero row: TextureWidth(max lights cnt) +  lightsCnt, ambientLightColor, ambientLightStrength, attenuations
+// first row: dynamicLightColor + Strength
+// second row: dynamicLightPosition
+// Bind this to 10'th registers to avoid intersections
+// TODO: figure out how to fix bindings
+Texture2D lightInfo: Texture : register(t10);
+SamplerState lightSampler : Sampler : register(s10);
+
+float2 getTextCoords(float y, float x, float width, float height = 3) {
+    // return coords in range [0, 1]
+    return float2(x / width, y / height);
+}
     
-// TODO: use this function in other pixelshaders? 
-// then no need to use `pixelshader_nolight`
-// just add new lightSource constant to lightBuffer
 float3 calculateColor(float3 sampleColor, float3 normal, float3 position, bool lightSource=false) {
+
+    const float MAX_LIGHTS_CNT = lightInfo.Sample(lightSampler, float2(0, 0)).x; // texture width
+    int lightsCnt = lightInfo.Sample(lightSampler, float2(0, 0)).y;
+    float3 ambientLightColor = lightInfo.Sample(lightSampler, getTextCoords(0, 1, MAX_LIGHTS_CNT)).rgb;
+    float ambientLightStrength = lightInfo.Sample(lightSampler, getTextCoords(0, 2, MAX_LIGHTS_CNT)).x;
+    float3 attenuations = lightInfo.Sample(lightSampler, getTextCoords(0, 3, MAX_LIGHTS_CNT)).xyz;
+    float dynamicLightAttenuation_a = attenuations.x;
+    float dynamicLightAttenuation_b = attenuations.y;
+    float dynamicLightAttenuation_c = attenuations.z;
+
+    float3 ambientLight = ambientLightColor * ambientLightStrength;
+    float3 appliedLight = ambientLight;
     
-    float3 ambientLightColor = lightInfo.Sample(lightSampler, float2(0, 0));
-    float3 ambientLightColor = lightInfo.Sample(lightSampler, float2(0, 0));
-    float3 ambientLightColor = lightInfo.Sample(lightSampler, float2(0, 0));
-    float3 ambientLightColor = lightInfo.Sample(lightSampler, float2(0, 0));
-    
-    float3 finalColor = float3(0, 1, 0);
-    for (int i = 0; i < lightsCnt; i++) {
-       
-        float3 ambientLight = ambientLightColor * ambientLightStrength;
-    
-        float3 appliedLight = ambientLight;
-         
+    for (int i = 0; i < lightsCnt; i++) {  
+        
+        float4 dynamicLightSC = lightInfo.Sample(lightSampler, getTextCoords(1, i, MAX_LIGHTS_CNT));
+        float3 dynamicLightColor = dynamicLightSC.xyz;
+        float dynamicLightStrength = dynamicLightSC.w;
+        float3 dynamicLightPosition = lightInfo.Sample(lightSampler, getTextCoords(2, i, MAX_LIGHTS_CNT)).xyz;
+        
         float3 diffuseLightIntensity;
         float distanceToLight;
         if (lightSource) {
@@ -58,24 +45,25 @@ float3 calculateColor(float3 sampleColor, float3 normal, float3 position, bool l
             diffuseLightIntensity = normalize(float3(1, 1, 1));
         }
         else {
-            float3 vectorToLight = normalize(dynamicLightPosition[i] - position);
+            float3 vectorToLight = normalize(dynamicLightPosition - position);
             // we don't lightning objects that are opposite to our light source,
             // but we don't want to make it darker too
             diffuseLightIntensity = max(dot(vectorToLight, normal), 0);
-            distanceToLight = distance(dynamicLightPosition[i], position);
+            distanceToLight = distance(dynamicLightPosition, position);
         }
     
         float attenuationFactor = 1.0 / (dynamicLightAttenuation_a +
-                                     dynamicLightAttenuation_b * distanceToLight +
-                                     dynamicLightAttenuation_c * pow(distanceToLight, 2));
+                                         dynamicLightAttenuation_b * distanceToLight +
+                                         dynamicLightAttenuation_c * pow(distanceToLight, 2));
        
         diffuseLightIntensity *= attenuationFactor;
 
-        float3 diffuseLight = diffuseLightIntensity * dynamicLightStrength[i] * dynamicLightColor[i];
-    
+        float3 diffuseLight = diffuseLightIntensity * dynamicLightStrength * dynamicLightColor;
+        
         appliedLight += diffuseLight;
-    
-        finalColor += sampleColor * appliedLight;
     }
+    
+    float3 finalColor = appliedLight * sampleColor;
+    
     return finalColor;
 }

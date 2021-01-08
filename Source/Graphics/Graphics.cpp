@@ -82,7 +82,9 @@ void Graphics::renderFrame() {
     deviceContext->RSSetState(rasterizerState.Get());
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
-    deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+    deviceContext->PSSetSamplers(0, 1, samplerStateTextures.GetAddressOf());
+
+    deviceContext->PSSetSamplers(10, 1, samplerStateLightInfo.GetAddressOf());
 
     // sprite mask 
     //deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
@@ -94,9 +96,11 @@ void Graphics::renderFrame() {
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader_nolight.getShader(), nullptr, 0);
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
-    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light_frame.GetAddressOf());
+    //deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light_frame.GetAddressOf());
     deviceContext->PSSetConstantBuffers(1, 1, cb_ps_light_obj.GetAddressOf());
     //deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
+
+    deviceContext->PSSetShaderResources(10, 1, lightTexture.GetAddressOf());
 
 #ifdef ENABLE_IMGUI
     // create imgui test window
@@ -107,57 +111,62 @@ void Graphics::renderFrame() {
     ImGui::End();
 #endif
 
-#ifdef ENABLE_IMGUI
-    // create imgui test window
-    ImGui::Begin("Light Controls");
-    ImGui::DragFloat3("Ambient light color", &cb_ps_light_frame.data.ambientLightColor.x, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Ambient light strength", &cb_ps_light_frame.data.ambientLightStrength, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
-    ImGui::InputInt("Light cnt", &lightsCnt);
-    ImGui::End();
-#endif
+#pragma region old_light_work
+//#ifdef ENABLE_IMGUI
+//    ImGui::Begin("Light Controls");
+//    ImGui::DragFloat3("Ambient light color", &cb_ps_light_frame.data.ambientLightColor.x, 0.01, 0.0f, 1.0f);
+//    ImGui::DragFloat("Ambient light strength", &cb_ps_light_frame.data.ambientLightStrength, 0.01, 0.0f, 1.0f);
+//    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
+//    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
+//    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
+//    ImGui::InputInt("Light cnt", &lightsCnt);
+//    ImGui::End();
+//#endif
+//
+//    constraintInPlace(lightsCnt, 0, MAX_LIGHT_CNT);
+//   
+    //cb_ps_light_obj.data.lightSource = true;
+    //cb_ps_light_obj.applyChanges();
 
-    ID3D11Texture2D tex;
+    //cb_ps_light_frame.data.dynamicLightAttenuation_a = light.attenuation_a;
+    //cb_ps_light_frame.data.dynamicLightAttenuation_b = light.attenuation_b;
+    //cb_ps_light_frame.data.dynamicLightAttenuation_c = light.attenuation_c;
+    //cb_ps_light_frame.data.lightsCnt = lightsCnt;
+    //std::vector<XMFLOAT3> lightPos(lightsCnt);
+    //double time = globalTimer.getMillisecondsElapsed() / 10000;
+    //for (int i = 0; i < lightsCnt; i++) {
+    //    lightPos[i] = { 10 * static_cast<float>(sin(time * i * i)),
+    //                    10 * static_cast<float>(cos(time * i * i)),
+    //                    0 };
+    //    //XMFLOAT3 lightPos = { i * static_cast<float>(sin(time * i)),
+    //    //                      i * static_cast<float>(cos(time * i)),
+    //    //                      i * static_cast<float>(time) };
+    //    cb_ps_light_frame.data.dynamicLightPosition[i] = lightPos[i];
+    //    cb_ps_light_frame.data.dynamicLightColor[i] = light.lightColor;
+    //    cb_ps_light_frame.data.dynamicLightStrength[i] = light.lightStrength;
+    //}
+    //cb_ps_light_frame.applyChanges();
 
-    constraintInPlace(lightsCnt, 0, MAXIMUM_LIGHTS);
-    if (lightsCnt > MAXIMUM_LIGHTS) {
-        lightsCnt = MAXIMUM_LIGHTS;
-    }
-    if (lightsCnt < 0) {
-        lightsCnt = 0;
-    }   
-   
-    cb_ps_light_obj.data.lightSource = true;
-    cb_ps_light_obj.applyChanges();
 
-    cb_ps_light_frame.data.dynamicLightAttenuation_a = light.attenuation_a;
-    cb_ps_light_frame.data.dynamicLightAttenuation_b = light.attenuation_b;
-    cb_ps_light_frame.data.dynamicLightAttenuation_c = light.attenuation_c;
-    cb_ps_light_frame.data.lightsCnt = lightsCnt;
-    std::vector<XMFLOAT3> lightPos(lightsCnt);
-    double time = globalTimer.getMillisecondsElapsed() / 10000;
-    for (int i = 0; i < lightsCnt; i++) {
-        lightPos[i] = { 10 * static_cast<float>(sin(time * i * i)),
-                        10 * static_cast<float>(cos(time * i * i)),
-                        0 };
-        //XMFLOAT3 lightPos = { i * static_cast<float>(sin(time * i)),
-        //                      i * static_cast<float>(cos(time * i)),
-        //                      i * static_cast<float>(time) };
-        cb_ps_light_frame.data.dynamicLightPosition[i] = lightPos[i];
-        cb_ps_light_frame.data.dynamicLightColor[i] = light.lightColor;
-        cb_ps_light_frame.data.dynamicLightStrength[i] = light.lightStrength;
-    }
-    cb_ps_light_frame.applyChanges();
+    //XMMATRIX wvp = camera3D.getViewMatrix() * camera3D.getProjectionMatrix();
+    //for (auto& pos : lightPos) {
+    //    light.setPosition(pos);
+    //    fRenderer.renderFrame(wvp);
+    //}
 
+    //cb_ps_light_obj.data.lightSource = false;
+    //cb_ps_light_obj.applyChanges();
+    //nanosuit.draw(wvp);
+#pragma endregion
 
     XMMATRIX wvp = camera3D.getViewMatrix() * camera3D.getProjectionMatrix();
-    for (auto& pos : lightPos) {
-        light.setPosition(pos);
+    cb_ps_light_obj.data.lightSource = true;
+    cb_ps_light_obj.applyChanges();
+    updateLight();
+    for (int i = 0; i < lightsCnt; i++) {
+        light.setPosition(lightData[2][i].x, lightData[2][i].y, lightData[2][i].z);
         fRenderer.renderFrame(wvp);
     }
-
     cb_ps_light_obj.data.lightSource = false;
     cb_ps_light_obj.applyChanges();
     nanosuit.draw(wvp);
@@ -172,8 +181,20 @@ void Graphics::renderFrame() {
         fpsTimer.restartTimer(); 
     }
     spriteBatch->Begin(); 
-    spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
-    spriteFont->DrawString(spriteBatch.get(), deviceDescription.c_str(), DirectX::XMFLOAT2(0, fontSize + spaceSize), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+    spriteFont->DrawString(spriteBatch.get(),
+                           fpsString.c_str(),
+                           DirectX::XMFLOAT2(0, 0),
+                           DirectX::Colors::White, 
+                           0.0f,
+                           DirectX::XMFLOAT2(0.0f, 0.0f),
+                           DirectX::XMFLOAT2(1.0f, 1.0f));
+    spriteFont->DrawString(spriteBatch.get(),
+                           deviceDescription.c_str(),
+                           DirectX::XMFLOAT2(0, fontSize + spaceSize),
+                           DirectX::Colors::White,
+                           0.0f,
+                           DirectX::XMFLOAT2(0.0f, 0.0f),
+                           DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
 
 #ifdef ENABLE_IMGUI
@@ -288,10 +309,12 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         sampDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
         
         // Create sampler state
-        hr = device->CreateSamplerState(&sampDesc, samplerState.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state.");
+        hr = device->CreateSamplerState(&sampDesc, samplerStateTextures.GetAddressOf());
+        COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state for textures.");
 
         deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
+
+        initLight();
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
@@ -367,13 +390,19 @@ bool Graphics::initializeShaders() {
 bool Graphics::initializeScene() {
     try {
         // Load texture
-        HRESULT hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
+        HRESULT hr = DirectX::CreateWICTextureFromFile(device.Get(), 
+                                                       L"Data\\Textures\\seamless_grass.jpg",
+                                                       nullptr, grassTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
 
-        hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
+        hr = DirectX::CreateWICTextureFromFile(device.Get(), 
+                                               L"Data\\Textures\\pinksquare.jpg", 
+                                               nullptr, pinkTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
 
-        hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Data\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
+        hr = DirectX::CreateWICTextureFromFile(device.Get(), 
+                                               L"Data\\Textures\\seamless_pavement.jpg", 
+                                               nullptr, pavementTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
         
         // Initialize constant buffer(s)
@@ -383,17 +412,18 @@ bool Graphics::initializeScene() {
         hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
 
-        hr = cb_ps_light_frame.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_light_frame constant buffer.");
+        //hr = cb_ps_light_frame.initialize(device.Get(), deviceContext.Get());
+        //COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_light_frame constant buffer.");
         hr = cb_ps_light_obj.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_light_obj constant buffer.");
         
         // TODO: move set initial values to another function
-        cb_ps_light_frame.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-        cb_ps_light_frame.data.ambientLightStrength = 1.0f;
+        //cb_ps_light_frame.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+        //cb_ps_light_frame.data.ambientLightStrength = 1.0f;
 
         // Initialize Model(s)
-        if(!nanosuit.initialize("Data\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
+        if(!nanosuit.initialize("Data\\Objects\\nanosuit\\nanosuit.obj", 
+                                device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
             return false;
         }
 
@@ -403,11 +433,13 @@ bool Graphics::initializeScene() {
 
         // TODO: FIX: when load anything from broken path,
         // the engine just crush silently, need to make the crush reason more clear
-        if (!sprite.initialize(device.Get(), deviceContext.Get(), 256, 256, "Data/textures/circle.png", cb_vs_vertexshader_2d)) {
+        if (!sprite.initialize(device.Get(), deviceContext.Get(), 256, 256, 
+                               "Data/textures/circle.png", cb_vs_vertexshader_2d)) {
             return false;
         }
 
-        sprite.setPosition(DirectX::XMFLOAT3(windowWidth/2 - sprite.getWidth()/2, windowHeight/2 - sprite.getHeight()/2, 0.0f));
+        sprite.setPosition(DirectX::XMFLOAT3(windowWidth/2 - sprite.getWidth()/2,
+                                             windowHeight/2 - sprite.getHeight()/2, 0.0f));
         
         camera2D.setProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 
@@ -420,6 +452,80 @@ bool Graphics::initializeScene() {
         ErrorLogger::log(e);
         return false;
     }
+    return true;
+}
+
+bool NGraphics::Graphics::initLight() {
+
+    // Refer to CB_light.hlsli 
+    // to read texture description
+
+    DXGI_FORMAT texFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+    CD3D11_TEXTURE2D_DESC texDesc(texFormat, MAX_LIGHT_CNT, LIGHT_TEXTURE_HEIGHT);
+    texDesc.MipLevels = 1;
+    texDesc.Usage = D3D11_USAGE_DYNAMIC;
+    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    HRESULT hr = device->CreateTexture2D(&texDesc, nullptr, lightInfo.GetAddressOf());
+    ONFAILHRLOG(hr, "Can't create texture for light info.", false);
+
+    CD3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc(D3D_SRV_DIMENSION_TEXTURE2D, texFormat);
+    hr = device->CreateShaderResourceView(lightInfo.Get(), &SRVDesc, lightTexture.GetAddressOf());
+    ONFAILHRLOG(hr, "Can't create shader resource view for light texture", false);
+
+    // Create sampler description for sampler state
+    CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    // Create sampler state
+    hr = device->CreateSamplerState(&sampDesc, samplerStateLightInfo.GetAddressOf());
+    COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state for lights.");
+
+    return true;
+}
+
+bool NGraphics::Graphics::updateLight() {
+
+#ifdef ENABLE_IMGUI
+    ImGui::Begin("Light Controls");
+    ImGui::DragFloat3("Ambient light color", &lightData[0][1].x, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat("Ambient light strength", &lightData[0][2].x, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat("Dynamic light strength", &light.lightStrength, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
+    ImGui::InputInt("Light cnt", &lightsCnt);
+    ImGui::End();
+#endif
+
+    std::wstring dls = std::to_wstring(light.lightStrength);
+    dls = L"dls: " + dls + L"\n";
+    OutputDebugStringW(dls.c_str());
+    constraintInPlace(lightsCnt, 0, MAX_LIGHT_CNT);
+
+    lightData[0][0].x = MAX_LIGHT_CNT;
+    lightData[0][0].y = lightsCnt;
+    lightData[0][3].x = light.attenuation_a;
+    lightData[0][3].y = light.attenuation_b;
+    lightData[0][3].z = light.attenuation_c;
+
+    double time = globalTimer.getMillisecondsElapsed() / 10000;
+    for (int i = 0; i < lightsCnt; i++) {
+        lightData[2][i] = { 10 * static_cast<float>(sin(time * i * i)),
+                            10 * static_cast<float>(cos(time * i * i)),
+                            0.0, 0.0 };
+        lightData[1][i].x = light.lightColor.x;
+        lightData[1][i].y = light.lightColor.y;
+        lightData[1][i].z = light.lightColor.z;
+        lightData[1][i].w = light.lightStrength;
+    }
+
+    constexpr UINT mapFlags = 0;
+    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    ZeroMemory(&mappedResource, sizeof(mappedResource));
+    HRESULT hr = deviceContext->Map(lightInfo.Get(), 0, D3D11_MAP_WRITE_DISCARD, mapFlags, &mappedResource);
+    ONFAILHRLOG(hr, "Failed to map light texture buffer.", false);
+    CopyMemory(mappedResource.pData, &lightData, sizeof(lightData));
+    deviceContext->Unmap(lightInfo.Get(), mapFlags);
     return true;
 }
 
@@ -517,40 +623,40 @@ void Graphics::createDepthStencilStates() {
     HRESULT hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.GetAddressOf());
     COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
 
-    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_drawMask(D3D11_DEFAULT);
-    depthStencilDesc_drawMask.DepthEnable = FALSE;
-    depthStencilDesc_drawMask.StencilEnable = TRUE;
+    //CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_drawMask(D3D11_DEFAULT);
+    //depthStencilDesc_drawMask.DepthEnable = FALSE;
+    //depthStencilDesc_drawMask.StencilEnable = TRUE;
 
-    depthStencilDesc_drawMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-    depthStencilDesc_drawMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_drawMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_drawMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_drawMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+    //depthStencilDesc_drawMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_drawMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_drawMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
 
-    depthStencilDesc_drawMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
-    depthStencilDesc_drawMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_drawMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_drawMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR_SAT;
-    depthStencilState_drawMask.Reset();
-    hr = device->CreateDepthStencilState(&depthStencilDesc_drawMask, depthStencilState_drawMask.GetAddressOf());
-    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for drawing mask.");
+    //depthStencilDesc_drawMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
+    //depthStencilDesc_drawMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_drawMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_drawMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR_SAT;
+    //depthStencilState_drawMask.Reset();
+    //hr = device->CreateDepthStencilState(&depthStencilDesc_drawMask, depthStencilState_drawMask.GetAddressOf());
+    //COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for drawing mask.");
 
-    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_applyMask(D3D11_DEFAULT);
-    depthStencilDesc_applyMask.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-    depthStencilDesc_applyMask.StencilEnable = TRUE;
+    //CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_applyMask(D3D11_DEFAULT);
+    //depthStencilDesc_applyMask.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
+    //depthStencilDesc_applyMask.StencilEnable = TRUE;
 
-    depthStencilDesc_applyMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-    depthStencilDesc_applyMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_applyMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_applyMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_applyMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
+    //depthStencilDesc_applyMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_applyMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_applyMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
 
-    depthStencilDesc_applyMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
-    depthStencilDesc_applyMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_applyMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    depthStencilDesc_applyMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-    
-    depthStencilState_applyMask.Reset();
-    hr = device->CreateDepthStencilState(&depthStencilDesc_applyMask, depthStencilState_applyMask.GetAddressOf());
-    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for applying mask.");
+    //depthStencilDesc_applyMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
+    //depthStencilDesc_applyMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_applyMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //depthStencilDesc_applyMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
+    //
+    //depthStencilState_applyMask.Reset();
+    //hr = device->CreateDepthStencilState(&depthStencilDesc_applyMask, depthStencilState_applyMask.GetAddressOf());
+    //COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for applying mask.");
 }
 
 void Graphics::createAndSetViewport() {

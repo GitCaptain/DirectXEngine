@@ -19,7 +19,8 @@ namespace NGraphics {
     //class GraphicsDescription {
 
     //};
-
+    constexpr int MAX_LIGHT_CNT = 256;
+    constexpr int LIGHT_TEXTURE_HEIGHT = 3;
     class Graphics {
     public:
         bool initialize(HWND hwnd, int width, int height);
@@ -39,6 +40,8 @@ namespace NGraphics {
         bool initializeDirectX(HWND hwnd);
         bool initializeShaders();
         bool initializeScene();
+        bool initLight();
+        bool updateLight();
         void createDeviceAndSwapChain(HWND hwnd);
         void createDepthStencilBufferAndView();
         void updateCamera();
@@ -71,8 +74,8 @@ namespace NGraphics {
         Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
         Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
-        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState_drawMask;
-        Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState_applyMask;
+        //Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState_drawMask;
+        //Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState_applyMask;
 
         Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
         Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStateCullFront;
@@ -83,10 +86,15 @@ namespace NGraphics {
         size_t fontSize = 16;
         size_t spaceSize = 4;
 
-        Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
+        Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStateTextures;
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pinkTexture;
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
+
+        Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStateLightInfo;
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> lightInfo;
+        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> lightTexture;
+        XMFLOAT4 lightData[LIGHT_TEXTURE_HEIGHT][MAX_LIGHT_CNT];
 
         int windowWidth = 800;
         int windowHeight = 600;
