@@ -49,7 +49,7 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     // need to remove this dependency
     // now it's not critical, because we have same ps shaders 
     // for nanosuit and light
-    renderableGameObjects.push_back(&light);
+    renderableGameObjects.push_back(&lights);
 
 #ifdef ENABLE_IMGUI
     // setup ImGUI
@@ -84,7 +84,6 @@ void Graphics::renderFrame() {
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerStateTextures.GetAddressOf());
 
-    deviceContext->PSSetSamplers(10, 1, samplerStateLightInfo.GetAddressOf());
 
     // sprite mask 
     //deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
@@ -99,8 +98,6 @@ void Graphics::renderFrame() {
     //deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light_frame.GetAddressOf());
     deviceContext->PSSetConstantBuffers(1, 1, cb_ps_light_obj.GetAddressOf());
     //deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
-
-    deviceContext->PSSetShaderResources(10, 1, lightTexture.GetAddressOf());
 
 #ifdef ENABLE_IMGUI
     // create imgui test window
@@ -162,11 +159,8 @@ void Graphics::renderFrame() {
     XMMATRIX wvp = camera3D.getViewMatrix() * camera3D.getProjectionMatrix();
     cb_ps_light_obj.data.lightSource = true;
     cb_ps_light_obj.applyChanges();
-    updateLight();
-    for (int i = 0; i < lightsCnt; i++) {
-        light.setPosition(lightData[2][i].x, lightData[2][i].y, lightData[2][i].z);
-        fRenderer.renderFrame(wvp);
-    }
+    fRenderer.renderFrame(wvp);
+
     cb_ps_light_obj.data.lightSource = false;
     cb_ps_light_obj.applyChanges();
     nanosuit.draw(wvp);
@@ -314,7 +308,6 @@ bool Graphics::initializeDirectX(HWND hwnd) {
 
         deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 
-        initLight();
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
@@ -427,7 +420,7 @@ bool Graphics::initializeScene() {
             return false;
         }
 
-        if (!light.initialize(device.Get(), deviceContext.Get(), cb_vs_vertexshader)) {
+        if (!lights.initialize(device.Get(), deviceContext.Get(), cb_vs_vertexshader)) {
             return false;
         }
 
@@ -452,80 +445,6 @@ bool Graphics::initializeScene() {
         ErrorLogger::log(e);
         return false;
     }
-    return true;
-}
-
-bool NGraphics::Graphics::initLight() {
-
-    // Refer to CB_light.hlsli 
-    // to read texture description
-
-    DXGI_FORMAT texFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
-
-    CD3D11_TEXTURE2D_DESC texDesc(texFormat, MAX_LIGHT_CNT, LIGHT_TEXTURE_HEIGHT);
-    texDesc.MipLevels = 1;
-    texDesc.Usage = D3D11_USAGE_DYNAMIC;
-    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    HRESULT hr = device->CreateTexture2D(&texDesc, nullptr, lightInfo.GetAddressOf());
-    ONFAILHRLOG(hr, "Can't create texture for light info.", false);
-
-    CD3D11_SHADER_RESOURCE_VIEW_DESC SRVDesc(D3D_SRV_DIMENSION_TEXTURE2D, texFormat);
-    hr = device->CreateShaderResourceView(lightInfo.Get(), &SRVDesc, lightTexture.GetAddressOf());
-    ONFAILHRLOG(hr, "Can't create shader resource view for light texture", false);
-
-    // Create sampler description for sampler state
-    CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    // Create sampler state
-    hr = device->CreateSamplerState(&sampDesc, samplerStateLightInfo.GetAddressOf());
-    COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state for lights.");
-
-    return true;
-}
-
-bool NGraphics::Graphics::updateLight() {
-
-#ifdef ENABLE_IMGUI
-    ImGui::Begin("Light Controls");
-    ImGui::DragFloat3("Ambient light color", &lightData[0][1].x, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Ambient light strength", &lightData[0][2].x, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light strength", &light.lightStrength, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
-    ImGui::InputInt("Light cnt", &lightsCnt);
-    ImGui::End();
-#endif
-
-    std::wstring dls = std::to_wstring(light.lightStrength);
-    dls = L"dls: " + dls + L"\n";
-    OutputDebugStringW(dls.c_str());
-    constraintInPlace(lightsCnt, 0, MAX_LIGHT_CNT);
-
-    lightData[0][0].x = MAX_LIGHT_CNT;
-    lightData[0][0].y = lightsCnt;
-    lightData[0][3].x = light.attenuation_a;
-    lightData[0][3].y = light.attenuation_b;
-    lightData[0][3].z = light.attenuation_c;
-
-    double time = globalTimer.getMillisecondsElapsed() / 10000;
-    for (int i = 0; i < lightsCnt; i++) {
-        lightData[2][i] = { 10 * static_cast<float>(sin(time * i * i)),
-                            10 * static_cast<float>(cos(time * i * i)),
-                            0.0, 0.0 };
-        lightData[1][i].x = light.lightColor.x;
-        lightData[1][i].y = light.lightColor.y;
-        lightData[1][i].z = light.lightColor.z;
-        lightData[1][i].w = light.lightStrength;
-    }
-
-    constexpr UINT mapFlags = 0;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
-    ZeroMemory(&mappedResource, sizeof(mappedResource));
-    HRESULT hr = deviceContext->Map(lightInfo.Get(), 0, D3D11_MAP_WRITE_DISCARD, mapFlags, &mappedResource);
-    ONFAILHRLOG(hr, "Failed to map light texture buffer.", false);
-    CopyMemory(mappedResource.pData, &lightData, sizeof(lightData));
-    deviceContext->Unmap(lightInfo.Get(), mapFlags);
     return true;
 }
 

@@ -19,8 +19,6 @@ namespace NGraphics {
     //class GraphicsDescription {
 
     //};
-    constexpr int MAX_LIGHT_CNT = 256;
-    constexpr int LIGHT_TEXTURE_HEIGHT = 3;
     class Graphics {
     public:
         bool initialize(HWND hwnd, int width, int height);
@@ -31,8 +29,7 @@ namespace NGraphics {
         Camera2D camera2D;
         Sprite sprite;
         RenderableGameObject3D nanosuit;
-        int lightsCnt = 1;
-        Light light;
+        Light lights;
         void onWindowResize(UINT width, UINT height);
         bool isInitialized();
 
@@ -40,8 +37,6 @@ namespace NGraphics {
         bool initializeDirectX(HWND hwnd);
         bool initializeShaders();
         bool initializeScene();
-        bool initLight();
-        bool updateLight();
         void createDeviceAndSwapChain(HWND hwnd);
         void createDepthStencilBufferAndView();
         void updateCamera();
@@ -90,11 +85,6 @@ namespace NGraphics {
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pinkTexture;
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
-
-        Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStateLightInfo;
-        Microsoft::WRL::ComPtr<ID3D11Texture2D> lightInfo;
-        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> lightTexture;
-        XMFLOAT4 lightData[LIGHT_TEXTURE_HEIGHT][MAX_LIGHT_CNT];
 
         int windowWidth = 800;
         int windowHeight = 600;
