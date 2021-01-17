@@ -5,6 +5,7 @@
             if ((buffer).Get() != nullptr){ \
                 (buffer).Reset(); \
             } \
+            else {} \
         }
 
 template<typename T>
@@ -41,9 +42,12 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     if (!fRenderer.initialize(deviceContext.Get())) {
         return false;
     }
+    //if (!fRenderer.initialize(device.Get(), deviceContext.Get(), width, height)) {
+    //    return false;
+    //}
     
     fRenderer.setObjects(renderableGameObjects);
-    //renderableGameObjects.push_back(&nanosuit);
+    // renderableGameObjects.push_back(&nanosuit);
     // TODO: light set its own shader, 
     // so now we have to draw it last
     // need to remove this dependency
@@ -84,8 +88,6 @@ void Graphics::renderFrame() {
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerStateTextures.GetAddressOf());
 
-    deviceContext->PSSetSamplers(10, 1, samplerStateLightInfo.GetAddressOf());
-
     // sprite mask 
     //deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
     //deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
@@ -96,7 +98,7 @@ void Graphics::renderFrame() {
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader_nolight.getShader(), nullptr, 0);
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
-    //deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light_frame.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light_frame.GetAddressOf());
     deviceContext->PSSetConstantBuffers(1, 1, cb_ps_light_obj.GetAddressOf());
     //deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
 
@@ -167,6 +169,9 @@ void Graphics::renderFrame() {
         light.setPosition(lightData[2][i].x, lightData[2][i].y, lightData[2][i].z);
         fRenderer.renderFrame(wvp);
     }
+
+    fRenderer.renderFrame(wvp);
+
     cb_ps_light_obj.data.lightSource = false;
     cb_ps_light_obj.applyChanges();
     nanosuit.draw(wvp);
@@ -455,7 +460,7 @@ bool Graphics::initializeScene() {
     return true;
 }
 
-bool NGraphics::Graphics::initLight() {
+bool Graphics::initLight() {
 
     // Refer to CB_light.hlsli 
     // to read texture description
@@ -473,17 +478,10 @@ bool NGraphics::Graphics::initLight() {
     hr = device->CreateShaderResourceView(lightInfo.Get(), &SRVDesc, lightTexture.GetAddressOf());
     ONFAILHRLOG(hr, "Can't create shader resource view for light texture", false);
 
-    // Create sampler description for sampler state
-    CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
-    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
-    // Create sampler state
-    hr = device->CreateSamplerState(&sampDesc, samplerStateLightInfo.GetAddressOf());
-    COM_ERROR_IF_FAILED(hr, "Failed to create rasterizer state for lights.");
-
     return true;
 }
 
-bool NGraphics::Graphics::updateLight() {
+bool Graphics::updateLight() {
 
 #ifdef ENABLE_IMGUI
     ImGui::Begin("Light Controls");
@@ -497,13 +495,14 @@ bool NGraphics::Graphics::updateLight() {
     ImGui::End();
 #endif
 
+#ifdef _DEBUG
     std::wstring dls = std::to_wstring(light.lightStrength);
     dls = L"dls: " + dls + L"\n";
     OutputDebugStringW(dls.c_str());
     constraintInPlace(lightsCnt, 0, MAX_LIGHT_CNT);
+#endif
 
-    lightData[0][0].x = MAX_LIGHT_CNT;
-    lightData[0][0].y = lightsCnt;
+    lightData[0][0].x = lightsCnt;
     lightData[0][3].x = light.attenuation_a;
     lightData[0][3].y = light.attenuation_b;
     lightData[0][3].z = light.attenuation_c;

@@ -22,7 +22,7 @@ void RenderableGameObject3D::draw(const XMMATRIX& viewProjectionMatrix) {
     model.draw(worldMatrix, viewProjectionMatrix);
 }
 
-void NGraphics::RenderableGameObject3D::prepare(ID3D11DeviceContext* deviceContext) {
+void RenderableGameObject3D::prepare(ID3D11DeviceContext* deviceContext) {
     
 }
 

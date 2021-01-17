@@ -7,6 +7,7 @@
 #include "Shaders.h"
 #include "RenderableGameObject3D.h"
 #include "ForwardRenderer.h"
+#include "DeferredRenderer.h"
 #include "Light.h"
 #include "Camera3D.h"
 #include "Camera2D.h"
@@ -48,8 +49,9 @@ namespace NGraphics {
         void createDepthStencilStates();
         void createAndSetViewport();
         float getAspectRatio();
-
+        
         ForwardRenderer fRenderer;
+        //DeferredRenderer fRenderer;
         std::vector<IRenderable*> renderableGameObjects;
 
         Microsoft::WRL::ComPtr<ID3D11Device> device;
@@ -91,7 +93,6 @@ namespace NGraphics {
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
 
-        Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerStateLightInfo;
         Microsoft::WRL::ComPtr<ID3D11Texture2D> lightInfo;
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> lightTexture;
         XMFLOAT4 lightData[LIGHT_TEXTURE_HEIGHT][MAX_LIGHT_CNT];
