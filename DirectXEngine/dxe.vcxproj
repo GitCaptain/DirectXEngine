@@ -1,0 +1,366 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{794805b0-f5fa-4a7d-9bd1-a33facdf61b4}</ProjectGuid>
+    <RootNamespace>dxe</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)\ThirdParty\include;$(ProjectDir)\ThirdParty\include\DirectXTK;$(ProjectDir)\ThirdParty\include\ImGUI;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)dev\Libs\Any;$(ProjectDir)dev\Libs\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)build_tmp\$(Platform)\$(Configuration)\</IntDir>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)\ThirdParty\include;$(ProjectDir)\ThirdParty\include\DirectXTK;$(ProjectDir)\ThirdParty\include\ImGUI;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)dev\Libs\Any;$(ProjectDir)dev\Libs\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir>$(ProjectDir)build_tmp\$(Platform)\$(Configuration)\</IntDir>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(ProjectDir)\ThirdParty\include;$(ProjectDir)\ThirdParty\include\DirectXTK;$(ProjectDir)\ThirdParty\include\ImGUI;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)dev\Libs\Any;$(ProjectDir)dev\Libs\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+    <IntDir>$(ProjectDir)build_tmp\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(ProjectDir)\ThirdParty\include;$(ProjectDir)\ThirdParty\include\DirectXTK;$(ProjectDir)\ThirdParty\include\ImGUI;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)dev\Libs\Any;$(ProjectDir)dev\Libs\$(Platform)\$(Configuration);$(LibraryPath)</LibraryPath>
+    <MultiProcFXC>true</MultiProcFXC>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <EnableClangTidyCodeAnalysis>false</EnableClangTidyCodeAnalysis>
+    <IntDir>$(ProjectDir)build_tmp\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(ProjectDir)$(Platform)\$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>false</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;DirectXTK.lib;d3d11.lib;DXGI.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive  -File "$(ProjectDir)dev\Scripts\pre_build.ps1" -DevEnvDir "'$(DevEnvDir)'" -Platform "'$(Platform)'"  -Config "'$(Configuration)'"</Command>
+      <Message>Run pre build step</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive $(ProjectDir)dev\Scripts\post_build.ps1 -Platform "'$(Platform)'" -Config "'$(Configuration)'" -OutDir "'$(OutDir)'"</Command>
+      <Message>Run post build steps</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;DirectXTK.lib;d3d11.lib;DXGI.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive $(ProjectDir)dev\Scripts\post_build.ps1 -Platform "'$(Platform)'" -Config "'$(Configuration)'" -OutDir "'$(OutDir)'"</Command>
+      <Message>Run post build steps</Message>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive  -File "$(ProjectDir)dev\Scripts\pre_build.ps1" -DevEnvDir "'$(DevEnvDir)'" -Platform "'$(Platform)'"  -Config "'$(Configuration)'"</Command>
+      <Message>Run pre build step</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>false</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;DirectXTK.lib;d3d11.lib;DXGI.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive $(ProjectDir)dev\Scripts\post_build.ps1 -Platform "'$(Platform)'" -Config "'$(Configuration)'" -OutDir "'$(OutDir)'"</Command>
+      <Message>Run post build steps</Message>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive  -File "$(ProjectDir)dev\Scripts\pre_build.ps1" -DevEnvDir "'$(DevEnvDir)'" -Platform "'$(Platform)'"  -Config "'$(Configuration)'"</Command>
+      <Message>Run pre build step</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>false</SDLCheck>
+      <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>assimp-vc142-mtd.lib;DirectXTK.lib;d3d11.lib;DXGI.lib;D3DCompiler.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive $(ProjectDir)dev\Scripts\post_build.ps1 -Platform "'$(Platform)'" -Config "'$(Configuration)'" -OutDir "'$(OutDir)'"</Command>
+      <Message>Run post build steps</Message>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>powershell.exe -ExecutionPolicy Bypass -NonInteractive  -File "$(ProjectDir)dev\Scripts\pre_build.ps1" -DevEnvDir "'$(DevEnvDir)'" -Platform "'$(Platform)'"  -Config "'$(Configuration)'"</Command>
+      <Message>Run pre build step</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="Sources\Graphics\Camera2D.cpp" />
+    <ClCompile Include="Sources\Graphics\GameObject2D.cpp" />
+    <ClCompile Include="Sources\Graphics\GameObject3D.cpp" />
+    <ClCompile Include="Sources\Graphics\Color.cpp" />
+    <ClCompile Include="Sources\COMException.cpp" />
+    <ClCompile Include="Sources\Graphics\GameObject.cpp" />
+    <ClCompile Include="Sources\Graphics\Camera3D.cpp" />
+    <ClCompile Include="Sources\Engine.cpp" />
+    <ClCompile Include="Sources\ErrorLogger.cpp" />
+    <ClCompile Include="Sources\Graphics\AdapterReader.cpp" />
+    <ClCompile Include="Sources\Graphics\Graphics.cpp" />
+    <ClCompile Include="Sources\Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Sources\Graphics\Shaders.cpp" />
+    <ClCompile Include="Sources\Keyboard\KeyboardClass.cpp" />
+    <ClCompile Include="Sources\Keyboard\KeyboardEvent.cpp" />
+    <ClCompile Include="Sources\Graphics\Light.cpp" />
+    <ClCompile Include="Sources\main.cpp" />
+    <ClCompile Include="Sources\Graphics\Model.cpp" />
+    <ClCompile Include="Sources\Graphics\Mesh.cpp" />
+    <ClCompile Include="Sources\Mouse\MouseClass.cpp" />
+    <ClCompile Include="Sources\Mouse\MouseEvent.cpp" />
+    <ClCompile Include="Sources\Graphics\RenderableGameObject.cpp" />
+    <ClCompile Include="Sources\RenderWindow.cpp" />
+    <ClCompile Include="Sources\Graphics\Sprite.cpp" />
+    <ClCompile Include="Sources\StringHelper.cpp" />
+    <ClCompile Include="Sources\Graphics\Texture.cpp" />
+    <ClCompile Include="Sources\Timer.cpp" />
+    <ClCompile Include="Sources\WindowContainer.cpp" />
+    <ClCompile Include="ThirdParty\sources\ImGui\imgui.cpp" />
+    <ClCompile Include="ThirdParty\sources\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="ThirdParty\sources\ImGui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="ThirdParty\sources\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="ThirdParty\sources\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="ThirdParty\sources\ImGui\imgui_widgets.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Sources\Graphics\Camera2D.h" />
+    <ClInclude Include="Sources\Graphics\GameObject2D.h" />
+    <ClInclude Include="Sources\Graphics\GameObject3D.h" />
+    <ClInclude Include="Sources\Graphics\Color.h" />
+    <ClInclude Include="Sources\COMException.h" />
+    <ClInclude Include="Sources\Graphics\GameObject.h" />
+    <ClInclude Include="Sources\Graphics\Camera3D.h" />
+    <ClInclude Include="Sources\Graphics\ConstantBuffer.h" />
+    <ClInclude Include="Sources\Graphics\ConstantBufferTypes.h" />
+    <ClInclude Include="Sources\Engine.h" />
+    <ClInclude Include="Sources\ErrorLogger.h" />
+    <ClInclude Include="Sources\Graphics\AdapterReader.h" />
+    <ClInclude Include="Sources\Graphics\Graphics.h" />
+    <ClInclude Include="Sources\Graphics\Shaders.h" />
+    <ClInclude Include="Sources\Graphics\Vertex.h" />
+    <ClInclude Include="Sources\Graphics\IndexBuffer.h" />
+    <ClInclude Include="Sources\Keyboard\KeyboardClass.h" />
+    <ClInclude Include="Sources\Keyboard\KeyboardEvent.h" />
+    <ClInclude Include="Sources\Graphics\Model.h" />
+    <ClInclude Include="Sources\Graphics\Mesh.h" />
+    <ClInclude Include="Sources\Graphics\Light.h" />
+    <ClInclude Include="Sources\Mouse\MouseClass.h" />
+    <ClInclude Include="Sources\Mouse\MouseEvent.h" />
+    <ClInclude Include="Sources\Graphics\RenderableGameObject.h" />
+    <ClInclude Include="Sources\RenderWindow.h" />
+    <ClInclude Include="Sources\Graphics\Sprite.h" />
+    <ClInclude Include="Sources\StringHelper.h" />
+    <ClInclude Include="Sources\Graphics\VertexBuffer.h" />
+    <ClInclude Include="Sources\Graphics\Texture.h" />
+    <ClInclude Include="Sources\Timer.h" />
+    <ClInclude Include="Sources\WindowContainer.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Resources\Shaders\PS\pixelshader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PS\pixelshader_2d.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PS\pixelshader_2d_discard.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\PS\pixelshader_nolight.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\VS\vertexshader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\VS\vertexshader_2d.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="dev\Scripts\prepare_imgui.ps1" />
+    <None Include="dev\Scripts\post_build.ps1" />
+    <None Include="dev\Scripts\prepare_assimp.ps1" />
+    <None Include="dev\Scripts\prepare_dx.ps1" />
+    <None Include="dev\Scripts\pre_build.ps1" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
