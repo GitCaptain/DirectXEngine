@@ -29,7 +29,7 @@ Copy-Item "$assimpBuildDir\lib\$Config\*" "$PSScriptRoot\..\Libs\$Platform\$Conf
 
 # Copy .dll files
 # They are created and neede even if I build static exe
-Copy-Item "$assimpBuildDir\bin\$Config\assimp-vc142-mtd.*" "$PSScriptRoot\..\Libs\$Platform\$Config\"
+Copy-Item "$assimpBuildDir\bin\$Config\assimp-*" "$PSScriptRoot\..\Libs\$Platform\$Config\"
 
 #copy include files
 $dstDir = "$PSScriptRoot\..\..\ThirdParty\include\assimp\"
