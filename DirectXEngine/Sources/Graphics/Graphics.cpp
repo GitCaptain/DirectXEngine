@@ -227,7 +227,7 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         hr = device->CreateDepthStencilState(&depthStencilDesc_applyMask, depthStencilState_applyMask.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for applying mask.");
 
-        // create and set viewoport
+        // create and set viewport
         CD3D11_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight));  
         deviceContext->RSSetViewports(1, &viewport);
 

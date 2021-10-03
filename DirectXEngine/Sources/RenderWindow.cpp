@@ -1,12 +1,14 @@
 #include "WindowContainer.h"
 #include "StringHelper.h"
 
-bool RenderWindow::initialize(WindowContainer* pWindowContainer, 
-                              HINSTANCE hInstance, 
-                              std::string windowTitle, 
-                              std::string windowClass, 
-                              int width,
-                              int height) {
+bool RenderWindow::initialize(
+    WindowContainer* pWindowContainer,
+    HINSTANCE hInstance,
+    std::string windowTitle,
+    std::string windowClass,
+    int width,
+    int height
+) {
     this->hInstance = hInstance;
     this->windowTitle = windowTitle;
     windowTitleWide = StringHelper::stringToWide(windowTitle).c_str();
