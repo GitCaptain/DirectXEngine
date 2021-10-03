@@ -45,6 +45,7 @@ bool Model::loadModel(const std::string& filePath) {
     const aiScene* pScene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
 
     if (pScene == nullptr) {
+        ErrorLogger::log("Failed to load model at path: " + filePath);
         return false;
     }
 
