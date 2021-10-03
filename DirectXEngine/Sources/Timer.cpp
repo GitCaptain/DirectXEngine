@@ -1,4 +1,5 @@
 #include "Timer.h"
+#include <cassert>
 
 Timer::Timer() {
     start = stop = std::chrono::high_resolution_clock::now();
@@ -22,19 +23,14 @@ void Timer::restartTimer() {
 }
 
 bool Timer::stopTimer() {
-    if (!isRunning) {
-        return false;
-    }
+    assert(isRunning && "Timer is not running");
     stop = std::chrono::high_resolution_clock::now();
     isRunning = false;
     return true;
 }
 
 bool Timer::startTimer() {
-    if (isRunning) {
-        return false;
-    }
-
+    assert(!isRunning && "Timer is running");
     start = std::chrono::high_resolution_clock::now();
     isRunning = true;
     return true;
