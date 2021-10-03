@@ -1,10 +1,12 @@
 #include <Windows.h>
 #include "Engine.h"
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+int APIENTRY wWinMain(
+	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR lpCmdLine,
-	_In_ int nCmdShow) {
+	_In_ int nCmdShow
+) {
 
 	HRESULT hr = CoInitialize(nullptr);
 	ONFAILHRLOG(hr, "Failed to call CoInitialize", -1);
@@ -17,7 +19,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 	}
 	else {
-		OutputDebugStringA("Fuck\n");
+		OutputDebugStringA("Failed to initialize engine\n");
 	}
 	return 0; 
 }
