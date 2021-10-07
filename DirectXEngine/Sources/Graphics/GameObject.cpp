@@ -1,6 +1,6 @@
 #include "GameObject.h"
 
-using namespace GameObjectNamespace;
+using namespace NGameObject;
 
 const XMVECTOR& GameObject::getPositionVector() const {
     return posVector;

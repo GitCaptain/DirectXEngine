@@ -7,7 +7,7 @@ namespace Camera {
 
     using namespace DirectX;
 
-    class Camera3D: public GameObjectNamespace::GameObject3D {
+    class Camera3D: public NGameObject::GameObject3D {
  
     public:
         Camera3D();

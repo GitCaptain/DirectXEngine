@@ -1,6 +1,6 @@
 #include "Model.h"
 
-using namespace ModelNamespace;
+using namespace NModel;
 
 bool Model::initialize(const std::string& filePath, 
                             ID3D11Device* device,
@@ -103,10 +103,12 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
     return Mesh(device, deviceContext, vertices, indices, textures, transformMatrix);
 }
 
-TextureStorageType ModelNamespace::Model::determineTextureStorageType(const aiScene* pScene, 
-                                                                      aiMaterial* pMaterial, 
-                                                                      size_t index, 
-                                                                      aiTextureType textureType) {
+TextureStorageType NModel::Model::determineTextureStorageType(
+    const aiScene* pScene,
+    aiMaterial* pMaterial,
+    size_t index,
+    aiTextureType textureType
+) {
     
     if (pMaterial->GetTextureCount(textureType) == 0) {
         // we shouldn't get here
@@ -152,9 +154,11 @@ TextureStorageType ModelNamespace::Model::determineTextureStorageType(const aiSc
     return TextureStorageType::None;
 } 
 
-std::vector<Texture> ModelNamespace::Model::LoadMaterialTextures(aiMaterial* pMaterial, 
-                                                                 aiTextureType textureType, 
-                                                                 const aiScene* pScene) {
+std::vector<Texture> NModel::Model::LoadMaterialTextures(
+    aiMaterial* pMaterial,
+    aiTextureType textureType,
+    const aiScene* pScene
+) {
     std::vector<Texture> materialTextures;
     TextureStorageType storageType = TextureStorageType::Invalid;
     unsigned int textureCount = pMaterial->GetTextureCount(textureType);
@@ -213,7 +217,7 @@ std::vector<Texture> ModelNamespace::Model::LoadMaterialTextures(aiMaterial* pMa
     return materialTextures;
 }
 
-int ModelNamespace::Model::getTextureIndex(aiString* pStr) {
+int NModel::Model::getTextureIndex(aiString* pStr) {
     assert(pStr->length >= 2);
     return atoi(&pStr->C_Str()[1]);
 }

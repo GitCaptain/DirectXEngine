@@ -6,7 +6,7 @@ namespace Camera {
     
     using namespace DirectX;
 
-    class Camera2D : public GameObjectNamespace::GameObject2D {
+    class Camera2D : public NGameObject::GameObject2D {
     
     public:
         Camera2D();

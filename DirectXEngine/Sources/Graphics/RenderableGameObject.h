@@ -2,7 +2,7 @@
 
 #include "GameObject3D.h"
 
-namespace GameObjectNamespace {
+namespace NGameObject {
 
     class RenderableGameObject: public GameObject3D {
 
@@ -19,4 +19,5 @@ namespace GameObjectNamespace {
         Model model;
         XMMATRIX worldMatrix = XMMatrixIdentity();
     };
+
 }

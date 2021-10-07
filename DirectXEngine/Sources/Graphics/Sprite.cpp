@@ -1,6 +1,6 @@
 #include "Sprite.h"
 
-using namespace GameObjectNamespace;
+using namespace NGameObject;
 
 bool Sprite::initialize(ID3D11Device* device, 
                         ID3D11DeviceContext* deviceContext, 

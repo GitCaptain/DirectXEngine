@@ -1,9 +1,9 @@
 #pragma once
 #include "Model.h"
 
-namespace GameObjectNamespace {
+namespace NGameObject {
 
-    using namespace ModelNamespace;
+    using namespace NModel;
 
     class GameObject {
 

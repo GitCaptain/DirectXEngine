@@ -4,7 +4,7 @@
 #include <vector>
 #include "Mesh.h"
 
-namespace ModelNamespace {
+namespace NModel {
 
     using namespace DirectX;
 

@@ -1,6 +1,13 @@
 #include "GameObject3D.h"
 
-using namespace GameObjectNamespace;
+using namespace NGameObject;
+
+const XMVECTOR GameObject3D::DEFAULT_FORWARD_VECTOR = XMVectorSet(0.0f, 0.0f, 1.0f, 0.0f);
+const XMVECTOR GameObject3D::DEFAULT_BACKWARD_VECTOR = XMVectorSet(0.0f, 0.0f, -1.0f, 0.0f);
+const XMVECTOR GameObject3D::DEFAULT_UP_VECTOR = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+const XMVECTOR GameObject3D::DEFAULT_LEFT_VECTOR = XMVectorSet(-1.0f, 0.0f, 0.0f, 0.0f);
+const XMVECTOR GameObject3D::DEFAULT_RIGHT_VECTOR = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+
 
 void GameObject3D::setLookAtPos(XMFLOAT3 lookAtPos) {
     // veirfy that look at pos is not the same as camera pos. 

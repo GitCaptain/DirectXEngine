@@ -2,7 +2,7 @@
 
 #include "GameObject2D.h" 
 
-namespace GameObjectNamespace {
+namespace NGameObject {
 
     class Sprite : public GameObject2D {
     public:
