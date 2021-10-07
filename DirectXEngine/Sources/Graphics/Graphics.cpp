@@ -52,18 +52,9 @@ void Graphics::renderFrame() {
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
-    // sprite mask
-    deviceContext->OMSetDepthStencilState(depthStencilState_drawMask.Get(), 0);
-    deviceContext->IASetInputLayout(vertexShader_2d.getInputLayout());
-    deviceContext->PSSetShader(pixelShader_2d_discard.getShader(), nullptr, 0); // we don't want to draw our mask
-    deviceContext->VSSetShader(vertexShader_2d.getShader(), nullptr, 0);
-    sprite.draw(camera2D.getWorldMatrix() * camera2D.getOrthoMatrix());
-
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
-
-    deviceContext->OMSetDepthStencilState(depthStencilState_applyMask.Get(), 0);
 
     { // Pavement cube
         gameObject.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
@@ -191,42 +182,6 @@ bool Graphics::initializeDirectX(HWND hwnd) {
         hr = device->CreateDepthStencilState(&depthStencilDesc, depthStencilState.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
 
-        CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_drawMask(D3D11_DEFAULT);
-        depthStencilDesc_drawMask.DepthEnable = FALSE;
-        depthStencilDesc_drawMask.StencilEnable = TRUE;
-        
-        depthStencilDesc_drawMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-        depthStencilDesc_drawMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-        
-        depthStencilDesc_drawMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_ALWAYS;
-        depthStencilDesc_drawMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_drawMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_INCR_SAT;
-
-        hr = device->CreateDepthStencilState(&depthStencilDesc_drawMask, depthStencilState_drawMask.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for drawing mask.");
-
-        CD3D11_DEPTH_STENCIL_DESC depthStencilDesc_applyMask(D3D11_DEFAULT);
-        depthStencilDesc_applyMask.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-        depthStencilDesc_applyMask.StencilEnable = TRUE;
-
-        depthStencilDesc_applyMask.BackFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_NEVER;
-        depthStencilDesc_applyMask.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.BackFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.BackFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-
-        depthStencilDesc_applyMask.FrontFace.StencilFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
-        depthStencilDesc_applyMask.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.FrontFace.StencilFailOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-        depthStencilDesc_applyMask.FrontFace.StencilPassOp = D3D11_STENCIL_OP::D3D11_STENCIL_OP_KEEP;
-
-        hr = device->CreateDepthStencilState(&depthStencilDesc_applyMask, depthStencilState_applyMask.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil state for applying mask.");
-
         // create and set viewport
         CD3D11_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight));  
         deviceContext->RSSetViewports(1, &viewport);
@@ -312,18 +267,6 @@ bool Graphics::initializeShaders() {
 
     UINT numElements2D = ARRAYSIZE(layout2D);
 
-    if (!vertexShader_2d.initialize(device, shaderFolder + L"vertexshader_2d.cso", layout2D, numElements2D)) {
-        return false;
-    }
-
-    if (!pixelShader_2d.initialize(device, shaderFolder + L"pixelshader_2d.cso")) {
-        return false;
-    }
-
-    if (!pixelShader_2d_discard.initialize(device, shaderFolder + L"pixelshader_2d_discard.cso")) {
-        return false;
-    }
-
     // 3d shaders
     D3D11_INPUT_ELEMENT_DESC layout3D[] = {
         {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -360,10 +303,6 @@ bool Graphics::initializeScene() {
         hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Resources\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
         COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
 
-        // Initialize constant buffer(s)
-        hr = cb_vs_vertexshader_2d.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader 2d constant buffer.");
-
         hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
 
@@ -381,15 +320,6 @@ bool Graphics::initializeScene() {
         if (!light.initialize(device.Get(), deviceContext.Get(), cb_vs_vertexshader)) {
             return false;
         }
-        // TODO: FIX: when load anything from broken path,
-        // the engine just crush silently, need to make the crush reason more clear
-        if (!sprite.initialize(device.Get(), deviceContext.Get(), 256, 256, "Resources\\textures\\circle.png", cb_vs_vertexshader_2d)) {
-            return false;
-        }
-
-        sprite.setPosition(DirectX::XMFLOAT3(windowWidth/2 - sprite.getWidth()/2, windowHeight/2 - sprite.getHeight()/2, 0.0f));
-        
-        camera2D.setProjectionValues(windowWidth, windowHeight, 0.0f, 1.0f);
 
         gameObject.setPosition(2.0f, 0.0f, 0.0f);
 
