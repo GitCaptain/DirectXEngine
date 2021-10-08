@@ -26,11 +26,11 @@ bool Model::initialize(const std::string& filePath,
 void Model::draw(const XMMATRIX& worldMatrix, const XMMATRIX& viewProjectionMatrix) {
 
     deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader->GetAddressOf());
-
+    XMMATRIX worldViewProjectionMatrix = worldMatrix * viewProjectionMatrix;
     for (size_t i = 0; i < meshes.size(); i++) {
         // TODO: I removed XMMATRIX transpose from here to vertexshader.
         // have to figure out what is better for performance
-        cb_vs_vertexshader->data.worldViewProjectionMatrix = meshes[i].getTransformMatrix() * worldMatrix * viewProjectionMatrix;
+        cb_vs_vertexshader->data.worldViewProjectionMatrix = meshes[i].getTransformMatrix() * worldViewProjectionMatrix;
         cb_vs_vertexshader->data.worldMatrix = meshes[i].getTransformMatrix() * worldMatrix;
         cb_vs_vertexshader->applyChanges();
         meshes[i].draw();

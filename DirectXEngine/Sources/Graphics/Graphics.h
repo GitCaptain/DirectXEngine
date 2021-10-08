@@ -18,14 +18,20 @@
 #include "imgui_impl_dx11.h"
 #endif
 
+struct GraphicsState {
+    int *windowWidth;
+    int *windowHeight;
+    ID3D11Device* device = nullptr;
+    ID3D11DeviceContext *deviceContext = nullptr;
+};
+
 class Graphics {
 public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
-    // TODO: fix that we have direct access to 2D camera
-    // but for 3D we have getter
-    Camera::Camera3D& const getCamera3D();
-    NGameObject::RenderableGameObject gameObject;
+    const GraphicsState& getGraphicsState() const;
+    NGameObject::Camera3D& getCamera3D();
+    NGameObject::RenderableGameObject nanoSuite;
     Light light;
 
 private:
@@ -33,8 +39,6 @@ private:
     bool initializeShaders();
     bool initializeScene();
 
-    Microsoft::WRL::ComPtr<ID3D11Device> device;
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext;
     Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
 
@@ -61,8 +65,11 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> grassTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pavementTexture;
 
+    Timer fpsTimer;
+    NGameObject::Camera3D camera3D;
     int windowWidth = 800;
     int windowHeight = 600;
-    Timer fpsTimer; 
-    Camera::Camera3D camera3D;
+    Microsoft::WRL::ComPtr<ID3D11Device> device = nullptr;
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext = nullptr;
+    GraphicsState state;
 };

@@ -1,10 +1,17 @@
 #include "Graphics.h"
 
+namespace go = NGameObject;
+
 bool Graphics::initialize(HWND hwnd, int width, int height) {
     
     windowHeight = height;
     windowWidth = width;
-    fpsTimer.startTimer();
+
+    state.device = device.Get();
+    state.deviceContext = deviceContext.Get();
+    state.windowHeight = &windowHeight;
+    state.windowWidth = &windowWidth;
+
     if (!initializeDirectX(hwnd)) {
         return false;
     }
@@ -26,6 +33,8 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     ImGui_ImplDX11_Init(device.Get(), deviceContext.Get());
     ImGui::StyleColorsDark();
 #endif
+
+    fpsTimer.startTimer();
 
     return true;
 }
@@ -57,7 +66,7 @@ void Graphics::renderFrame() {
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
 
     { // Pavement cube
-        gameObject.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
+        nanoSuite.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
     }
 
     { // TODO: take multiption out
@@ -101,7 +110,11 @@ void Graphics::renderFrame() {
     swapChain->Present(vsync, 0);
 }
 
-Camera::Camera3D& const Graphics::getCamera3D() {
+const GraphicsState& Graphics::getGraphicsState() const {
+    return state;
+}
+
+go::Camera3D& Graphics::getCamera3D() {
     return camera3D;
 }
 
@@ -313,7 +326,7 @@ bool Graphics::initializeScene() {
         cb_ps_light.data.ambientLightStrength = 1.0f;
 
         // Initialize Model(s)
-        if(!gameObject.initialize("Resources\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
+        if(!nanoSuite.initialize("Resources\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
             return false;
         }
 
@@ -321,7 +334,7 @@ bool Graphics::initializeScene() {
             return false;
         }
 
-        gameObject.setPosition(2.0f, 0.0f, 0.0f);
+        nanoSuite.setPosition(2.0f, 0.0f, 0.0f);
 
         camera3D.setPosition(0.0f, 0.0f, -2.0f);
         camera3D.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);

@@ -1,5 +1,5 @@
 #pragma once
-namespace Keyboard {
+namespace HID {
 
     using key_type = unsigned char;
 

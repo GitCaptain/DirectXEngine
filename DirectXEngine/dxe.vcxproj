@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -236,17 +236,18 @@
     <ClCompile Include="Sources\Graphics\Graphics.cpp" />
     <ClCompile Include="Sources\Graphics\IndexBuffer.cpp" />
     <ClCompile Include="Sources\Graphics\Shaders.cpp" />
-    <ClCompile Include="Sources\Keyboard\KeyboardClass.cpp" />
-    <ClCompile Include="Sources\Keyboard\KeyboardEvent.cpp" />
+    <ClCompile Include="Sources\HID\Keyboard.cpp" />
+    <ClCompile Include="Sources\HID\KeyboardEvent.cpp" />
     <ClCompile Include="Sources\Graphics\Light.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Graphics\Model.cpp" />
     <ClCompile Include="Sources\Graphics\Mesh.cpp" />
-    <ClCompile Include="Sources\Mouse\MouseClass.cpp" />
-    <ClCompile Include="Sources\Mouse\MouseEvent.cpp" />
+    <ClCompile Include="Sources\HID\Mouse.cpp" />
+    <ClCompile Include="Sources\HID\MouseEvent.cpp" />
     <ClCompile Include="Sources\Graphics\RenderableGameObject.cpp" />
     <ClCompile Include="Sources\RenderWindow.cpp" />
     <ClCompile Include="Sources\Graphics\Sprite.cpp" />
+    <ClCompile Include="Sources\Scene\PongScene.cpp" />
     <ClCompile Include="Sources\StringHelper.cpp" />
     <ClCompile Include="Sources\Graphics\Texture.cpp" />
     <ClCompile Include="Sources\Timer.cpp" />
@@ -275,16 +276,18 @@
     <ClInclude Include="Sources\Graphics\Shaders.h" />
     <ClInclude Include="Sources\Graphics\Vertex.h" />
     <ClInclude Include="Sources\Graphics\IndexBuffer.h" />
-    <ClInclude Include="Sources\Keyboard\KeyboardClass.h" />
-    <ClInclude Include="Sources\Keyboard\KeyboardEvent.h" />
+    <ClInclude Include="Sources\HID\Keyboard.h" />
+    <ClInclude Include="Sources\HID\KeyboardEvent.h" />
     <ClInclude Include="Sources\Graphics\Model.h" />
     <ClInclude Include="Sources\Graphics\Mesh.h" />
     <ClInclude Include="Sources\Graphics\Light.h" />
-    <ClInclude Include="Sources\Mouse\MouseClass.h" />
-    <ClInclude Include="Sources\Mouse\MouseEvent.h" />
+    <ClInclude Include="Sources\HID\Mouse.h" />
+    <ClInclude Include="Sources\HID\MouseEvent.h" />
     <ClInclude Include="Sources\Graphics\RenderableGameObject.h" />
     <ClInclude Include="Sources\RenderWindow.h" />
     <ClInclude Include="Sources\Graphics\Sprite.h" />
+    <ClInclude Include="Sources\Scene\PongScene.h" />
+    <ClInclude Include="Sources\Scene\Scene.h" />
     <ClInclude Include="Sources\StringHelper.h" />
     <ClInclude Include="Sources\Graphics\VertexBuffer.h" />
     <ClInclude Include="Sources\Graphics\Texture.h" />
