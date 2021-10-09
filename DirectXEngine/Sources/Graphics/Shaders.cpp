@@ -1,6 +1,6 @@
 #include "Shaders.h"
 
-bool VertexShader::initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
+bool VertexShader::initialize(ID3D11Device* device,
                               std::wstring shaderpath, 
                               D3D11_INPUT_ELEMENT_DESC* layoutDescription, 
                               UINT numElements) {
@@ -51,7 +51,7 @@ ID3D11InputLayout* VertexShader::getInputLayout() {
     return inputLayout.Get();
 }
 
-bool PixelShader::initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device, std::wstring shaderpath) {
+bool PixelShader::initialize(ID3D11Device* device, std::wstring shaderpath) {
     HRESULT hr = D3DReadFileToBlob(shaderpath.c_str(), shaderBuffer.GetAddressOf());
 
     if (FAILED(hr)) {

@@ -273,6 +273,7 @@
     <ClInclude Include="Sources\ErrorLogger.h" />
     <ClInclude Include="Sources\Graphics\AdapterReader.h" />
     <ClInclude Include="Sources\Graphics\Graphics.h" />
+    <ClInclude Include="Sources\Graphics\GraphicsState.h" />
     <ClInclude Include="Sources\Graphics\Shaders.h" />
     <ClInclude Include="Sources\Graphics\Vertex.h" />
     <ClInclude Include="Sources\Graphics\IndexBuffer.h" />

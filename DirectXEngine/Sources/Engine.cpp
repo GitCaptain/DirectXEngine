@@ -33,7 +33,7 @@ void Engine::Update() {
         auto me = mouse.readEvent();
         if (mouse.isRightDown()) {
             if (me.getType() == HID::MouseEvent::EventType::RAW_MOVE) {
-                gfx.getCamera3D().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
+                //gfx.getCamera3D().adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
             }
         }
     }
@@ -42,8 +42,6 @@ void Engine::Update() {
     // it seems ugly, but its quick workaround for now
     using DirectX::operator*;
     using DirectX::operator+=;
-
-    gfx.nanoSuite.adjustRotation(0.0f, 0.001f * dt, 0.0f);
 
     const float camera3DSpeed = 0.005f;
     float camera3DSpeedMultiplyer = 1.0f;
@@ -55,29 +53,29 @@ void Engine::Update() {
     
 
     if (keyboard.isKeyPressed('W')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getForwardVector() * camera3DSpeed * camera3DSpeedMultiplyer * dt);
+        //gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getForwardVector() * camera3DSpeed * camera3DSpeedMultiplyer * dt);
     }
     if (keyboard.isKeyPressed('S')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getBackwardVector() * camera3DSpeed * dt);
+        //gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getBackwardVector() * camera3DSpeed * dt);
     }
     if (keyboard.isKeyPressed('A')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getLeftVector() * camera3DSpeed * dt);
+        //gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getLeftVector() * camera3DSpeed * dt);
     }
     if (keyboard.isKeyPressed('D')) {
-        gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getRightVector() * camera3DSpeed * dt);
+        //gfx.getCamera3D().adjustPosition(gfx.getCamera3D().getRightVector() * camera3DSpeed * dt);
     }
     if (keyboard.isKeyPressed(VK_SPACE)) {
-        gfx.getCamera3D().adjustPosition(0.0f, camera3DSpeed * dt, 0.0f);
+        //gfx.getCamera3D().adjustPosition(0.0f, camera3DSpeed * dt, 0.0f);
     }
     if (keyboard.isKeyPressed(VK_CONTROL)) {
-        gfx.getCamera3D().adjustPosition(0.0f, - camera3DSpeed * dt, 0.0f);
+        //gfx.getCamera3D().adjustPosition(0.0f, - camera3DSpeed * dt, 0.0f);
     }
 
     if (keyboard.isKeyPressed('C')) {
-        DirectX::XMVECTOR lightPosition = gfx.getCamera3D().getPositionVector();
-        lightPosition += gfx.getCamera3D().getForwardVector();
-        gfx.light.setPosition(lightPosition);
-        gfx.light.setRotation(gfx.getCamera3D().getRotationFloat3());
+        //DirectX::XMVECTOR lightPosition = gfx.getCamera3D().getPositionVector();
+        //lightPosition += gfx.getCamera3D().getForwardVector();
+        //gfx.light.setPosition(lightPosition);
+        //gfx.light.setRotation(gfx.getCamera3D().getRotationFloat3());
     }
 }
 

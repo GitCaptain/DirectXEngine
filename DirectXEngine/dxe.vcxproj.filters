@@ -572,6 +572,9 @@
     <ClInclude Include="Sources\HID\MouseEvent.h">
       <Filter>Headers\HID</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Graphics\GraphicsState.h">
+      <Filter>Headers\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\VS\vertexshader.hlsl">

@@ -1,24 +1,18 @@
 #include "Graphics.h"
 
-namespace go = NGameObject;
-
 bool Graphics::initialize(HWND hwnd, int width, int height) {
     
     windowHeight = height;
     windowWidth = width;
 
-    state.device = device.Get();
-    state.deviceContext = deviceContext.Get();
-    state.windowHeight = &windowHeight;
-    state.windowWidth = &windowWidth;
-
     if (!initializeDirectX(hwnd)) {
         return false;
     }
 
-    if (!initializeShaders()) {
-        return false;
-    }
+    state.device = device.Get();
+    state.deviceContext = deviceContext.Get();
+    state.windowHeight = &windowHeight;
+    state.windowWidth = &windowWidth;
 
     if (!initializeScene()) {
         return false;
@@ -41,16 +35,6 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 
 void Graphics::renderFrame() {
 
-    cb_ps_light.data.dynamicLightColor = light.lightColor;
-    cb_ps_light.data.dynamicLightStrength = light.lightStrength;
-    cb_ps_light.data.dynamicLightPosition = light.getPositionFloat3();
-    cb_ps_light.data.dynamicLightAttenuation_a = light.attenuation_a;
-    cb_ps_light.data.dynamicLightAttenuation_b = light.attenuation_b;
-    cb_ps_light.data.dynamicLightAttenuation_c = light.attenuation_c;
-
-    cb_ps_light.applyChanges();
-    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
-
     float bgcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0); 
@@ -61,18 +45,7 @@ void Graphics::renderFrame() {
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 
-    deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
-    deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
-    deviceContext->IASetInputLayout(vertexShader.getInputLayout());
-
-    { // Pavement cube
-        nanoSuite.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
-    }
-
-    { // TODO: take multiption out
-        deviceContext->PSSetShader(pixelShader_nolight.getShader(), nullptr, 0);
-        light.draw(camera3D.getViewMatrix() * camera3D.getProjectionMatrix());
-    }
+    renderScene.render();
 
     //Draw text
     static int fpsCounter = 0;
@@ -87,35 +60,8 @@ void Graphics::renderFrame() {
     spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
 
-#ifdef ENABLE_IMGUI
-    // start dear imgui frame
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-    // create imgui test window
-    ImGui::Begin("Light Controls");
-    ImGui::DragFloat3("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
-    ImGui::End();
-    // Assemble Together Draw data
-    ImGui::Render();
-    // render draw data
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#endif
-
     const UINT vsync = 0;
     swapChain->Present(vsync, 0);
-}
-
-const GraphicsState& Graphics::getGraphicsState() const {
-    return state;
-}
-
-go::Camera3D& Graphics::getCamera3D() {
-    return camera3D;
 }
 
 bool Graphics::initializeDirectX(HWND hwnd) {
@@ -251,97 +197,10 @@ bool Graphics::initializeDirectX(HWND hwnd) {
     return true;
 }
 
-bool Graphics::initializeShaders() {
-
-    std::wstring shaderFolder = L"";
-
-#pragma region DetermineShaderPath
-    if (IsDebuggerPresent() == TRUE) {
-#ifdef _DEBUG
-#ifdef _WIN64
-        shaderFolder = L"x64\\Debug\\";
-#else
-        shaderFolder = L"x86\\Debug\\";
-#endif
-#else
-#ifdef _WIN64
-        shaderFolder = L"x64\\Release\\";
-#else
-        shaderFolder = L"x86\\Release\\";
-#endif
-#endif
-    }
-
-    // 2d shaders 
-    D3D11_INPUT_ELEMENT_DESC layout2D[] = {
-        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-    };
-
-    UINT numElements2D = ARRAYSIZE(layout2D);
-
-    // 3d shaders
-    D3D11_INPUT_ELEMENT_DESC layout3D[] = {
-        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-    };
-
-    UINT numElements = ARRAYSIZE(layout3D);
-
-    if (!vertexShader.initialize(device, shaderFolder + L"vertexshader.cso", layout3D, numElements)) {
-        return false;
-    }
-
-    if (!pixelShader.initialize(device, shaderFolder + L"pixelshader.cso")) {
-        return false;
-    }
-
-    if (!pixelShader_nolight.initialize(device, shaderFolder + L"pixelShader_nolight.cso")) {
-        return false;
-    }
-
-    return true;
+bool Graphics::initializeScene() {
+    return renderScene.initialize(state);
 }
 
-bool Graphics::initializeScene() {
-    try {
-        // Load texture
-        HRESULT hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Resources\\Textures\\seamless_grass.jpg", nullptr, grassTexture.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
-
-        hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Resources\\Textures\\pinksquare.jpg", nullptr, pinkTexture.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
-
-        hr = DirectX::CreateWICTextureFromFile(device.Get(), L"Resources\\Textures\\seamless_pavement.jpg", nullptr, pavementTexture.GetAddressOf());
-        COM_ERROR_IF_FAILED(hr, "Failed to create wic texture from file");
-
-        hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
-
-        hr = cb_ps_light.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_light constant buffer.");
-
-        cb_ps_light.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-        cb_ps_light.data.ambientLightStrength = 1.0f;
-
-        // Initialize Model(s)
-        if(!nanoSuite.initialize("Resources\\Objects\\nanosuit\\nanosuit.obj", device.Get(), deviceContext.Get(), cb_vs_vertexshader)){
-            return false;
-        }
-
-        if (!light.initialize(device.Get(), deviceContext.Get(), cb_vs_vertexshader)) {
-            return false;
-        }
-
-        nanoSuite.setPosition(2.0f, 0.0f, 0.0f);
-
-        camera3D.setPosition(0.0f, 0.0f, -2.0f);
-        camera3D.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
-    }
-    catch (const COMException& e) {
-        ErrorLogger::log(e);
-        return false;
-    }
-    return true;
+const GraphicsState& Graphics::getGraphicsState() const {
+    return state;
 }
