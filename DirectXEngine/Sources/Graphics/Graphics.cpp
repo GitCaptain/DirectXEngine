@@ -1,7 +1,7 @@
 #include "Graphics.h"
 
 bool Graphics::initialize(HWND hwnd, int width, int height) {
-    
+
     windowHeight = height;
     windowWidth = width;
 
@@ -13,23 +13,13 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     state.deviceContext = deviceContext.Get();
     state.windowHeight = &windowHeight;
     state.windowWidth = &windowWidth;
+    imgui = ImGUIWInstance::getPInstance(hwnd, state);
 
     if (!initializeScene()) {
         return false;
     }
 
-#ifdef ENABLE_IMGUI
-    // setup ImGUI
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    ImGui_ImplWin32_Init(hwnd);
-    ImGui_ImplDX11_Init(device.Get(), deviceContext.Get());
-    ImGui::StyleColorsDark();
-#endif
-
     fpsTimer.startTimer();
-
     return true;
 }
 

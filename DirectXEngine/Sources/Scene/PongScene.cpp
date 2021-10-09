@@ -1,11 +1,5 @@
 #include "PongScene.h"
 
-#ifdef ENABLE_IMGUI
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
-#endif
-
 using namespace App;
 
 bool PongScene::initialize(GraphicsState& graphicsState) {
@@ -25,6 +19,9 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     if (!border.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device, graphicsState.deviceContext, cb_vs_vertexshader)) {
         return false;
     }
+
+    imgui = ImGUIWInstance::getPInstance();
+
     camera.setPosition(0.0f, 0.0f, -2.0f);
     camera.setProjectionValues(90.0f, static_cast<float>(*graphicsState.windowWidth) / static_cast<float>(*graphicsState.windowHeight), 0.1f, 3000.0f);
     return true;
@@ -46,25 +43,15 @@ void PongScene::render() {
     cb_ps_light.applyChanges();
     graphicsState->deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
 
-#ifdef ENABLE_IMGUI
-    // start dear imgui frame
-    ImGui_ImplDX11_NewFrame();
-    ImGui_ImplWin32_NewFrame();
-    ImGui::NewFrame();
-    // create imgui test window
-    ImGui::Begin("Light Controls");
-    ImGui::DragFloat3("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f);
-    ImGui::DragFloat("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01f, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f);
-    ImGui::End();
-    // Assemble Together Draw data
-    ImGui::Render();
-    // render draw data
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
-#endif
-
+    imgui->startFrame();
+    imgui->newWindow("Light Controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f)
+        .end();
+    imgui->endFrame();
     //border.setScale(1.f, 0.1f, 2.f);
     border.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
 }

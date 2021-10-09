@@ -162,6 +162,9 @@
     <ClCompile Include="Sources\HID\MouseEvent.cpp">
       <Filter>Source Files\HID</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\Graphics\ImGUIWrapper.cpp">
+      <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Sources\ErrorLogger.h">
@@ -573,6 +576,9 @@
       <Filter>Headers\HID</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\GraphicsState.h">
+      <Filter>Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\ImGUIWrapper.h">
       <Filter>Headers\Graphics</Filter>
     </ClInclude>
   </ItemGroup>

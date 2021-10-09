@@ -117,7 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -145,7 +145,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -173,7 +173,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -201,7 +201,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp14</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -223,6 +223,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\Graphics\ImGUIWrapper.cpp" />
     <ClCompile Include="Sources\Graphics\Camera2D.cpp" />
     <ClCompile Include="Sources\Graphics\GameObject2D.cpp" />
     <ClCompile Include="Sources\Graphics\GameObject3D.cpp" />
@@ -260,6 +261,7 @@
     <ClCompile Include="ThirdParty\sources\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\Graphics\ImGUIWrapper.h" />
     <ClInclude Include="Sources\Graphics\Camera2D.h" />
     <ClInclude Include="Sources\Graphics\GameObject2D.h" />
     <ClInclude Include="Sources\Graphics\GameObject3D.h" />

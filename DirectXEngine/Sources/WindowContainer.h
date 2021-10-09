@@ -4,6 +4,7 @@
 #include "HID/Keyboard.h"
 #include "HID/Mouse.h"
 #include "Graphics/Graphics.h"
+#include "Graphics/ImGUIWrapper.h"
 
 class WindowContainer {
     using key_type = HID::key_type;
@@ -16,4 +17,5 @@ protected:
     HID::Keyboard keyboard;
     HID::Mouse mouse;
     Graphics gfx;
+    ImGUIW* imgui;
 };

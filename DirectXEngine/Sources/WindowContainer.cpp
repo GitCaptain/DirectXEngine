@@ -1,10 +1,11 @@
 #pragma once
 
-#include "WindowContainer.h"
 #include <memory>
+#include "WindowContainer.h"
 
 WindowContainer::WindowContainer() {
     static bool raw_input_initialized = false;
+    imgui = ImGUIWInstance::getPInstance();
     if (!raw_input_initialized) {
         RAWINPUTDEVICE rid;
         rid.usUsagePage = 0x01; // mouse
@@ -20,16 +21,11 @@ WindowContainer::WindowContainer() {
     }
 }
 
-#ifdef ENABLE_IMGUI
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-#endif
 LRESULT WindowContainer::windowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 
-#ifdef ENABLE_IMGUI
-    if (ImGui_ImplWin32_WndProcHandler(hwnd, uMsg, wParam, lParam)) {
+    if (imgui->handleMsg(hwnd, uMsg, wParam, lParam)) {
         return true;
     }
-#endif
 
     switch (uMsg) {
         // keyboard messages

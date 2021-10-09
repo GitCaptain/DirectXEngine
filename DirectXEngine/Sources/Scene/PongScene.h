@@ -7,6 +7,7 @@
 #include "../Graphics/Light.h"
 #include "../HID/Mouse.h"
 #include "../HID/Keyboard.h"
+#include "../Graphics/ImGUIWrapper.h"
 
 namespace App {
 
@@ -34,6 +35,7 @@ namespace App {
 		Camera3D camera;
 		Light light;
 
-		GraphicsState* graphicsState = nullptr;
+		GraphicsState *graphicsState = nullptr;
+		ImGUIW *imgui;
 	};
 }

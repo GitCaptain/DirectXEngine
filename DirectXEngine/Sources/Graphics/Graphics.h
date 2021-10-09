@@ -8,12 +8,7 @@
 #include "GraphicsState.h"
 #include "../Timer.h"
 #include "../Scene/PongScene.h"
-
-#ifdef ENABLE_IMGUI
-#include "imgui.h"
-#include "imgui_impl_win32.h"
-#include "imgui_impl_dx11.h"
-#endif
+#include "ImGUIWrapper.h"
 
 class Graphics {
 public:
@@ -50,4 +45,5 @@ private:
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext = nullptr;
     GraphicsState state;
     App::PongScene renderScene;
+    ImGUIW *imgui;
 };
