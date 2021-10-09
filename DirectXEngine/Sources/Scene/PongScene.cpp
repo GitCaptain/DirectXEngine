@@ -53,11 +53,11 @@ void PongScene::render() {
     ImGui::NewFrame();
     // create imgui test window
     ImGui::Begin("Light Controls");
-    ImGui::DragFloat3("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01, 0.1f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01, 0.0f, 1.0f);
-    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01, 0.0f, 1.0f);
+    ImGui::DragFloat3("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f);
+    ImGui::DragFloat("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f);
     ImGui::End();
     // Assemble Together Draw data
     ImGui::Render();
@@ -65,8 +65,63 @@ void PongScene::render() {
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 #endif
 
-    border.setScale(1, 0.1, 2);
+    //border.setScale(1.f, 0.1f, 2.f);
     border.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
+}
+
+void App::PongScene::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
+
+    while (!kbd.isCharBufferEmpty()) {
+        auto ch = kbd.readChar();
+    }
+
+    while (!kbd.isKeyBufferEmpty()) {
+        auto event = kbd.readKey();
+        auto keycode = event.getKeyCode();
+    }
+
+    while (!mouse.isEventBufferEmpty()) {
+        auto me = mouse.readEvent();
+        if (mouse.isRightDown()) {
+            if (me.getType() == HID::MouseEvent::EventType::RAW_MOVE) {
+                camera.adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
+            }
+        }
+    }
+
+    const float camera3DSpeed = 0.005f;
+    float cameraSpeedMultiplyer = 1.0f;
+
+    if (kbd.isKeyPressed(VK_SHIFT)) {
+        cameraSpeedMultiplyer *= 50;
+        dt *= 50;
+    }
+
+    if (kbd.isKeyPressed('W')) {
+        camera.adjustPosition(camera.getForwardVector() * camera3DSpeed * cameraSpeedMultiplyer * dt);
+    }
+    if (kbd.isKeyPressed('S')) {
+        camera.adjustPosition(camera.getBackwardVector() * camera3DSpeed * dt);
+    }
+    if (kbd.isKeyPressed('A')) {
+        camera.adjustPosition(camera.getLeftVector() * camera3DSpeed * dt);
+    }
+    if (kbd.isKeyPressed('D')) {
+        camera.adjustPosition(camera.getRightVector() * camera3DSpeed * dt);
+    }
+    if (kbd.isKeyPressed(VK_SPACE)) {
+        camera.adjustPosition(0.0f, camera3DSpeed * dt, 0.0f);
+    }
+    if (kbd.isKeyPressed(VK_CONTROL)) {
+        camera.adjustPosition(0.0f, - camera3DSpeed * dt, 0.0f);
+    }
+
+    if (kbd.isKeyPressed('C')) {
+        DirectX::XMVECTOR lightPosition = camera.getPositionVector();
+        lightPosition += camera.getForwardVector();
+        light.setPosition(lightPosition);
+        light.setRotation(camera.getRotationFloat3());
+    }
 }
 
 bool PongScene::initializeShaders() {
@@ -127,7 +182,6 @@ bool PongScene::initializeShaders() {
     if (!light.initialize(graphicsState->device, graphicsState->deviceContext, cb_vs_vertexshader)) {
         return false;
     }
-
 
     return true;
 }

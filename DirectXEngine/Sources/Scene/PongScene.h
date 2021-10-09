@@ -5,6 +5,8 @@
 #include "../Graphics/Camera3D.h"
 #include "../Graphics/Shaders.h"
 #include "../Graphics/Light.h"
+#include "../HID/Mouse.h"
+#include "../HID/Keyboard.h"
 
 namespace App {
 
@@ -16,11 +18,11 @@ namespace App {
 		~PongScene() = default;
 		virtual bool initialize(GraphicsState& graphicsState) override;
 		virtual void render() override;
+		void update(HID::Keyboard &kbd, HID::Mouse &mouse, float dt);
 	private:
 		bool initializeShaders();
 
 	private:
-
 		ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
 		ConstantBuffer<CB_PS_light> cb_ps_light;
 
@@ -32,6 +34,6 @@ namespace App {
 		Camera3D camera;
 		Light light;
 
-		GraphicsState* graphicsState;
+		GraphicsState* graphicsState = nullptr;
 	};
 }

@@ -19,6 +19,7 @@ class Graphics {
 public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
+    void update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt);
     const GraphicsState& getGraphicsState() const;
 
 private:

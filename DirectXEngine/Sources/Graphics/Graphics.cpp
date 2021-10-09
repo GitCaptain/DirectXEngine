@@ -64,6 +64,10 @@ void Graphics::renderFrame() {
     swapChain->Present(vsync, 0);
 }
 
+void Graphics::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
+    renderScene.update(kbd, mouse, dt);
+}
+
 bool Graphics::initializeDirectX(HWND hwnd) {
     try {
         auto adapters = AdapterReader::getAdapters();
