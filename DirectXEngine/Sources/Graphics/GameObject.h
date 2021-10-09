@@ -32,13 +32,13 @@ namespace NGameObject {
 
     protected:
 
-        virtual void updateMatrix();
+        virtual void updateMatrix() = 0;
 
         XMVECTOR posVector;
         XMVECTOR rotVector;
         XMFLOAT3 pos;
         XMFLOAT3 rot;
 
-        XMFLOAT3 scale;
+        XMFLOAT3 scale = {1., 1., 1.};
     };
 }
