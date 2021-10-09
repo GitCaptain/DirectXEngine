@@ -1,6 +1,5 @@
 #include "ImGUIWrapper.h"
 
-
 void ImGUIW::doAssertion() {
     assert(initialized && "You should initilize Imgui before start using it");
 }

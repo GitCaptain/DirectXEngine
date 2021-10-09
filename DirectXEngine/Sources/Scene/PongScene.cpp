@@ -21,8 +21,7 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     }
 
     imgui = ImGUIWInstance::getPInstance();
-
-    camera.setPosition(0.0f, 0.0f, -2.0f);
+    camera.setPosition(0.0f, tableHeight + 20, -2.0f);
     camera.setProjectionValues(90.0f, static_cast<float>(*graphicsState.windowWidth) / static_cast<float>(*graphicsState.windowHeight), 0.1f, 3000.0f);
     return true;
 }
@@ -43,17 +42,94 @@ void PongScene::render() {
     cb_ps_light.applyChanges();
     graphicsState->deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
 
+    XMMATRIX viewProjectionMatrix = camera.getViewMatrix() * camera.getProjectionMatrix();
+
+    // draw table
+    border.setRotation(0, 0, 0);
+    border.setPosition(tablePos);
+    border.setScale(tableWidth, tableHeight, tableLength);
+    border.draw(viewProjectionMatrix);
+
+    // draw left border
+    border.setPosition(leftBorderPos);
+    border.setScale(borderWidth, borderHeight, borderLength);
+    border.draw(viewProjectionMatrix);
+
+    // draw right border
+    border.setPosition(rightBorderPos);
+    border.setScale(borderWidth, borderHeight, borderLength);
+    border.draw(viewProjectionMatrix);
+
+    const float pi = 3.1415926;
+
+    // draw player pad
+    border.setPosition(PlayerPos);
+    border.setRotation(0, pi, 0);
+    border.setScale(padWidth, padHeight, padLength);
+    border.draw(viewProjectionMatrix);
+
+    // draw AI pad
+    border.setPosition(AIPos);
+    border.setRotation(0, -pi , 0);
+    border.setScale(padWidth, padHeight, padLength);
+    border.draw(viewProjectionMatrix);
+
+    // draw ball
+    ball.setPosition(ballPosition);
+    ball.setScale(ballRadius, ballRadius, ballRadius);
+    ball.draw(viewProjectionMatrix);
+
+    //light.draw(viewProjectionMatrix);
+
+
+#pragma region IMGUI drawing
     imgui->startFrame();
-    imgui->newWindow("Light Controls")
+
+    imgui->newWindow("Light controls")
         .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01f, 0.0f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f)
         .end();
+
+    imgui->newWindow("Camera controls")
+        .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
+        .attach<IMGUIFN::TEXT>("position: %.3f %.3f %.3f", camera.getPositionFloat3().x, camera.getPositionFloat3().y, camera.getPositionFloat3().z)
+        .end();
+    imgui->newWindow("table controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &tablePos.x, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("width", &tableWidth, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("height", &tableHeight, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("length", &tableLength, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->newWindow("left border controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &leftBorderPos.x, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->newWindow("right border controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &rightBorderPos.x, 1, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->newWindow("player pad controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &PlayerPos.x, 1, -200.f, 200.f)
+        .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->newWindow("AI pad controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &AIPos.x, 1, -200.f, 200.f)
+        .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
+        .end();
+
     imgui->endFrame();
-    //border.setScale(1.f, 0.1f, 2.f);
-    border.draw(camera.getViewMatrix() * camera.getProjectionMatrix());
+#pragma endregion
 }
 
 void App::PongScene::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
@@ -76,7 +152,6 @@ void App::PongScene::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
         }
     }
 
-    const float camera3DSpeed = 0.005f;
     float cameraSpeedMultiplyer = 1.0f;
 
     if (kbd.isKeyPressed(VK_SHIFT)) {
@@ -85,22 +160,22 @@ void App::PongScene::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
     }
 
     if (kbd.isKeyPressed('W')) {
-        camera.adjustPosition(camera.getForwardVector() * camera3DSpeed * cameraSpeedMultiplyer * dt);
+        camera.adjustPosition(camera.getForwardVector() * cameraSpeed * cameraSpeedMultiplyer * dt);
     }
     if (kbd.isKeyPressed('S')) {
-        camera.adjustPosition(camera.getBackwardVector() * camera3DSpeed * dt);
+        camera.adjustPosition(camera.getBackwardVector() * cameraSpeed * dt);
     }
     if (kbd.isKeyPressed('A')) {
-        camera.adjustPosition(camera.getLeftVector() * camera3DSpeed * dt);
+        camera.adjustPosition(camera.getLeftVector() * cameraSpeed * dt);
     }
     if (kbd.isKeyPressed('D')) {
-        camera.adjustPosition(camera.getRightVector() * camera3DSpeed * dt);
+        camera.adjustPosition(camera.getRightVector() * cameraSpeed * dt);
     }
     if (kbd.isKeyPressed(VK_SPACE)) {
-        camera.adjustPosition(0.0f, camera3DSpeed * dt, 0.0f);
+        camera.adjustPosition(0.0f, cameraSpeed * dt, 0.0f);
     }
     if (kbd.isKeyPressed(VK_CONTROL)) {
-        camera.adjustPosition(0.0f, - camera3DSpeed * dt, 0.0f);
+        camera.adjustPosition(0.0f, - cameraSpeed * dt, 0.0f);
     }
 
     if (kbd.isKeyPressed('C')) {
