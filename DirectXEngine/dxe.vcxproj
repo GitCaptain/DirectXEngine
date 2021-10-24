@@ -117,7 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -145,7 +145,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -173,7 +173,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -201,7 +201,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NOMINMAX;ENABLE_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <AdditionalIncludeDirectories>$(ProjectDir)\Sources\ThirdParty\sources\ImGui</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -249,7 +249,8 @@
     <ClCompile Include="Sources\RenderWindow.cpp" />
     <ClCompile Include="Sources\Graphics\Sprite.cpp" />
     <ClCompile Include="Sources\Scene\PongScene.cpp" />
-    <ClCompile Include="Sources\StringHelper.cpp" />
+    <ClCompile Include="Sources\Utils\DXUtils.cpp" />
+    <ClCompile Include="Sources\Utils\StringHelper.cpp" />
     <ClCompile Include="Sources\Graphics\Texture.cpp" />
     <ClCompile Include="Sources\Timer.cpp" />
     <ClCompile Include="Sources\WindowContainer.cpp" />
@@ -291,7 +292,8 @@
     <ClInclude Include="Sources\Graphics\Sprite.h" />
     <ClInclude Include="Sources\Scene\PongScene.h" />
     <ClInclude Include="Sources\Scene\Scene.h" />
-    <ClInclude Include="Sources\StringHelper.h" />
+    <ClInclude Include="Sources\Utils\DXUtils.h" />
+    <ClInclude Include="Sources\Utils\StringHelper.h" />
     <ClInclude Include="Sources\Graphics\VertexBuffer.h" />
     <ClInclude Include="Sources\Graphics\Texture.h" />
     <ClInclude Include="Sources\Timer.h" />
