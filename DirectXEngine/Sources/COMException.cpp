@@ -1,5 +1,5 @@
 #include "COMException.h"
-#include "StringHelper.h"
+#include "Utils/StringHelper.h"
 
 COMException::COMException(HRESULT hr, const std::string& msg, const std::string& file, const std::string& function, int line) {
     _com_error error(hr);

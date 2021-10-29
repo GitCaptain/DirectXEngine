@@ -16,6 +16,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 enum class IMGUIFN {
 	DRAGFLOAT,
 	DRAGFLOAT3,
+	TEXT,
 };
 
 class ImGUIW {
@@ -30,6 +31,9 @@ public:
 			} 
 			else if constexpr (fn == IMGUIFN::DRAGFLOAT3) {
 				ImGui::DragFloat3(params...);
+			}
+			else if constexpr (fn == IMGUIFN::TEXT) {
+				ImGui::Text(params...);
 			}
 			else {
 				static_assert("MISSED IMGUI FUNCTION" && false);

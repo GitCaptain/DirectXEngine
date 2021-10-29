@@ -55,6 +55,12 @@
     <Filter Include="Source Files\HID">
       <UniqueIdentifier>{a6224bdc-ed97-47a5-9f7d-c30e03264a40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Utils">
+      <UniqueIdentifier>{cb66b0f3-7e55-451d-be90-3301b7276e23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Utils">
+      <UniqueIdentifier>{7429d7d8-be36-4d23-bb3c-8ff6c6fbaf27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\ErrorLogger.cpp">
@@ -104,9 +110,6 @@
     </ClCompile>
     <ClCompile Include="Sources\Graphics\Texture.cpp">
       <Filter>Source Files\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\StringHelper.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\RenderableGameObject.cpp">
       <Filter>Source Files\Graphics</Filter>
@@ -164,6 +167,12 @@
     </ClCompile>
     <ClCompile Include="Sources\Graphics\ImGUIWrapper.cpp">
       <Filter>Source Files\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\DXUtils.cpp">
+      <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Utils\StringHelper.cpp">
+      <Filter>Source Files\Utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -223,9 +232,6 @@
     </ClInclude>
     <ClInclude Include="Sources\Graphics\Texture.h">
       <Filter>Headers\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="Sources\StringHelper.h">
-      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Sources\Graphics\RenderableGameObject.h">
       <Filter>Headers\Graphics</Filter>
@@ -580,6 +586,12 @@
     </ClInclude>
     <ClInclude Include="Sources\Graphics\ImGUIWrapper.h">
       <Filter>Headers\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\DXUtils.h">
+      <Filter>Headers\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Utils\StringHelper.h">
+      <Filter>Headers\Utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

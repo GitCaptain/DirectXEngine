@@ -1,5 +1,5 @@
 #include "WindowContainer.h"
-#include "StringHelper.h"
+#include "Utils/StringHelper.h"
 
 bool RenderWindow::initialize(
     WindowContainer* pWindowContainer,
