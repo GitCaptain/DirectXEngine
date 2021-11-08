@@ -62,15 +62,23 @@ void PongScene::render() {
     graphicsState->deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
     graphicsState->deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
 
-    cb_ps_light.data.dynamicLightColor = light.lightColor;
-    cb_ps_light.data.dynamicLightStrength = light.lightStrength;
-    cb_ps_light.data.dynamicLightPosition = light.getPositionFloat3();
-    cb_ps_light.data.dynamicLightAttenuation_a = light.attenuation_a;
-    cb_ps_light.data.dynamicLightAttenuation_b = light.attenuation_b;
-    cb_ps_light.data.dynamicLightAttenuation_c = light.attenuation_c;
+    cb_ps_phonglight.data.dynamicLightColor = light.lightColor;
+    cb_ps_phonglight.data.dynamicLightStrength = light.lightStrength;
+    cb_ps_phonglight.data.dynamicLightPosition = light.getPositionFloat3();
+    cb_ps_phonglight.data.dynamicLightAttenuation_a = light.attenuation_a;
+    cb_ps_phonglight.data.dynamicLightAttenuation_b = light.attenuation_b;
+    cb_ps_phonglight.data.dynamicLightAttenuation_c = light.attenuation_c;
 
-    cb_ps_light.applyChanges();
-    graphicsState->deviceContext->PSSetConstantBuffers(0, 1, cb_ps_light.GetAddressOf());
+    //Should be configured from the material
+    cb_ps_phonglight.data.shinessPower = 32;
+    cb_ps_phonglight.data.specularStrength = 0.5;
+
+    cb_ps_phonglight.applyChanges();
+    graphicsState->deviceContext->PSSetConstantBuffers(0, 1, cb_ps_phonglight.GetAddressOf());
+
+    cb_ps_camera.data.cameraWorldPosition = camera.getPositionFloat3();
+    cb_ps_camera.applyChanges();
+    graphicsState->deviceContext->PSSetConstantBuffers(1, 1, cb_ps_camera.GetAddressOf());
 
     XMMATRIX viewProjectionMatrix = camera.getViewMatrix() * camera.getProjectionMatrix();
 
@@ -120,8 +128,8 @@ void PongScene::render() {
     imgui->startFrame();
 
     imgui->newWindow("Light controls")
-        .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &cb_ps_light.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &cb_ps_light.data.ambientLightStrength, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &cb_ps_phonglight.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &cb_ps_phonglight.data.ambientLightStrength, 0.01f, 0.0f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f)
@@ -289,7 +297,7 @@ bool PongScene::initializeShaders() {
         return false;
     }
 
-    if (!pixelShader.initialize(graphicsState->device, shaderFolder + L"pixelshader.cso")) {
+    if (!pixelShader.initialize(graphicsState->device, shaderFolder + L"PhongLightning_ps.cso")) {
         return false;
     }
 
@@ -299,16 +307,19 @@ bool PongScene::initializeShaders() {
         HRESULT hr = cb_vs_vertexshader.initialize(graphicsState->device, graphicsState->deviceContext);
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
 
-        hr = cb_ps_light.initialize(graphicsState->device, graphicsState->deviceContext);
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_light constant buffer.");
+        hr = cb_ps_phonglight.initialize(graphicsState->device, graphicsState->deviceContext);
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
+
+        hr = cb_ps_camera.initialize(graphicsState->device, graphicsState->deviceContext);
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
         return false;
     }
 
-    cb_ps_light.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-    cb_ps_light.data.ambientLightStrength = 1.0f;
+    cb_ps_phonglight.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+    cb_ps_phonglight.data.ambientLightStrength = 1.0f;
 
     if (!light.initialize(graphicsState->device, graphicsState->deviceContext, cb_vs_vertexshader)) {
         return false;

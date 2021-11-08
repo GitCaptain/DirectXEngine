@@ -1,6 +1,22 @@
+#include <stdexcept>
+#include <format>
+#include <cmath>
+#include "../ErrorLogger.h"
 #include "Model.h"
-
 using namespace NModel;
+
+bool FloatEqual(const float a, const float b, const float epsilon = 5e-7) {
+#ifndef NDEBUG
+    const auto diff = fabs(a - b);
+    if (diff < epsilon) {
+        return true;
+    }
+    ErrorLogger::log(std::format("The difference is: {}", diff));
+    return false;
+#else
+    return fabs(a - b) < epsilon;
+#endif
+}
 
 bool Model::initialize(const std::string& filePath, 
                             ID3D11Device* device,
@@ -42,7 +58,12 @@ bool Model::loadModel(const std::string& filePath) {
     directory = StringHelper::getDirectoryFromPath(filePath);
 
     Assimp::Importer importer;
-    const aiScene* pScene = importer.ReadFile(filePath, aiProcess_Triangulate | aiProcess_ConvertToLeftHanded);
+    const aiScene* pScene = importer.ReadFile(filePath,
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_Triangulate |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_GenNormals
+    );
 
     if (pScene == nullptr) {
         ErrorLogger::log("Failed to load model at path: " + filePath);
@@ -77,9 +98,14 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
         vertex.pos.y = mesh->mVertices[i].y;
         vertex.pos.z = mesh->mVertices[i].z;
 
-        vertex.normal.x = mesh->mNormals[i].x;
-        vertex.normal.y = mesh->mNormals[i].y;
-        vertex.normal.z = mesh->mNormals[i].z;
+        const auto normalVector = mesh->mNormals[i].Normalize();
+        //following assertion fails without prior call to Normalize,
+        //so we can't trust to model's vector and should normalize ourselves
+        assert(FloatEqual(normalVector.SquareLength(), 1) && "Normal length doesn't equal to 1!");
+
+        vertex.normal.x = normalVector.x;
+        vertex.normal.y = normalVector.y;
+        vertex.normal.z = normalVector.z;
 
         // TODO: what if mesh doesn't have a texture?
         if (mesh->mTextureCoords[0]) {
@@ -125,8 +151,7 @@ TextureStorageType NModel::Model::determineTextureStorageType(
             return TextureStorageType::EmbeddedIndexCompressed;
         }
         else {
-            // TODO: fix this strange assert usage and next usages too
-            assert("SUPPORT DOES NOT EXIST YET FOR INDEXED NON COMPRESSED TEXTURES" && 0);
+            assert("SUPPORT DOES NOT EXIST YET FOR INDEXED NON COMPRESSED TEXTURES" && false);
             return TextureStorageType::EmbeddedIndexNonCompressed;
         }
     }
@@ -139,12 +164,12 @@ TextureStorageType NModel::Model::determineTextureStorageType(
             return TextureStorageType::EmbeddedCompressed;
         }
         else {
-            assert("SUPPORT DOES NOT EXIST YET FOR EMBEDDED NON COMPRESSED TEXTURES" && 0);
+            assert("SUPPORT DOES NOT EXIST YET FOR EMBEDDED NON COMPRESSED TEXTURES" && false);
             return TextureStorageType::EmbeddedNonCompressed;
         }
     }
 
-    // Lastly checl if texture is a filepath 
+    // Lastly check if texture is a filepath
     // by checking for a period before extension name
     if (texturePath.find('.') != std::string::npos) {
         return TextureStorageType::Disk;
@@ -168,8 +193,8 @@ std::vector<Texture> NModel::Model::LoadMaterialTextures(
         aiColor3D aiColor(0.0f, 0.0f, 0.0f);
         switch (textureType) {
             case aiTextureType_DIFFUSE: {
-                pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor);
-                if (aiColor.IsBlack()) { // in case of black color, we use grey
+                const aiReturn colorLoadStatus = pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor);
+                if (colorLoadStatus != AI_SUCCESS) { // in case of absence of texture color, use UnloadedColor
                     materialTextures.emplace_back(device, Colors::UnloadedTextureColor, textureType);
                 }
                 else {
@@ -177,6 +202,8 @@ std::vector<Texture> NModel::Model::LoadMaterialTextures(
                 }
                 return materialTextures;
             }
+            default:
+                throw std::invalid_argument(std::format("Unexpected AiTextureType: {}", static_cast<int>(textureType)));
         }
     }
     else {

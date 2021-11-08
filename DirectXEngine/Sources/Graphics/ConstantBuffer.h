@@ -34,10 +34,6 @@ inline ID3D11Buffer* const* ConstantBuffer<T>::GetAddressOf() const {
 
 template<typename T>
 inline HRESULT ConstantBuffer<T>::initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext) {
-    
-    if (buffer.Get() != nullptr) {
-        buffer.Reset();
-    }
 
     this->deviceContext = deviceContext;
     
@@ -49,7 +45,7 @@ inline HRESULT ConstantBuffer<T>::initialize(ID3D11Device* device, ID3D11DeviceC
     desc.ByteWidth = static_cast<UINT>(sizeof(T) + 16 - (sizeof(T) % 16));
     desc.StructureByteStride = 0;
 
-    HRESULT hr = device->CreateBuffer(&desc, 0, buffer.GetAddressOf());
+    HRESULT hr = device->CreateBuffer(&desc, 0, &buffer);
     return hr;
 }
 
