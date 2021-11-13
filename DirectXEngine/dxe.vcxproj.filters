@@ -613,6 +613,7 @@
     <FxCompile Include="Resources\Shaders\PS\pixelshader_2d_discard.hlsl">
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\Shaders\PS\PhongLightning_ps.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dev\Scripts\prepare_imgui.ps1">
