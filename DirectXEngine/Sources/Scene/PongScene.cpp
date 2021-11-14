@@ -12,8 +12,8 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
 
     this->graphicsState = &graphicsState;
 
-    windowWidth = *graphicsState.windowWidth;
-    windowHeight = *graphicsState.windowHeight;
+    windowWidth = graphicsState.windowWidth;
+    windowHeight = graphicsState.windowHeight;
 
     if (!initializeShaders()) {
         return false;

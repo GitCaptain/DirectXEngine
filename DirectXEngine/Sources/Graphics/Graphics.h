@@ -9,41 +9,26 @@
 #include "../Timer.h"
 #include "../Scene/PongScene.h"
 #include "ImGUIWrapper.h"
+#include "Render/ForwardRenderer.h"
 
 class Graphics {
 public:
     bool initialize(HWND hwnd, int width, int height);
     void renderFrame();
     void update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt);
-    const GraphicsState& getGraphicsState() const;
+    GraphicsState& getGraphicsState() const;
 
 private:
-    bool initializeDirectX(HWND hwnd);
+    bool initializeRenderer(HWND hwnd, int width, int height);
     bool initializeShaders();
     bool initializeScene();
+    void initSprites();
 
-    Microsoft::WRL::ComPtr<IDXGISwapChain> swapChain;
-    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> renderTargetView;
-
-    Microsoft::WRL::ComPtr<ID3D11DepthStencilView> depthStencilView;
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> depthStencilBuffer;
-    Microsoft::WRL::ComPtr<ID3D11DepthStencilState> depthStencilState;
-
-    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerState;
-    Microsoft::WRL::ComPtr<ID3D11RasterizerState> rasterizerStateCullFront;
-    Microsoft::WRL::ComPtr<ID3D11BlendState> blendState; 
-
+    std::unique_ptr<Renderer> renderer{ new ForwardRenderer{} };
     std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
     std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
-    Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
-
     Timer fpsTimer;
-    int windowWidth = 800;
-    int windowHeight = 600;
-    Microsoft::WRL::ComPtr<ID3D11Device> device = nullptr;
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext> deviceContext = nullptr;
-    GraphicsState state;
     App::PongScene renderScene;
     ImGUIW *imgui;
 };

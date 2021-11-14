@@ -47,7 +47,7 @@ namespace App {
         RenderableGameObject border;
         RenderableGameObject ball;
         Camera3D camera;
-        float cameraSpeed = 0.1;
+        float cameraSpeed = 0.1f;
         Light light;
 
         GraphicsState* graphicsState = nullptr;
