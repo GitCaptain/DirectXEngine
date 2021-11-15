@@ -236,6 +236,9 @@
     <ClCompile Include="Sources\Graphics\AdapterReader.cpp" />
     <ClCompile Include="Sources\Graphics\Graphics.cpp" />
     <ClCompile Include="Sources\Graphics\IndexBuffer.cpp" />
+    <ClCompile Include="Sources\Graphics\Render\DeferredRenderer.cpp" />
+    <ClCompile Include="Sources\Graphics\Render\ForwardRenderer.cpp" />
+    <ClCompile Include="Sources\Graphics\Render\Renderer.cpp" />
     <ClCompile Include="Sources\Graphics\Shaders.cpp" />
     <ClCompile Include="Sources\HID\Keyboard.cpp" />
     <ClCompile Include="Sources\HID\KeyboardEvent.cpp" />
@@ -262,6 +265,8 @@
     <ClCompile Include="ThirdParty\sources\ImGui\imgui_widgets.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Sources\Graphics\Render\DeferredRenderer.h" />
+    <ClInclude Include="Sources\Graphics\Render\ForwardRenderer.h" />
     <ClInclude Include="Sources\Graphics\ImGUIWrapper.h" />
     <ClInclude Include="Sources\Graphics\Camera2D.h" />
     <ClInclude Include="Sources\Graphics\GameObject2D.h" />
@@ -277,6 +282,7 @@
     <ClInclude Include="Sources\Graphics\AdapterReader.h" />
     <ClInclude Include="Sources\Graphics\Graphics.h" />
     <ClInclude Include="Sources\Graphics\GraphicsState.h" />
+    <ClInclude Include="Sources\Graphics\Render\Renderer.h" />
     <ClInclude Include="Sources\Graphics\Shaders.h" />
     <ClInclude Include="Sources\Graphics\Vertex.h" />
     <ClInclude Include="Sources\Graphics\IndexBuffer.h" />
@@ -403,6 +409,12 @@
     <ClInclude Include="ThirdParty\include\ImGUI\imstb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="Resources\Shaders\PS\deferred_geometry_pass_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="Resources\Shaders\PS\PhongLightning_ps.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -448,6 +460,12 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\VS\deferred_geometry_pass_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\VS\vertexshader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
