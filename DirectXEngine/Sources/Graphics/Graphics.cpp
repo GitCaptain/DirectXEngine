@@ -5,7 +5,6 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
     if (!initializeRenderer(hwnd, width, height)) {
         return false;
     }
-
     imgui = ImGUIWInstance::getPInstance(hwnd, getGraphicsState());
 
     if (!initializeScene()) {
@@ -20,7 +19,8 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 void Graphics::renderFrame() {
 
     renderer->preparePipeline();
-    renderScene.render();
+    const float bgcolor[4] = { 0.f, 0.f, 0.f, 1.f };
+    renderer->renderScene(&renderScene, bgcolor);
 
     //Draw text
     static int fpsCounter = 0;

@@ -20,7 +20,7 @@ public:
 
 private:
     bool initializeRenderer(HWND hwnd, int width, int height);
-    bool initializeShaders();
+    bool initializeConstantBuffers();
     bool initializeScene();
     void initSprites();
 

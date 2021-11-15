@@ -18,7 +18,7 @@ namespace App {
 
     using namespace NGameObject;
 
-    class PongScene : Scene {
+    class PongScene : public Scene {
     public:
         PongScene() = default;
         ~PongScene() = default;
@@ -28,7 +28,7 @@ namespace App {
         virtual void update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt);
 
     private:
-        bool initializeShaders();
+        bool initializeConstantBuffers();
         void pushBall();
         void updateAI(float dt);
         void checkCollision();
@@ -37,9 +37,6 @@ namespace App {
         ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
         ConstantBuffer<CB_PS_Phonglight> cb_ps_phonglight;
         ConstantBuffer<CB_PS_Camera> cb_ps_camera;
-
-        VertexShader vertexShader;
-        PixelShader pixelShader;
 
         std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
         std::unique_ptr<DirectX::SpriteFont> spriteFont;

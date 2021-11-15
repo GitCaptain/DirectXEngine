@@ -15,7 +15,7 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     windowWidth = graphicsState.windowWidth;
     windowHeight = graphicsState.windowHeight;
 
-    if (!initializeShaders()) {
+    if (!initializeConstantBuffers()) {
         return false;
     }
 
@@ -57,10 +57,6 @@ void PongScene::reset() {
 }
 
 void PongScene::render() {
-
-    graphicsState->deviceContext->IASetInputLayout(vertexShader.getInputLayout());
-    graphicsState->deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
-    graphicsState->deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
 
     cb_ps_phonglight.data.dynamicLightColor = light.lightColor;
     cb_ps_phonglight.data.dynamicLightStrength = light.lightStrength;
@@ -263,43 +259,7 @@ void App::PongScene::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
     checkCollision();
 }
 
-bool PongScene::initializeShaders() {
-
-    std::wstring shaderFolder = L"";
-
-#pragma region DetermineShaderPath
-    if (IsDebuggerPresent() == TRUE) {
-#ifdef _DEBUG
-#ifdef _WIN64
-        shaderFolder = L"x64\\Debug\\";
-#else
-        shaderFolder = L"x86\\Debug\\";
-#endif
-#else
-#ifdef _WIN64
-        shaderFolder = L"x64\\Release\\";
-#else
-        shaderFolder = L"x86\\Release\\";
-#endif
-#endif
-    }
-
-    // 3d shaders
-    D3D11_INPUT_ELEMENT_DESC layout3D[] = {
-        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-    };
-
-    UINT numElements = ARRAYSIZE(layout3D);
-
-    if (!vertexShader.initialize(graphicsState->device, shaderFolder + L"vertexshader.cso", layout3D, numElements)) {
-        return false;
-    }
-
-    if (!pixelShader.initialize(graphicsState->device, shaderFolder + L"PhongLightning_ps.cso")) {
-        return false;
-    }
+bool PongScene::initializeConstantBuffers() {
 
     // initialize constants buffers
     try {
