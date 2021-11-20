@@ -17,7 +17,7 @@ namespace App {
 		virtual bool initialize(GraphicsState& graphicsState) = 0;
 		virtual void update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt);
 		virtual void postRender();
-		virtual const Light& getLightInfo() const = 0;
+		virtual const LightInfo& getLightInfo() const = 0;
 		virtual const NGameObject::Camera3D& getCameraInfo() const = 0;
 		virtual const DirectX::XMMATRIX& getViewMatrix() const = 0;
 		virtual const DirectX::XMMATRIX& getProjectionMatrix() const = 0;

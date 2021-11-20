@@ -38,7 +38,7 @@ namespace NGameObject {
         XMVECTOR rotVector;
         XMFLOAT3 pos;
         XMFLOAT3 rot;
-
         XMFLOAT3 scale = {1., 1., 1.};
+        XMMATRIX worldMatrix = XMMatrixIdentity();
     };
 }

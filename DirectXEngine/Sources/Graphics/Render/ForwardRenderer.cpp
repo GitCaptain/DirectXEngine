@@ -37,15 +37,15 @@ void ForwardRenderer::renderScene(App::Scene* scene, const float bgcolor[4] ) {
     const std::vector<RenderableGameObject*> &renderables = scene->getRenderables();
     const DirectX::XMFLOAT3 camPos = scene->getCameraInfo().getPositionFloat3();
     // update lights
-    const Light& light = scene->getLightInfo();
-    cb_ps_phonglight.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-    cb_ps_phonglight.data.ambientLightStrength = 1.0f;
-    cb_ps_phonglight.data.dynamicLightColor = light.lightColor;
-    cb_ps_phonglight.data.dynamicLightStrength = light.lightStrength;
-    cb_ps_phonglight.data.dynamicLightPosition = light.getPositionFloat3();
-    cb_ps_phonglight.data.dynamicLightAttenuation_a = light.attenuation_a;
-    cb_ps_phonglight.data.dynamicLightAttenuation_b = light.attenuation_b;
-    cb_ps_phonglight.data.dynamicLightAttenuation_c = light.attenuation_c;
+    const LightInfo& light = scene->getLightInfo();
+    cb_ps_phonglight.data.ambientLightColor = light.ambient.lightColor;
+    cb_ps_phonglight.data.ambientLightStrength = light.ambient.lightStrength;
+    cb_ps_phonglight.data.dynamicLightColor = light.dLights[0].lightColor;
+    cb_ps_phonglight.data.dynamicLightStrength = light.dLights[0].lightStrength;
+    cb_ps_phonglight.data.dynamicLightPosition = light.dLights[0].getPositionFloat3();
+    cb_ps_phonglight.data.dynamicLightAttenuation_a = light.dLights[0].attenuation_a;
+    cb_ps_phonglight.data.dynamicLightAttenuation_b = light.dLights[0].attenuation_b;
+    cb_ps_phonglight.data.dynamicLightAttenuation_c = light.dLights[0].attenuation_c;
 
     //Should be configured from the material
     cb_ps_phonglight.data.shinessPower = 32;

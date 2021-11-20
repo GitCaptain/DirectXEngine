@@ -1,13 +1,17 @@
 #include "Light.h"
+#include <DirectXMath.h>
 
-bool Light::initialize(ID3D11Device* device) {
-    
-    if (!model.initialize("Resources/Objects/light.fbx", device)) {
-        return false;
-    }
+using namespace DirectX;
 
+Light::Light() {
     setPosition(0.0f, 0.0f, 0.0f);
     setRotation(0.0f, 0.0f, 0.0f);
     updateMatrix();
-    return true;
+}
+
+void Light::updateMatrix() {}
+
+void DynamicLight::updateMatrix() {
+    worldMatrix = XMMatrixRotationRollPitchYaw(rot.x, rot.y, rot.z) * XMMatrixTranslation(pos.x, pos.y, pos.z);
+    updateDirectionVectors();
 }

@@ -15,10 +15,6 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     windowWidth = graphicsState.windowWidth;
     windowHeight = graphicsState.windowHeight;
 
-
-    if (!light.initialize(graphicsState.device)) {
-        return false;
-    }
     if (!ball.initialize("Resources\\Objects\\wooden_sphere\\wooden_sphere.obj", graphicsState.device)) {
         return false;
     }
@@ -37,6 +33,8 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     if (!playerPad.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
         return false;
     }
+
+    light.dLights.emplace_back();
 
     p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad};
 
@@ -131,8 +129,8 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
     if (kbd.isKeyPressed('C')) {
         DirectX::XMVECTOR lightPosition = camera.getPositionVector();
         lightPosition += camera.getForwardVector();
-        light.setPosition(lightPosition);
-        light.setRotation(camera.getRotationFloat3());
+        light.dLights[0].setPosition(lightPosition);
+        light.dLights[0].setRotation(camera.getRotationFloat3());
     }
 
     // If ball doesn't move, stick it to the pad
@@ -157,11 +155,11 @@ void PongScene::updateGUI() {
     imgui->startFrame();
 
     imgui->newWindow("Light controls")
-        .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &light.lightColor.x, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &light.lightStrength, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &light.ambient.lightColor.x, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &light.ambient.lightStrength, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.dLights[0].attenuation_a, 0.01f, 0.1f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.dLights[0].attenuation_b, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.dLights[0].attenuation_c, 0.01f, 0.0f, 1.0f)
         .end();
 
     imgui->newWindow("Camera controls")
@@ -304,7 +302,7 @@ void PongScene::checkCollision() {
     }
 }
 
-const Light& PongScene::getLightInfo() const {
+const LightInfo& PongScene::getLightInfo() const {
     return light;
 }
 

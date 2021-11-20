@@ -26,7 +26,7 @@ namespace App {
         void reset() override;
         const XMMATRIX& getViewMatrix() const override;
         const XMMATRIX& getProjectionMatrix() const override;
-        const Light& getLightInfo() const override;
+        const LightInfo& getLightInfo() const override;
         const Camera3D& getCameraInfo() const override;
     private:
         void pushBall();
@@ -47,7 +47,7 @@ namespace App {
         RenderableGameObject AIPad;
         RenderableGameObject playerPad;
         RenderableGameObject ball;
-        Light light;
+        LightInfo light;
         Camera3D camera;
         float cameraSpeed = 0.1f;
 

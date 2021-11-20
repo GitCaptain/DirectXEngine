@@ -18,7 +18,6 @@ namespace NGameObject {
         void updateMatrix() override;
 
         Model model;
-        XMMATRIX worldMatrix = XMMatrixIdentity();
     };
 
 }
