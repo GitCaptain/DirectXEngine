@@ -17,9 +17,9 @@ struct PS_OUTPUT {
 PS_OUTPUT main(PS_INPUT input) : SV_TARGET {
     PS_OUTPUT output;
 
-    output.worldPosition = input.inWorldPosition;
-    output.color = shaderTexture.Sample(objSamplerState, input.inTexCoord);
-    output.normal = float4(input.normal, 1.0f);
+    output.worldPosition = float4(input.inWorldPosition, 1.0f);
+    output.color = objTexture.Sample(objSamplerState, input.inTexCoord);
+    output.normal = float4(input.inNormal, 1.0f);
 
     return output;
 }
