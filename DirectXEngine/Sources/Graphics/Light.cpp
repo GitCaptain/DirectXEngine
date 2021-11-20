@@ -1,8 +1,8 @@
 #include "Light.h"
 
-bool Light::initialize(ID3D11Device* device, ID3D11DeviceContext* deviceContext, ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
+bool Light::initialize(ID3D11Device* device) {
     
-    if (!model.initialize("Resources/Objects/light.fbx", device, deviceContext, cb_vs_vertexshader)) {
+    if (!model.initialize("Resources/Objects/light.fbx", device)) {
         return false;
     }
 

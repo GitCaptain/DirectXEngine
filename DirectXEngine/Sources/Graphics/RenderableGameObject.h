@@ -7,12 +7,13 @@ namespace NGameObject {
     class RenderableGameObject: public GameObject3D {
 
     public:
-        bool initialize(const std::string& filePath,
-            ID3D11Device* device,
-            ID3D11DeviceContext* deviceContext,
-            ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader);
-        void draw(const XMMATRIX& viewProjectionMatrix);
-    
+        bool initialize(
+            const std::string& filePath,
+            ID3D11Device* device
+        );
+        const Model& getModel() const;
+        const XMMATRIX& getWorldMatrix() const;
+
     protected:
         void updateMatrix() override;
 
