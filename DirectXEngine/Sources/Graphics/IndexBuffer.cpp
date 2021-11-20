@@ -8,7 +8,7 @@ ID3D11Buffer* const* IndexBuffer::GetAddressOf() const {
     return buffer.GetAddressOf();
 }
 
-UINT IndexBuffer::getIndexCount() {
+UINT IndexBuffer::getIndexCount() const {
     return indexCount;
 }
 

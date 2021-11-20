@@ -26,9 +26,9 @@ public:
     Texture(ID3D11Device* device, const std::string& filePath, aiTextureType type);
     Texture(ID3D11Device* device, const uint8_t* pData, size_t size, aiTextureType type);
 
-    aiTextureType getType();
-    ID3D11ShaderResourceView* getTextureResourceView();
-    ID3D11ShaderResourceView** getTextureResourceViewAddress();
+    const aiTextureType getType() const;
+    ID3D11ShaderResourceView* const  getTextureResourceView() const;
+    ID3D11ShaderResourceView* const* getTextureResourceViewAddress() const;
 
 private:
     void initialize1x1ColorTexture(ID3D11Device* device, 
