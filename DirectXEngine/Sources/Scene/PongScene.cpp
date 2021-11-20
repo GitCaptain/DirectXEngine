@@ -15,16 +15,30 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     windowWidth = graphicsState.windowWidth;
     windowHeight = graphicsState.windowHeight;
 
-    if (!initializeConstantBuffers()) {
+
+    if (!light.initialize(graphicsState.device)) {
+        return false;
+    }
+    if (!ball.initialize("Resources\\Objects\\wooden_sphere\\wooden_sphere.obj", graphicsState.device)) {
+        return false;
+    }
+    if (!leftBorder.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
+        return false;
+    }
+    if (!rightBorder.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
+        return false;
+    }
+    if (!table.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
+        return false;
+    }
+    if (!AIPad.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
+        return false;
+    }
+    if (!playerPad.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
         return false;
     }
 
-    if (!ball.initialize("Resources\\Objects\\wooden_sphere\\wooden_sphere.obj", graphicsState.device, graphicsState.deviceContext, cb_vs_vertexshader)) {
-        return false;
-    }
-    if (!border.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device, graphicsState.deviceContext, cb_vs_vertexshader)) {
-        return false;
-    }
+    p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad};
 
     spriteBatch = std::make_unique<DirectX::SpriteBatch>(graphicsState.deviceContext);
     spriteFont = std::make_unique<DirectX::SpriteFont>(graphicsState.device, L"Resources\\Fonts\\comic_sans_ms_16.spritefont");
@@ -56,127 +70,7 @@ void PongScene::reset() {
     camera.setLookAtPos((DefaultPlayerPos + tablePos)/2);
 }
 
-void PongScene::render() {
-
-    cb_ps_phonglight.data.dynamicLightColor = light.lightColor;
-    cb_ps_phonglight.data.dynamicLightStrength = light.lightStrength;
-    cb_ps_phonglight.data.dynamicLightPosition = light.getPositionFloat3();
-    cb_ps_phonglight.data.dynamicLightAttenuation_a = light.attenuation_a;
-    cb_ps_phonglight.data.dynamicLightAttenuation_b = light.attenuation_b;
-    cb_ps_phonglight.data.dynamicLightAttenuation_c = light.attenuation_c;
-
-    //Should be configured from the material
-    cb_ps_phonglight.data.shinessPower = 32;
-    cb_ps_phonglight.data.specularStrength = 0.5;
-
-    cb_ps_phonglight.applyChanges();
-    graphicsState->deviceContext->PSSetConstantBuffers(0, 1, cb_ps_phonglight.GetAddressOf());
-
-    cb_ps_camera.data.cameraWorldPosition = camera.getPositionFloat3();
-    cb_ps_camera.applyChanges();
-    graphicsState->deviceContext->PSSetConstantBuffers(1, 1, cb_ps_camera.GetAddressOf());
-
-    XMMATRIX viewProjectionMatrix = camera.getViewMatrix() * camera.getProjectionMatrix();
-
-    // draw table
-    border.setRotation(0, 0, 0);
-    border.setPosition(tablePos);
-    border.setScale(tableWidth, tableHeight, tableLength);
-    border.draw(viewProjectionMatrix);
-
-    // draw left border
-    border.setPosition(leftBorderPos);
-    border.setScale(borderWidth, borderHeight, borderLength);
-    border.draw(viewProjectionMatrix);
-
-    // draw right border
-    border.setPosition(rightBorderPos);
-    border.setScale(borderWidth, borderHeight, borderLength);
-    border.draw(viewProjectionMatrix);
-
-    // draw player pad
-    border.setPosition(PlayerPos);
-    border.setRotation(0, PI, 0);
-    border.setScale(padWidth, padHeight, padLength);
-    border.draw(viewProjectionMatrix);
-
-    // draw AI pad
-    border.setPosition(AIPos);
-    border.setRotation(0, -PI , 0);
-    border.setScale(padWidth, padHeight, padLength);
-    border.draw(viewProjectionMatrix);
-
-    // draw ball
-    ball.setPosition(ballPosition);
-    ball.setScale(ballRadius, ballRadius, ballRadius);
-    ball.draw(viewProjectionMatrix);
-
-    //light.draw(viewProjectionMatrix);
-
-    // Score
-    const std::string scores = std::format("Player {} : {} AI", gs.playerScore, gs.AIScore);
-    spriteBatch->Begin();
-    spriteFont->DrawString(spriteBatch.get(), scores.c_str(), DirectX::XMFLOAT2((windowWidth)/2 - scores.size(), 0), DirectX::Colors::Green, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
-    spriteBatch->End();
-
-#pragma region IMGUI drawing
-#if 1
-    imgui->startFrame();
-
-    imgui->newWindow("Light controls")
-        .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &cb_ps_phonglight.data.ambientLightColor.x, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &cb_ps_phonglight.data.ambientLightStrength, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f)
-        .end();
-
-    imgui->newWindow("Camera controls")
-        .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
-        .attach<IMGUIFN::TEXT>("position: %.3f %.3f %.3f", camera.getPositionFloat3().x, camera.getPositionFloat3().y, camera.getPositionFloat3().z)
-        .end();
-    imgui->newWindow("table controls")
-        //.attach<IMGUIFN::DRAGFLOAT3>("position", &tablePos.x, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &tableWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &tableHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &tableLength, 1.f, 0.0f, 100.f)
-        .end();
-    imgui->newWindow("left border controls")
-        //.attach<IMGUIFN::DRAGFLOAT3>("position", &leftBorderPos.x, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
-        .end();
-    imgui->newWindow("right border controls")
-        //.attach<IMGUIFN::DRAGFLOAT3>("position", &rightBorderPos.x, 1, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
-        .end();
-    imgui->newWindow("player pad controls")
-        .attach<IMGUIFN::DRAGFLOAT3>("position", &PlayerPos.x, 1, -200.f, 200.f)
-        .attach<IMGUIFN::DRAGFLOAT>("speed", &playerSpeed, 1, -200.f, 200.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
-        .end();
-    //imgui->newWindow("AI pad controls")
-    //    .attach<IMGUIFN::DRAGFLOAT3>("position", &AIPos.x, 1, -200.f, 200.f)
-    //    .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
-    //    .attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
-    //    .attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
-    //    .end();
-    imgui->newWindow("ball controls")
-        .attach<IMGUIFN::DRAGFLOAT3>("position", &ballPosition.x, 1, -200.f, 200.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("radius", &ballRadius, 1.f, 0.0f, 100.f)
-        .attach<IMGUIFN::DRAGFLOAT>("speed", &ballSpeed, 1.f, 0.0f, 100.f)
-        .end();
-    imgui->endFrame();
-#endif
-#pragma endregion
-}
-
-void App::PongScene::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
+void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
 
     while (!kbd.isCharBufferEmpty()) {
         auto ch = kbd.readChar();
@@ -255,40 +149,97 @@ void App::PongScene::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
         ballPosition = ballPosition + ballDirection * (dt * ballSpeed);
     }
 
-    updateAI(dt);
-    checkCollision();
 }
 
-bool PongScene::initializeConstantBuffers() {
+void PongScene::updateGUI() {
+#pragma region IMGUI drawing
+#ifndef NDEBUG
+    imgui->startFrame();
 
-    // initialize constants buffers
-    try {
+    imgui->newWindow("Light controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &light.lightColor.x, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &light.lightStrength, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.attenuation_a, 0.01f, 0.1f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.attenuation_b, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.attenuation_c, 0.01f, 0.0f, 1.0f)
+        .end();
 
-        HRESULT hr = cb_vs_vertexshader.initialize(graphicsState->device, graphicsState->deviceContext);
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
-
-        hr = cb_ps_phonglight.initialize(graphicsState->device, graphicsState->deviceContext);
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
-
-        hr = cb_ps_camera.initialize(graphicsState->device, graphicsState->deviceContext);
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
-    }
-    catch (const COMException& e) {
-        ErrorLogger::log(e);
-        return false;
-    }
-
-    cb_ps_phonglight.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
-    cb_ps_phonglight.data.ambientLightStrength = 1.0f;
-
-    if (!light.initialize(graphicsState->device, graphicsState->deviceContext, cb_vs_vertexshader)) {
-        return false;
-    }
-
-    return true;
+    imgui->newWindow("Camera controls")
+        .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
+        .attach<IMGUIFN::TEXT>("position: %.3f %.3f %.3f", camera.getPositionFloat3().x, camera.getPositionFloat3().y, camera.getPositionFloat3().z)
+        .end();
+    imgui->newWindow("table controls")
+        //.attach<IMGUIFN::DRAGFLOAT3>("position", &tablePos.x, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("width", &tableWidth, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("height", &tableHeight, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("length", &tableLength, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->newWindow("left border controls")
+        //.attach<IMGUIFN::DRAGFLOAT3>("position", &leftBorderPos.x, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->newWindow("right border controls")
+        //.attach<IMGUIFN::DRAGFLOAT3>("position", &rightBorderPos.x, 1, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->newWindow("player pad controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &PlayerPos.x, 1, -200.f, 200.f)
+        .attach<IMGUIFN::DRAGFLOAT>("speed", &playerSpeed, 1, -200.f, 200.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
+        .end();
+    //imgui->newWindow("AI pad controls")
+    //    .attach<IMGUIFN::DRAGFLOAT3>("position", &AIPos.x, 1, -200.f, 200.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
+    //    .end();
+    imgui->newWindow("ball controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &ballPosition.x, 1, -200.f, 200.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("radius", &ballRadius, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("speed", &ballSpeed, 1.f, 0.0f, 100.f)
+        .end();
+    imgui->endFrame();
+#endif
+#pragma endregion
+    // Score
+    const std::string scores = std::format("Player {} : {} AI", gs.playerScore, gs.AIScore);
+    spriteBatch->Begin();
+    spriteFont->DrawString(spriteBatch.get(), scores.c_str(), DirectX::XMFLOAT2((windowWidth) / 2 - scores.size(), 0), DirectX::Colors::Green, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
+    spriteBatch->End();
 }
 
-void App::PongScene::pushBall() {
+void PongScene::updateGameObjects() {
+
+    table.setRotation(0, 0, 0);
+    table.setPosition(tablePos);
+    table.setScale(tableWidth, tableHeight, tableLength);
+
+    leftBorder.setPosition(leftBorderPos);
+    leftBorder.setScale(borderWidth, borderHeight, borderLength);
+
+    rightBorder.setPosition(rightBorderPos);
+    rightBorder.setScale(borderWidth, borderHeight, borderLength);
+
+    playerPad.setPosition(PlayerPos);
+    playerPad.setRotation(0, PI, 0);
+    playerPad.setScale(padWidth, padHeight, padLength);
+
+    AIPad.setPosition(AIPos);
+    AIPad.setRotation(0, -PI, 0);
+    AIPad.setScale(padWidth, padHeight, padLength);
+
+    ball.setPosition(ballPosition);
+    ball.setScale(ballRadius, ballRadius, ballRadius);
+
+}
+
+void PongScene::pushBall() {
     if (ballSpeed != 0) {
         return; // ball is moving already
     }
@@ -301,7 +252,7 @@ void App::PongScene::pushBall() {
     }
 }
 
-void App::PongScene::updateAI(float dt) {
+void PongScene::updateAI(float dt) {
     // Move AI
     if (AIPos.x < ballPosition.x) {
         AIPos.x += dt * AISpeed;
@@ -313,7 +264,7 @@ void App::PongScene::updateAI(float dt) {
     AIPos.x = std::min(AIPos.x, rightBorderPos.x - padWidth / 2);
 }
 
-void App::PongScene::checkCollision() {
+void PongScene::checkCollision() {
     // Check for collisions
     if (ballPosition.x + ballRadius >= rightBorderPos.x || ballPosition.x - ballRadius <= leftBorderPos.x) {
         ballDirection.x *= -1;
@@ -351,4 +302,20 @@ void App::PongScene::checkCollision() {
         gs.AIScore += 1;
         reset();
     }
+}
+
+const Light& PongScene::getLightInfo() const {
+    return light;
+}
+
+const Camera3D& PongScene::getCameraInfo() const {
+    return camera;
+}
+
+const XMMATRIX& PongScene::getViewMatrix() const {
+    return camera.getViewMatrix();
+}
+
+const XMMATRIX& PongScene::getProjectionMatrix() const {
+    return camera.getProjectionMatrix();
 }

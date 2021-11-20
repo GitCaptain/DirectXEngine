@@ -632,8 +632,9 @@
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PS\PhongLightning_ps.hlsl" />
-    <FxCompile Include="Resources\Shaders\VS\deferred_geometry_pass_vs.hlsl" />
     <FxCompile Include="Resources\Shaders\PS\deferred_geometry_pass_ps.hlsl" />
+    <FxCompile Include="Resources\Shaders\PS\deferred_light_pass_ps.hlsl" />
+    <FxCompile Include="Resources\Shaders\VS\deferred_light_pass_vs.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dev\Scripts\prepare_imgui.ps1">
@@ -684,5 +685,6 @@
     <None Include="ThirdParty\include\assimp\vector3.inl">
       <Filter>Third Party\Headers\assimp</Filter>
     </None>
+    <None Include="Resources\Shaders\PS\LightConstantBuffers.hlsli" />
   </ItemGroup>
 </Project>

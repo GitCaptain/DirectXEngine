@@ -9,6 +9,8 @@ public:
     bool processMessages();  
     void Update();
     void renderFrame();
+    void postRender();
+    void present();
 
 private:
     Timer timer;

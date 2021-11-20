@@ -18,34 +18,38 @@ namespace App {
 
     using namespace NGameObject;
 
-    class PongScene : public Scene {
+    class PongScene final: public Scene {
     public:
         PongScene() = default;
         ~PongScene() = default;
-        virtual bool initialize(GraphicsState& graphicsState) override;
-        virtual void render() override;
-        virtual void reset() override;
-        virtual void update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt);
-
+        bool initialize(GraphicsState& graphicsState) override;
+        void reset() override;
+        const XMMATRIX& getViewMatrix() const override;
+        const XMMATRIX& getProjectionMatrix() const override;
+        const Light& getLightInfo() const override;
+        const Camera3D& getCameraInfo() const override;
     private:
-        bool initializeConstantBuffers();
         void pushBall();
         void updateAI(float dt);
         void checkCollision();
+        void updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) override;
+        void updateGUI() override;
+        void updateGameObjects() override;
 
     private:
-        ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
-        ConstantBuffer<CB_PS_Phonglight> cb_ps_phonglight;
-        ConstantBuffer<CB_PS_Camera> cb_ps_camera;
 
         std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
         std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
-        RenderableGameObject border;
+        RenderableGameObject leftBorder;
+        RenderableGameObject rightBorder;
+        RenderableGameObject table;
+        RenderableGameObject AIPad;
+        RenderableGameObject playerPad;
         RenderableGameObject ball;
+        Light light;
         Camera3D camera;
         float cameraSpeed = 0.1f;
-        Light light;
 
         GraphicsState* graphicsState = nullptr;
         ImGUIW* imgui;
@@ -58,8 +62,8 @@ namespace App {
         const float borderWidth = 1;
         const float borderLength = tableLength;
         const float borderHeight = 5;
-        XMFLOAT3 leftBorderPos;
-        XMFLOAT3 rightBorderPos;
+        XMFLOAT3 leftBorderPos{};
+        XMFLOAT3 rightBorderPos{};
 
         const float padWidth = 20;
         const float padHeight = 10;
@@ -70,16 +74,16 @@ namespace App {
         const XMFLOAT3 AIToPlayerDirection = DefaultPlayerPos - DefaultAIPos;
         const XMFLOAT3 PlayerToAIDirection = DefaultAIPos - DefaultPlayerPos;
 
-        XMFLOAT3 PlayerPos;
-        XMFLOAT3 AIPos;
+        XMFLOAT3 PlayerPos{};
+        XMFLOAT3 AIPos{};
 
         const float ballRadius = 1;
-        XMFLOAT3 ballPosition;
-        XMFLOAT3 ballDirection;
+        XMFLOAT3 ballPosition{};
+        XMFLOAT3 ballDirection{};
 
-        float playerSpeed;
-        float AISpeed;
-        float ballSpeed;
+        float playerSpeed{};
+        float AISpeed{};
+        float ballSpeed{};
 
         const float PI = std::numbers::pi_v<float>;
 
@@ -91,7 +95,7 @@ namespace App {
             int AIScore = 0;
             int playerScore = 0;
             bool ballside = PLAYER;
-        };
-        GameState gs;
+        } gs;
+
     };
 }

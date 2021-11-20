@@ -16,6 +16,8 @@ int APIENTRY wWinMain(
 		while (engine.processMessages()) {
 			engine.Update();
 			engine.renderFrame();
+			engine.postRender();
+			engine.present();
 		}
 	}
 	else {

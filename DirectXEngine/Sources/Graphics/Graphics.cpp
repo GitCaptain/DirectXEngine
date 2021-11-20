@@ -17,11 +17,16 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 }
 
 void Graphics::renderFrame() {
-
     renderer->preparePipeline();
     const float bgcolor[4] = { 0.f, 0.f, 0.f, 1.f };
     renderer->renderScene(&renderScene, bgcolor);
+}
 
+void Graphics::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
+    renderScene.update(kbd, mouse, dt);
+}
+
+void Graphics::postRender() {
     //Draw text
     static int fpsCounter = 0;
     fpsCounter += 1;
@@ -29,18 +34,17 @@ void Graphics::renderFrame() {
     if (fpsTimer.getMillisecondsElapsed() > 1000.0f) {
         fpsString = L"FPS: " + std::to_wstring(fpsCounter);
         fpsCounter = 0;
-        fpsTimer.restartTimer(); 
+        fpsTimer.restartTimer();
     }
-    spriteBatch->Begin(); 
+    spriteBatch->Begin();
     spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
-
-    const UINT vsync = 0;
-    renderer->present(vsync, 0);
+    renderScene.postRender();
 }
 
-void Graphics::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
-    renderScene.update(kbd, mouse, dt);
+void Graphics::present() {
+    const UINT vsync = 0;
+    renderer->present(vsync, 0);
 }
 
 bool Graphics::initializeRenderer(HWND hwnd, int width, int height) {
