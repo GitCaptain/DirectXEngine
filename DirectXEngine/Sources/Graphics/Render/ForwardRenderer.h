@@ -13,7 +13,11 @@ public:
 
 private:
     bool initShaders();
+    bool initConstantBuffers();
 
     VertexShader vertexShader;
     PixelShader pixelShader;
+    ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
+    ConstantBuffer<CB_PS_Phonglight> cb_ps_phonglight;
+    ConstantBuffer<CB_PS_Camera> cb_ps_camera;
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <d3d11.h>
+#include <DirectXMath.h>
 #include "../GraphicsState.h"
 #include "../AdapterReader.h"
 #include "../../Scene/Scene.h"

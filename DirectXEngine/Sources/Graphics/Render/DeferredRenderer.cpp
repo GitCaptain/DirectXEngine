@@ -41,6 +41,15 @@ void DeferredRenderer::preparePipeline() {
 
 void DeferredRenderer::renderScene(App::Scene* scene, const float bgcolor[4]) {
 
+    constexpr int sz = GBuffer::BUFFER_COUNT;
+    ID3D11RenderTargetView* rtv[sz];
+    ID3D11ShaderResourceView* srv[sz];
+    for (int i = 0; i < sz; i++) {
+        rtv[i] = gbuffer.renderTargetViews[i].Get();
+        srv[i] = gbuffer.shaderResourceViews[i].Get();
+    }
+
+    // geometry pass pipeline
     deviceContext->IASetInputLayout(vs_geometry_pass.getInputLayout());
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     deviceContext->RSSetState(rasterizerState.Get());
@@ -50,18 +59,20 @@ void DeferredRenderer::renderScene(App::Scene* scene, const float bgcolor[4]) {
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 
-    constexpr int sz = GBuffer::BUFFER_COUNT;
-    ID3D11RenderTargetView* rtv[sz];
-    for (int i = 0; i < sz; i++) {
-        rtv[i] = gbuffer.renderTargetViews[i].Get();
-    }
     for (auto &rtv: gbuffer.renderTargetViews) {
         deviceContext->ClearRenderTargetView(rtv.Get(), bgcolor);
     }
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     deviceContext->OMSetRenderTargets(sz, rtv, depthStencilView.Get());
 
-    scene->render();
+    // lightning pass pipeline
+    deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
+    deviceContext->IASetInputLayout(vs_light_pass.getInputLayout());
+    deviceContext->VSSetShader(vs_light_pass.getShader(), nullptr, 0);
+    deviceContext->PSSetShader(ps_light_pass.getShader(), nullptr, 0);
+    deviceContext->PSSetShaderResources(0, 3, srv);
+    deviceContext->PSSetSamplers(0, 1, perPixelSamplerState.GetAddressOf());
+    deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
 bool DeferredRenderer::initShaders() {
@@ -75,27 +86,34 @@ bool DeferredRenderer::initShaders() {
     UINT numElements = ARRAYSIZE(layout_geometry_pass);
 
     if (!vs_geometry_pass.initialize(device.Get(), shaderFolder + L"vertexshader.cso", layout_geometry_pass, numElements)) {
+        ErrorLogger::log("Can't initialize geometry pass vertex shader for deferred renderer");
         return false;
     }
 
     if (!ps_geometry_pass.initialize(device.Get(), shaderFolder + L"deferred_geometry_pass_ps.cso")) {
+        ErrorLogger::log("Can't initialize geometry pass pixel shader for deferred renderer");
         return false;
     }
 
-    D3D11_INPUT_ELEMENT_DESC layout_light_pass[] = {
-        {"POSITION", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"NORMAL", 0, DXGI_FORMAT::DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_CLASSIFICATION::D3D11_INPUT_PER_VERTEX_DATA, 0},
-    };
-
-    UINT numElements = ARRAYSIZE(layout_light_pass);
-
-    if (!vs_light_pass.initialize(device.Get(), shaderFolder + L"deferred_light_pass_vs.cso", layout_light_pass, numElements)) {
+    if (!vs_light_pass.initialize(device.Get(), shaderFolder + L"deferred_light_pass_vs.cso", layout_geometry_pass, numElements)) {
+        ErrorLogger::log("Can't initialize light pass vertex shader for deferred renderer");
         return false;
     }
 
     if (!ps_light_pass.initialize(device.Get(), shaderFolder + L"deferred_light_pass_ps.cso")) {
+        ErrorLogger::log("Can't initialize light pass pixel shader for deferred renderer");
         return false;
     }
 
+    return true;
+}
+
+void DeferredRenderer::createSamplerState() {
+    Renderer::createSamplerState();
+    // Create sampler description for sampler state
+    CD3D11_SAMPLER_DESC sampDesc(D3D11_DEFAULT);
+    sampDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    // Create sampler state
+    HRESULT hr = device->CreateSamplerState(&sampDesc, &perPixelSamplerState);
+    COM_ERROR_IF_FAILED(hr, "Failed to create per pixel sampler state.");
 }

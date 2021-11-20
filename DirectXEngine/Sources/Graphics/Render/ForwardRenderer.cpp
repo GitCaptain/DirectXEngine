@@ -1,19 +1,32 @@
 #include "ForwardRenderer.h"
+#include "../RenderableGameObject.h"
 #include <vector>
+
+using NGameObject::RenderableGameObject;
+using NModel::Model;
 
 bool ForwardRenderer::initRenderer(HWND renderWindowHandle, int windowWidth, int windowHeight) {
     bool inited = Renderer::initRenderer(renderWindowHandle, windowWidth, windowHeight);
     inited &= initShaders();
+    inited &= initConstantBuffers();
     return inited;
 }
 
 void ForwardRenderer::preparePipeline() {
+
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
     deviceContext->RSSetState(rasterizerState.Get());
+
     deviceContext->VSSetShader(vertexShader.getShader(), nullptr, 0);
+    deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader.GetAddressOf());
+
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_phonglight.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(1, 1, cb_ps_camera.GetAddressOf());
+
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
 }
@@ -21,7 +34,51 @@ void ForwardRenderer::preparePipeline() {
 void ForwardRenderer::renderScene(App::Scene* scene, const float bgcolor[4] ) {
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-    scene->render();
+    const std::vector<RenderableGameObject*> &renderables = scene->getRenderables();
+    const DirectX::XMFLOAT3 camPos = scene->getCameraInfo().getPositionFloat3();
+    // update lights
+    const Light& light = scene->getLightInfo();
+    cb_ps_phonglight.data.ambientLightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+    cb_ps_phonglight.data.ambientLightStrength = 1.0f;
+    cb_ps_phonglight.data.dynamicLightColor = light.lightColor;
+    cb_ps_phonglight.data.dynamicLightStrength = light.lightStrength;
+    cb_ps_phonglight.data.dynamicLightPosition = light.getPositionFloat3();
+    cb_ps_phonglight.data.dynamicLightAttenuation_a = light.attenuation_a;
+    cb_ps_phonglight.data.dynamicLightAttenuation_b = light.attenuation_b;
+    cb_ps_phonglight.data.dynamicLightAttenuation_c = light.attenuation_c;
+
+    //Should be configured from the material
+    cb_ps_phonglight.data.shinessPower = 32;
+    cb_ps_phonglight.data.specularStrength = 0.5;
+
+    cb_ps_phonglight.applyChanges();
+
+    cb_ps_camera.data.cameraWorldPosition = camPos;
+    cb_ps_camera.applyChanges();
+    ///
+
+    const DirectX::XMMATRIX viewProj = scene->getViewMatrix() * scene->getProjectionMatrix();
+    for (RenderableGameObject* rgo : renderables) {
+        const DirectX::XMMATRIX& worldMatrix = rgo->getWorldMatrix();
+        const DirectX::XMMATRIX worldViewProjectionMatrix = worldMatrix * viewProj;
+        const Model& model = rgo->getModel();
+        const std::vector<Mesh>& meshes = model.getMeshes();
+        for (const Mesh &mesh: meshes) {
+            const VertexBuffer<Vertex3D>& vertexBuffer = mesh.getVertexBuffer();
+            const IndexBuffer &indexBuffer = mesh.getIndexBuffer();
+            const UINT offset = 0;
+            const Texture* const t = mesh.getTexture();
+            if (t) {
+                deviceContext->PSSetShaderResources(0, 1, t->getTextureResourceViewAddress());
+            }
+            cb_vs_vertexshader.data.worldViewProjectionMatrix = mesh.getTransformMatrix() * worldViewProjectionMatrix;
+            cb_vs_vertexshader.data.worldMatrix = mesh.getTransformMatrix() * worldMatrix;
+            cb_vs_vertexshader.applyChanges();
+            deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
+            deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+            deviceContext->DrawIndexed(indexBuffer.getIndexCount(), 0, 0);
+        }
+    }
 }
 
 bool ForwardRenderer::initShaders() {
@@ -40,6 +97,27 @@ bool ForwardRenderer::initShaders() {
     }
 
     if (!pixelShader.initialize(device.Get(), shaderFolder + L"PhongLightning_ps.cso")) {
+        return false;
+    }
+
+    return true;
+}
+
+bool ForwardRenderer::initConstantBuffers() {
+
+    // initialize constants buffers
+    try {
+        HRESULT hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
+
+        hr = cb_ps_phonglight.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
+
+        hr = cb_ps_camera.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
+    }
+    catch (const COMException& e) {
+        ErrorLogger::log(e);
         return false;
     }
 
