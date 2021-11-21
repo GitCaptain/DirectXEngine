@@ -5,6 +5,7 @@
 #include "../GraphicsState.h"
 #include "../AdapterReader.h"
 #include "../../Scene/Scene.h"
+#include "../RenderableGameObject.h"
 
 class Renderer {
 

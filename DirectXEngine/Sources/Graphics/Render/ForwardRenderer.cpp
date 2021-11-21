@@ -1,5 +1,4 @@
 #include "ForwardRenderer.h"
-#include "../RenderableGameObject.h"
 #include <vector>
 
 using NGameObject::RenderableGameObject;
@@ -47,12 +46,13 @@ void ForwardRenderer::renderScene(App::Scene* scene, const float bgcolor[4] ) {
     cb_ps_phonglight.data.dynamicLightAttenuation_b = light.dLights[0].attenuation_b;
     cb_ps_phonglight.data.dynamicLightAttenuation_c = light.dLights[0].attenuation_c;
 
-    //Should be configured from the material
+    // Should be configured from the material
     cb_ps_phonglight.data.shinessPower = 32;
     cb_ps_phonglight.data.specularStrength = 0.5;
 
     cb_ps_phonglight.applyChanges();
 
+    // update camera
     cb_ps_camera.data.cameraWorldPosition = camPos;
     cb_ps_camera.applyChanges();
     ///

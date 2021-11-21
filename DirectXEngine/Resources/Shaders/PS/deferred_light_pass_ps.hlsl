@@ -5,15 +5,13 @@ Texture2D colorTex:    Texture: register(t1);
 Texture2D normalTex:   Texture: register(t2);
 SamplerState perPixelSampler : Sampler: register(s0);
 
-struct PS_INPUT {
-    float4 sv_pos: SV_POSITION;
-};
 
-float4 main(PS_INPUT input) : SV_TARGET {
-    float4 texCoord = input.sv_pos;
-    float3 sampleColor = colorTex.Sample(perPixelSampler, texCoord.xy);
-    float3 normal = normalTex.Sample(perPixelSampler, texCoord.xy);
-    float3 worldPosition = positionTex.Sample(perPixelSampler, texCoord.xy);
+float4 main(float4 screenPos: SV_POSITION) : SV_TARGET {
+
+    int3 texCoord = int3(screenPos.xy, 0);
+    float3 sampleColor = colorTex.Load(texCoord);
+    float3 normal = normalTex.Load(texCoord);
+    float3 worldPosition = positionTex.Load(texCoord);
 
     //ambient
     float3 ambientLight = ambientLightColor * ambientLightStrength;
