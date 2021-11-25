@@ -40,8 +40,6 @@ bool DeferredRenderer::initRenderer(HWND renderWindowHandle, int windowWidth, in
     return inited;
 }
 
-void DeferredRenderer::preparePipeline() { }
-
 void DeferredRenderer::renderScene(App::Scene* scene, const float bgcolor[4]) {
 
     // preparation
@@ -126,13 +124,15 @@ void DeferredRenderer::renderScene(App::Scene* scene, const float bgcolor[4]) {
     deviceContext->VSSetShader(vs_light_pass.getShader(), nullptr, 0);
 
     deviceContext->PSSetShader(ps_light_pass.getShader(), nullptr, 0);
-    deviceContext->PSSetShaderResources(0, 3, srv);
     deviceContext->PSSetConstantBuffers(0, 1, cb_ps_phonglight.GetAddressOf());
     deviceContext->PSSetConstantBuffers(1, 1, cb_ps_camera.GetAddressOf());
     deviceContext->PSSetSamplers(0, 1, perPixelSamplerState.GetAddressOf());
-
-    deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
-
+    // Remove 2 previous render targets
+    ID3D11RenderTargetView* views[] = { renderTargetView.Get(), nullptr, nullptr};
+    deviceContext->OMSetRenderTargets(3, views, depthStencilView.Get());
+    // set gbuffer textures as current pass resource
+    // only after unbinding it from previous pass render targets
+    deviceContext->PSSetShaderResources(0, 3, srv);
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
 
     for (RenderableGameObject* rgo : renderables) {

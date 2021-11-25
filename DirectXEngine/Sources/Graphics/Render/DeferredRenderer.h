@@ -25,8 +25,6 @@ class DeferredRenderer final : public Renderer {
 
 public:
     bool initRenderer(HWND renderWindowHandle, int windowWidth, int windowHeight) override;
-
-    void preparePipeline() override;
     void renderScene(App::Scene* scene, const float bgcolor[4]) override;
 
 private:

@@ -12,7 +12,7 @@ bool ForwardRenderer::initRenderer(HWND renderWindowHandle, int windowWidth, int
 }
 
 void ForwardRenderer::preparePipeline() {
-
+    Renderer::preparePipeline();
     deviceContext->IASetInputLayout(vertexShader.getInputLayout());
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY::D3D10_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -28,6 +28,7 @@ void ForwardRenderer::preparePipeline() {
 
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
+    deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
 void ForwardRenderer::renderScene(App::Scene* scene, const float bgcolor[4] ) {

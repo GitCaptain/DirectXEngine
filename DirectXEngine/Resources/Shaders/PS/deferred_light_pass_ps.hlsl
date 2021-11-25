@@ -1,14 +1,14 @@
 #include "LightConstantBuffers.hlsli"
 
-Texture2D positionTex: Texture: register(t0);
-Texture2D colorTex:    Texture: register(t1);
-Texture2D normalTex:   Texture: register(t2);
-SamplerState perPixelSampler : Sampler: register(s0);
+Texture2D positionTex:        register(t0);
+Texture2D colorTex:           register(t1);
+Texture2D normalTex:          register(t2);
+SamplerState perPixelSampler: register(s0);
 
 
 float4 main(float4 screenPos: SV_POSITION) : SV_TARGET {
 
-    int3 texCoord = int3(screenPos.xy, 0);
+    float3 texCoord = float3(screenPos.xy, 0);
     float3 sampleColor = colorTex.Load(texCoord);
     float3 normal = normalTex.Load(texCoord);
     float3 worldPosition = positionTex.Load(texCoord);

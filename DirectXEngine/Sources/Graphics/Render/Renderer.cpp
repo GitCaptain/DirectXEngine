@@ -71,9 +71,9 @@ bool Renderer::initRenderer(HWND renderWindowHandle, int windowWidth, int window
 
     try {
         createDeviceAndSwapChain();
-        createAndSetRenderTargets();
+        createBackBufferRenderTargets();
         createDepthStencilState();
-        createAndSetViewPort();
+        createViewPort();
         createRasterizerState();
         createBlendState();
         createSamplerState();
@@ -91,8 +91,13 @@ GraphicsState& Renderer::getGraphicsState() {
     return graphicsState;
 }
 
+void Renderer::preparePipeline() {
+    deviceContext->RSSetViewports(1, &viewport);
+}
+
 void Renderer::present(size_t syncInterval, size_t flags) {
     swapChain->Present(syncInterval, flags);
+    deviceContext->ClearState();
 }
 
 /**
@@ -165,14 +170,13 @@ void Renderer::createDeviceAndSwapChain() {
 
 }
 
-void Renderer::createAndSetRenderTargets() {
+void Renderer::createBackBufferRenderTargets() {
     ComPtr<ID3D11Texture2D> backBuffer;
     HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), static_cast<void**>(&backBuffer));
     COM_ERROR_IF_FAILED(hr, "swapChain GetBuffer failed.");
 
     createRenderTargetView(device.Get(), backBuffer.Get(), &renderTargetView);
     createDepthStencilBuffer();
-    deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
 void Renderer::createDepthStencilState() {
@@ -184,10 +188,11 @@ void Renderer::createDepthStencilState() {
     COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
 }
 
-void Renderer::createAndSetViewPort() {
-    // create and set viewport
-    CD3D11_VIEWPORT viewport(0.0f, 0.0f, static_cast<float>(windowWidth), static_cast<float>(windowHeight));
-    deviceContext->RSSetViewports(1, &viewport);
+void Renderer::createViewPort() {
+    viewport.TopLeftX = 0.0f;
+    viewport.TopLeftY = 0.0f;
+    viewport.Width = static_cast<float>(windowWidth);
+    viewport.Height = static_cast<float>(windowHeight);
 }
 
 void Renderer::createRasterizerState() {

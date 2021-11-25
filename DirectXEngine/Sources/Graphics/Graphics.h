@@ -2,15 +2,13 @@
 
 #include <SpriteBatch.h>
 #include <SpriteFont.h>
-#include <WICTextureLoader.h> 
 #include "AdapterReader.h"
-#include "Sprite.h"
 #include "GraphicsState.h"
+#include "ImGUIWrapper.h"
 #include "../Timer.h"
 #include "../Scene/PongScene.h"
-#include "ImGUIWrapper.h"
-#include "Render/ForwardRenderer.h"
 #include "Render/DeferredRenderer.h"
+#include "Render/ForwardRenderer.h"
 
 class Graphics {
 public:
@@ -32,6 +30,6 @@ private:
     std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
     Timer fpsTimer;
-    App::PongScene renderScene;
-    ImGUIW *imgui;
+    App::PongScene renderScene{};
+    ImGUIW *imgui = nullptr;
 };

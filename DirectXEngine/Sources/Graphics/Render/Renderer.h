@@ -12,7 +12,7 @@ class Renderer {
 public:
     virtual bool initRenderer(HWND renderWindowHandle, int windowWidth, int windowHeight);
     virtual GraphicsState& getGraphicsState();
-    virtual void preparePipeline() = 0;
+    virtual void preparePipeline();
     virtual void renderScene(App::Scene* scene, const float bgcolor[4]) = 0;
     virtual void present(size_t syncInterval, size_t flags);
     virtual ~Renderer() = default;
@@ -53,9 +53,9 @@ protected:
     virtual AdapterData selectAdapter();
     virtual void createDeviceAndSwapChain();
     virtual void createDepthStencilBuffer();
-    virtual void createAndSetRenderTargets();
+    virtual void createBackBufferRenderTargets();
     virtual void createDepthStencilState();
-    virtual void createAndSetViewPort();
+    virtual void createViewPort();
     virtual void createRasterizerState();
     virtual void createBlendState();
     virtual void createSamplerState();
@@ -72,6 +72,8 @@ protected:
 
     ComPtr<ID3D11Device> device = nullptr;
     ComPtr<ID3D11DeviceContext> deviceContext = nullptr;
+
+    CD3D11_VIEWPORT viewport{};
 
     int windowWidth = 0;
     int windowHeight = 0;
