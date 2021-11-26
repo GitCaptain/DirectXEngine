@@ -1,17 +1,15 @@
 #pragma once
 
-#include <SpriteBatch.h>
-#include <SpriteFont.h>
 #include <memory>
 #include <numbers>
+#include <SpriteBatch.h>
+#include <SpriteFont.h>
 
 #include "Scene.h"
-#include "../Graphics/Model.h"
-#include "../Graphics/RenderableGameObject.h"
 #include "../Graphics/Camera3D.h"
-#include "../Graphics/Shaders.h"
-#include "../Graphics/Light.h"
 #include "../Graphics/ImGUIWrapper.h"
+#include "../Graphics/Light.h"
+#include "../Graphics/RenderableGameObject.h"
 #include "../Utils/DXUtils.h"
 
 namespace App {

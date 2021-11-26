@@ -48,6 +48,7 @@ void DeferredRenderer::renderScene(App::Scene* scene, const float bgcolor[4]) {
     ID3D11ShaderResourceView* srv[sz];
     for (int i = 0; i < sz; i++) {
         rtv[i] = gbuffer.renderTargetViews[i].Get();
+        deviceContext->ClearRenderTargetView(rtv[i], bgcolor);
         srv[i] = gbuffer.shaderResourceViews[i].Get();
     }
 
@@ -67,9 +68,6 @@ void DeferredRenderer::renderScene(App::Scene* scene, const float bgcolor[4]) {
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     deviceContext->OMSetRenderTargets(sz, rtv, depthStencilView.Get());
 
-    for (auto &rtv: gbuffer.renderTargetViews) {
-        deviceContext->ClearRenderTargetView(rtv.Get(), bgcolor);
-    }
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
     const std::vector<RenderableGameObject*>& renderables = scene->getRenderables();
