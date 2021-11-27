@@ -19,11 +19,11 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 void Graphics::renderFrame() {
     renderer->preparePipeline();
     const float bgcolor[4] = { 0.f, 0.f, 0.f, 1.f };
-    renderer->renderScene(&renderScene, bgcolor);
+    renderer->renderScene(renderScene.get(), bgcolor);
 }
 
 void Graphics::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
-    renderScene.update(kbd, mouse, dt);
+    renderScene->update(kbd, mouse, dt);
 }
 
 void Graphics::postRender() {
@@ -39,7 +39,7 @@ void Graphics::postRender() {
     spriteBatch->Begin();
     spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
-    renderScene.postRender();
+    renderScene->postRender();
 }
 
 void Graphics::present() {
@@ -52,7 +52,7 @@ bool Graphics::initializeRenderer(HWND hwnd, int width, int height) {
 }
 
 bool Graphics::initializeScene() {
-    return renderScene.initialize(getGraphicsState());
+    return renderScene->initialize(getGraphicsState());
 }
 
 void Graphics::initSprites() {

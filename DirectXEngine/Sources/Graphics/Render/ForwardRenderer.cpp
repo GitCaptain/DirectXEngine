@@ -23,63 +23,45 @@ void ForwardRenderer::preparePipeline() {
 
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
-    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_phonglight.GetAddressOf());
-    deviceContext->PSSetConstantBuffers(1, 1, cb_ps_camera.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(0, 1, cb_ps_ambientlight.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(1, 1, cb_ps_pointlight.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(2, 1, cb_ps_camera.GetAddressOf());
 
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
-void ForwardRenderer::renderScene(App::Scene* scene, const float bgcolor[4] ) {
+void ForwardRenderer::renderScene(const App::Scene* const scene, const float bgcolor[4] ) {
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-    const std::vector<RenderableGameObject*> &renderables = scene->getRenderables();
-    const DirectX::XMFLOAT3 camPos = scene->getCameraInfo().getPositionFloat3();
-    // update lights
+    // update lights (only one light allowed in forward renderer for now)
     const LightInfo& light = scene->getLightInfo();
-    cb_ps_phonglight.data.ambientLightColor = light.ambient.lightColor;
-    cb_ps_phonglight.data.ambientLightStrength = light.ambient.lightStrength;
-    cb_ps_phonglight.data.dynamicLightColor = light.dLights[0].lightColor;
-    cb_ps_phonglight.data.dynamicLightStrength = light.dLights[0].lightStrength;
-    cb_ps_phonglight.data.dynamicLightPosition = light.dLights[0].getPositionFloat3();
-    cb_ps_phonglight.data.dynamicLightAttenuation_a = light.dLights[0].attenuation_a;
-    cb_ps_phonglight.data.dynamicLightAttenuation_b = light.dLights[0].attenuation_b;
-    cb_ps_phonglight.data.dynamicLightAttenuation_c = light.dLights[0].attenuation_c;
+
+    cb_ps_ambientlight.data.color = light.ambient.lightColor;
+    cb_ps_ambientlight.data.strength = light.ambient.lightStrength;
+    cb_ps_ambientlight.applyChanges();
+
+    cb_ps_pointlight.data.color = light.pointLights[0].lightColor;
+    cb_ps_pointlight.data.strength = light.pointLights[0].lightStrength;
+    cb_ps_pointlight.data.position = light.pointLights[0].getPositionFloat3();
+    cb_ps_pointlight.data.attenuations = light.pointLights[0].attenuations;
 
     // Should be configured from the material
-    cb_ps_phonglight.data.shinessPower = 32;
-    cb_ps_phonglight.data.specularStrength = 0.5;
+    cb_ps_pointlight.data.shinessPower = 32;
+    cb_ps_pointlight.data.specularStrength = 0.5;
 
-    cb_ps_phonglight.applyChanges();
+    cb_ps_pointlight.applyChanges();
 
     // update camera
+    const DirectX::XMFLOAT3 camPos = scene->getCameraInfo().getPositionFloat3();
     cb_ps_camera.data.cameraWorldPosition = camPos;
     cb_ps_camera.applyChanges();
     ///
 
+    const std::vector<const RenderableGameObject*>& renderables = scene->getRenderables();
     const DirectX::XMMATRIX viewProj = scene->getViewMatrix() * scene->getProjectionMatrix();
-    for (RenderableGameObject* rgo : renderables) {
-        const DirectX::XMMATRIX& worldMatrix = rgo->getWorldMatrix();
-        const DirectX::XMMATRIX worldViewProjectionMatrix = worldMatrix * viewProj;
-        const Model& model = rgo->getModel();
-        const std::vector<Mesh>& meshes = model.getMeshes();
-        for (const Mesh &mesh: meshes) {
-            const VertexBuffer<Vertex3D>& vertexBuffer = mesh.getVertexBuffer();
-            const IndexBuffer &indexBuffer = mesh.getIndexBuffer();
-            const UINT offset = 0;
-            const Texture* const t = mesh.getTexture();
-            if (t) {
-                deviceContext->PSSetShaderResources(0, 1, t->getTextureResourceViewAddress());
-            }
-            cb_vs_vertexshader.data.worldViewProjectionMatrix = mesh.getTransformMatrix() * worldViewProjectionMatrix;
-            cb_vs_vertexshader.data.worldMatrix = mesh.getTransformMatrix() * worldMatrix;
-            cb_vs_vertexshader.applyChanges();
-            deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
-            deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
-            deviceContext->DrawIndexed(indexBuffer.getIndexCount(), 0, 0);
-        }
-    }
+    draw(renderables, viewProj);
 }
 
 bool ForwardRenderer::initShaders() {
@@ -98,27 +80,6 @@ bool ForwardRenderer::initShaders() {
     }
 
     if (!pixelShader.initialize(device.Get(), shaderFolder + L"PhongLightning_ps.cso")) {
-        return false;
-    }
-
-    return true;
-}
-
-bool ForwardRenderer::initConstantBuffers() {
-
-    // initialize constants buffers
-    try {
-        HRESULT hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
-
-        hr = cb_ps_phonglight.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
-
-        hr = cb_ps_camera.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
-    }
-    catch (const COMException& e) {
-        ErrorLogger::log(e);
         return false;
     }
 

@@ -17,34 +17,18 @@ struct CB_VS_vertexshader_2d {
     DirectX::XMMATRIX worldViewProjectionMatrix;
 };
 
-struct CB_PS_light {
-    DirectX::XMFLOAT3 ambientLightColor;
-    float ambientLightStrength;
-
-    DirectX::XMFLOAT3 dynamicLightColor;
-    float dynamicLightStrength;
-
-    DirectX::XMFLOAT3 dynamicLightPosition;
-
-    float dynamicLightAttenuation_a;
-    float dynamicLightAttenuation_b;
-    float dynamicLightAttenuation_c;
+struct CB_PS_Ambientlight {
+    DirectX::XMFLOAT3 color;
+    float strength;
 };
 
-struct CB_PS_Phonglight {
-    DirectX::XMFLOAT3 ambientLightColor;
-    float ambientLightStrength;
-
-    DirectX::XMFLOAT3 dynamicLightColor;
-    float dynamicLightStrength;
-
-    DirectX::XMFLOAT3 dynamicLightPosition;
+struct CB_PS_PointLight {
+    DirectX::XMFLOAT3 color;
+    float strength;
+    DirectX::XMFLOAT3 position;
     float specularStrength;
-
+    DirectX::XMFLOAT3 attenuations;
     float shinessPower;
-    float dynamicLightAttenuation_a;
-    float dynamicLightAttenuation_b;
-    float dynamicLightAttenuation_c;
 };
 
 struct CB_PS_Camera {

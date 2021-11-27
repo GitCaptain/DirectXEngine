@@ -242,3 +242,51 @@ void Renderer::fillGraphicsState() {
     graphicsState.device = device.Get();
     graphicsState.deviceContext = deviceContext.Get();
 }
+
+bool Renderer::initConstantBuffers() {
+
+    // initialize constants buffers
+    try {
+        HRESULT hr = cb_vs_vertexshader.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_vs_vertexhader constant buffer.");
+
+        hr = cb_ps_ambientlight.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_ambientlight constant buffer.");
+
+        hr = cb_ps_pointlight.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_pointlight constant buffer.");
+
+        hr = cb_ps_camera.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
+    }
+    catch (const COMException& e) {
+        ErrorLogger::log(e);
+        return false;
+    }
+
+    return true;
+}
+
+void Renderer::draw(const std::vector<const RenderableGameObject*>& renderables, const XMMATRIX& viewProj) {
+    for (const RenderableGameObject* rgo : renderables) {
+        const XMMATRIX& worldMatrix = rgo->getWorldMatrix();
+        const XMMATRIX worldViewProjectionMatrix = worldMatrix * viewProj;
+        const Model& model = rgo->getModel();
+        const std::vector<Mesh>& meshes = model.getMeshes();
+        for (const Mesh& mesh : meshes) {
+            const VertexBuffer<Vertex3D>& vertexBuffer = mesh.getVertexBuffer();
+            const IndexBuffer& indexBuffer = mesh.getIndexBuffer();
+            const UINT offset = 0;
+            const Texture* const t = mesh.getTexture();
+            if (t) {
+                deviceContext->PSSetShaderResources(0, 1, t->getTextureResourceViewAddress());
+            }
+            cb_vs_vertexshader.data.worldViewProjectionMatrix = mesh.getTransformMatrix() * worldViewProjectionMatrix;
+            cb_vs_vertexshader.data.worldMatrix = mesh.getTransformMatrix() * worldMatrix;
+            cb_vs_vertexshader.applyChanges();
+            deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
+            deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
+            deviceContext->DrawIndexed(indexBuffer.getIndexCount(), 0, 0);
+        }
+    }
+}

@@ -1,11 +1,10 @@
 #pragma once
 
 #include <d3d11.h>
-#include <DirectXMath.h>
 #include "../GraphicsState.h"
 #include "../AdapterReader.h"
 #include "../../Scene/Scene.h"
-#include "../RenderableGameObject.h"
+#include "../Shaders.h"
 
 class Renderer {
 
@@ -13,7 +12,7 @@ public:
     virtual bool initRenderer(HWND renderWindowHandle, int windowWidth, int windowHeight);
     virtual GraphicsState& getGraphicsState();
     virtual void preparePipeline();
-    virtual void renderScene(App::Scene* scene, const float bgcolor[4]) = 0;
+    virtual void renderScene(const App::Scene * const scene, const float bgcolor[4]) = 0;
     virtual void present(size_t syncInterval, size_t flags);
     virtual ~Renderer() = default;
 
@@ -45,6 +44,10 @@ public:
 
 protected:
 
+    using RenderableGameObject = NGameObject::RenderableGameObject;
+    using Model = NModel::Model;
+    using XMMATRIX = DirectX::XMMATRIX;
+
     template<typename T>
     using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -60,6 +63,12 @@ protected:
     virtual void createBlendState();
     virtual void createSamplerState();
     virtual void fillGraphicsState();
+    virtual bool initConstantBuffers();
+    virtual void draw(
+        const std::vector<const RenderableGameObject*>& renderables,
+        const XMMATRIX &viewProj
+    );
+    virtual bool initShaders() = 0;
 
     ComPtr<IDXGISwapChain> swapChain = nullptr;
     ComPtr<ID3D11RenderTargetView> renderTargetView = nullptr;
@@ -77,7 +86,12 @@ protected:
 
     int windowWidth = 0;
     int windowHeight = 0;
-    HWND renderWindowHandle;
+    HWND renderWindowHandle = nullptr;
 
     GraphicsState graphicsState;
+
+    ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader{};
+    ConstantBuffer<CB_PS_PointLight> cb_ps_pointlight{};
+    ConstantBuffer<CB_PS_Ambientlight> cb_ps_ambientlight{};
+    ConstantBuffer<CB_PS_Camera> cb_ps_camera{};
 };

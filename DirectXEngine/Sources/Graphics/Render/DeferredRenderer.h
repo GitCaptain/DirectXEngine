@@ -25,21 +25,23 @@ class DeferredRenderer final : public Renderer {
 
 public:
     bool initRenderer(HWND renderWindowHandle, int windowWidth, int windowHeight) override;
-    void renderScene(App::Scene* scene, const float bgcolor[4]) override;
+    void renderScene(const App::Scene* const scene, const float bgcolor[4]) override;
 
 private:
-    bool initShaders();
+    bool initShaders() override;
     void createSamplerState() override;
-    bool initConstantBuffers();
+    void geometryPass(const App::Scene* const scene, const float bgcolor[4], const DirectX::XMMATRIX& viewProj);
+    void lightPass(const App::Scene* const scene, const float bgcolor[4], const DirectX::XMMATRIX& viewProj);
+
+    void drawLights(
+        const LightInfo& lightInfo,
+        const XMMATRIX& viewProj
+    );
 
     VertexShader vs_geometry_pass;
     VertexShader vs_light_pass;
     PixelShader ps_geometry_pass;
     PixelShader ps_light_pass;
-
-    ConstantBuffer<CB_VS_vertexshader> cb_vs_vertexshader;
-    ConstantBuffer<CB_PS_Phonglight> cb_ps_phonglight;
-    ConstantBuffer<CB_PS_Camera> cb_ps_camera;
 
     ComPtr<ID3D11SamplerState> perPixelSamplerState = nullptr;
 

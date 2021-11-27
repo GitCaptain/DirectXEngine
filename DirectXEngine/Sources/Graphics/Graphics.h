@@ -24,12 +24,12 @@ private:
     bool initializeScene();
     void initSprites();
 
-    //std::unique_ptr<Renderer> renderer{ new ForwardRenderer{} };
-    std::unique_ptr<Renderer> renderer{ new DeferredRenderer{} };
+    std::unique_ptr<Renderer> renderer{ new ForwardRenderer{} };
+    //std::unique_ptr<Renderer> renderer{ new DeferredRenderer{} };
     std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
     std::unique_ptr<DirectX::SpriteFont> spriteFont;
 
     Timer fpsTimer;
-    App::PongScene renderScene{};
+    std::unique_ptr<App::Scene> renderScene{new App::PongScene{}};
     ImGUIW *imgui = nullptr;
 };
