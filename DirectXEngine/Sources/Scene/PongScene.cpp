@@ -34,9 +34,12 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
         return false;
     }
 
-    light.dLights.emplace_back();
+    light.pointLights.emplace_back();
+    if(!light.pointLights.back().initialize("Resources\\Objects\\light.fbx", graphicsState.device)) {
+        return false;
+    }
 
-    p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad};
+    p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad, &light.pointLights.back()};
 
     spriteBatch = std::make_unique<DirectX::SpriteBatch>(graphicsState.deviceContext);
     spriteFont = std::make_unique<DirectX::SpriteFont>(graphicsState.device, L"Resources\\Fonts\\comic_sans_ms_16.spritefont");
@@ -126,11 +129,14 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
     if (kbd.isKeyPressed('R')) {
         reset();
     }
+    if (kbd.isKeyPressed('B')) {
+        camera.setPosition(ball.getPositionFloat3());
+    }
     if (kbd.isKeyPressed('C')) {
         DirectX::XMVECTOR lightPosition = camera.getPositionVector();
         lightPosition += camera.getForwardVector();
-        light.dLights[0].setPosition(lightPosition);
-        light.dLights[0].setRotation(camera.getRotationFloat3());
+        light.pointLights[0].setPosition(lightPosition);
+        light.pointLights[0].setRotation(camera.getRotationFloat3());
     }
 
     // If ball doesn't move, stick it to the pad
@@ -157,11 +163,10 @@ void PongScene::updateGUI() {
     imgui->newWindow("Light controls")
         .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &light.ambient.lightColor.x, 0.01f, 0.0f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Ambient light strength", &light.ambient.lightStrength, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation A", &light.dLights[0].attenuation_a, 0.01f, 0.1f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation B", &light.dLights[0].attenuation_b, 0.01f, 0.0f, 1.0f)
-        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Attenuation C", &light.dLights[0].attenuation_c, 0.01f, 0.0f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT3>("Dynamic light Attenuations", &light.pointLights[0].attenuations.x, 0.01f, 0.1f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT3>("Dynamic light Color", &light.pointLights[0].lightColor.x, 0.01f, 0.1f, 1.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Strength", &light.pointLights[0].lightStrength, 0.01f, 0.1f, 1.0f)
         .end();
-
     imgui->newWindow("Camera controls")
         .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
         .attach<IMGUIFN::TEXT>("position: %.3f %.3f %.3f", camera.getPositionFloat3().x, camera.getPositionFloat3().y, camera.getPositionFloat3().z)

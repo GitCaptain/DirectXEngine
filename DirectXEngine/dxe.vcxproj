@@ -242,7 +242,6 @@
     <ClCompile Include="Sources\Graphics\Shaders.cpp" />
     <ClCompile Include="Sources\HID\Keyboard.cpp" />
     <ClCompile Include="Sources\HID\KeyboardEvent.cpp" />
-    <ClCompile Include="Sources\Graphics\Light.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\Graphics\Model.cpp" />
     <ClCompile Include="Sources\Graphics\Mesh.cpp" />
@@ -517,7 +516,8 @@
     <None Include="dev\Scripts\prepare_assimp.ps1" />
     <None Include="dev\Scripts\prepare_dx.ps1" />
     <None Include="dev\Scripts\pre_build.ps1" />
-    <None Include="Resources\Shaders\PS\LightConstantBuffers.hlsli" />
+    <None Include="Resources\Shaders\PS\calculate_phong.hlsli" />
+    <None Include="Resources\Shaders\PS\ConstantBuffers.hlsli" />
     <None Include="ThirdParty\include\assimp\.editorconfig" />
     <None Include="ThirdParty\include\assimp\color4.inl" />
     <None Include="ThirdParty\include\assimp\config.h.in" />

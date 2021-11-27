@@ -14,7 +14,7 @@ void App::Scene::postRender() {
 	updateGUI();
 }
 
-const std::vector<NGameObject::RenderableGameObject*>& Scene::getRenderables() const {
+const std::vector<const NGameObject::RenderableGameObject*>& Scene::getRenderables() const {
     return p_renderables;
 }
 

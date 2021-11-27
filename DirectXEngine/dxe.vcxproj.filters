@@ -114,9 +114,6 @@
     <ClCompile Include="Sources\Graphics\RenderableGameObject.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Graphics\Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Graphics\GameObject2D.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -181,6 +178,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Sources\Graphics\Render\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Scene\Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -685,6 +685,7 @@
     <None Include="ThirdParty\include\assimp\vector3.inl">
       <Filter>Third Party\Headers\assimp</Filter>
     </None>
-    <None Include="Resources\Shaders\PS\LightConstantBuffers.hlsli" />
+    <None Include="Resources\Shaders\PS\ConstantBuffers.hlsli" />
+    <None Include="Resources\Shaders\PS\calculate_phong.hlsli" />
   </ItemGroup>
 </Project>

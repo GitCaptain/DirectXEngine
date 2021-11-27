@@ -21,7 +21,7 @@ namespace App {
 		virtual const NGameObject::Camera3D& getCameraInfo() const = 0;
 		virtual const DirectX::XMMATRIX& getViewMatrix() const = 0;
 		virtual const DirectX::XMMATRIX& getProjectionMatrix() const = 0;
-		virtual const std::vector<NGameObject::RenderableGameObject*>& getRenderables() const;
+		virtual const std::vector<const NGameObject::RenderableGameObject*>& getRenderables() const;
 		virtual ~Scene() = default;
 	protected:
 		virtual void reset();
@@ -32,6 +32,6 @@ namespace App {
 		virtual void updateGUI();
 		virtual void updateGameObjects();
 		Scene() = default;
-		std::vector<NGameObject::RenderableGameObject*> p_renderables;
+		std::vector<const NGameObject::RenderableGameObject*> p_renderables;
 	};
 }
