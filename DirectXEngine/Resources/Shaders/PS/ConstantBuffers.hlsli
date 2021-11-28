@@ -15,3 +15,7 @@ cbuffer PointLightBuffer: register(b1) {
 cbuffer cameraBuffer: register(b2) {
     float3 cameraWorldPos;
 }
+
+cbuffer lightsCountBuffer: register(b3) {
+    int lightsCount;
+}

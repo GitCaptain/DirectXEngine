@@ -33,7 +33,7 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     if (!playerPad.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
         return false;
     }
-
+    light.initialize(graphicsState, 100);
     light.pointLights.emplace_back();
     if(!light.pointLights.back().initialize("Resources\\Objects\\light.fbx", graphicsState.device)) {
         return false;

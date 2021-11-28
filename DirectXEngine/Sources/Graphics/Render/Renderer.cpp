@@ -34,8 +34,11 @@ void Renderer::createTexture(
     CD3D11_TEXTURE2D_DESC textureDesc(textureFormat, Width, Height);
     textureDesc.BindFlags = textureBindFlags;
     textureDesc.MipLevels = textureMipLevels;
+    createTexture(device, textureDesc, pptexture);
+}
 
-    HRESULT hr = device->CreateTexture2D(&textureDesc, nullptr, pptexture);
+void Renderer::createTexture(ID3D11Device* device, const CD3D11_TEXTURE2D_DESC& desc, ID3D11Texture2D** pptexture) {
+    HRESULT hr = device->CreateTexture2D(&desc, nullptr, pptexture);
     COM_ERROR_IF_FAILED(hr, "Failed to create 2D texture.");
 }
 
@@ -257,7 +260,10 @@ bool Renderer::initConstantBuffers() {
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_pointlight constant buffer.");
 
         hr = cb_ps_camera.initialize(device.Get(), deviceContext.Get());
-        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_phonglight constant buffer.");
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_camera constant buffer.");
+
+        hr = cb_ps_lightsCount.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_lightsCount constant buffer.");
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);
@@ -289,4 +295,16 @@ void Renderer::draw(const std::vector<const RenderableGameObject*>& renderables,
             deviceContext->DrawIndexed(indexBuffer.getIndexCount(), 0, 0);
         }
     }
+}
+
+void Renderer::prepareLights(const LightInfo& light, int slot) {
+
+    cb_ps_ambientlight.data.color = light.ambient.lightColor;
+    cb_ps_ambientlight.data.strength = light.ambient.lightStrength;
+    cb_ps_ambientlight.applyChanges();
+
+    cb_ps_lightsCount.data.lightCount = light.getLightsCnt();
+    cb_ps_lightsCount.applyChanges();
+
+    deviceContext->PSSetShaderResources(slot, 1, light.getLightTextureSRV(graphicsState));
 }

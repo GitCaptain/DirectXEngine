@@ -27,6 +27,8 @@ public:
         size_t textureMipLevels = 1
     );
 
+    static void createTexture(ID3D11Device* device, const CD3D11_TEXTURE2D_DESC& desc, ID3D11Texture2D** pptexture);
+
     static void createRenderTargetView(
         ID3D11Device* device,
         ID3D11Resource* pResource,
@@ -68,6 +70,7 @@ protected:
         const std::vector<const RenderableGameObject*>& renderables,
         const XMMATRIX &viewProj
     );
+    virtual void prepareLights(const LightInfo& light, int slot);
     virtual bool initShaders() = 0;
 
     ComPtr<IDXGISwapChain> swapChain = nullptr;
@@ -94,4 +97,5 @@ protected:
     ConstantBuffer<CB_PS_PointLight> cb_ps_pointlight{};
     ConstantBuffer<CB_PS_Ambientlight> cb_ps_ambientlight{};
     ConstantBuffer<CB_PS_Camera> cb_ps_camera{};
+    ConstantBuffer<CB_PS_LightsCount> cb_ps_lightsCount{};
 };

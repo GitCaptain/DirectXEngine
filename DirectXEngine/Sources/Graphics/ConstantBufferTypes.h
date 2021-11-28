@@ -22,6 +22,10 @@ struct CB_PS_Ambientlight {
     float strength;
 };
 
+struct CB_PS_LightsCount {
+    int lightCount;
+};
+
 struct CB_PS_PointLight {
     DirectX::XMFLOAT3 color;
     float strength;

@@ -140,6 +140,7 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
     deviceContext->PSSetConstantBuffers(0, 1, cb_ps_ambientlight.GetAddressOf());
     deviceContext->PSSetConstantBuffers(1, 1, cb_ps_pointlight.GetAddressOf());
     deviceContext->PSSetConstantBuffers(2, 1, cb_ps_camera.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(3, 1, cb_ps_lightsCount.GetAddressOf());
     deviceContext->PSSetSamplers(0, 1, perPixelSamplerState.GetAddressOf());
     // Remove 2 previous render targets
     ID3D11RenderTargetView* views[sz] = { renderTargetView.Get(), nullptr, nullptr };
