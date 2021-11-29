@@ -5,8 +5,8 @@ struct PS_INPUT {
     float3 inWorldPosition: WORLD_POSITION;
 };
 
-Texture2D objTexture : Texture: register(t0);
-SamplerState objSamplerState : Sampler: register(s0);
+Texture2D objTexture: register(t0);
+SamplerState objSamplerState: register(s0);
 
 struct PS_OUTPUT {
     float4 worldPosition: SV_Target0;

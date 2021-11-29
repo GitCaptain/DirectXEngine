@@ -11,7 +11,7 @@ Texture2D objTexture:         register(t0);
 Texture2D lightTexture:       register(t1);
 SamplerState objSamplerState: register(s0);
 
-float4 main(PS_INPUT input) : SV_TARGET{
+float4 main(PS_INPUT input) : SV_TARGET {
     float3 sampleColor = objTexture.Sample(objSamplerState, input.inTexCoord);
     return calculateLightTex(input.inWorldPosition, sampleColor, input.inNormal, lightTexture);
 }

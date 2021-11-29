@@ -95,5 +95,7 @@ namespace App {
             bool ballside = PLAYER;
         } gs;
 
+        double update_time = 0;
+
     };
 }

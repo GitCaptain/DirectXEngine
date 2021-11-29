@@ -24,7 +24,6 @@ void ForwardRenderer::preparePipeline() {
     deviceContext->PSSetShader(pixelShader.getShader(), nullptr, 0);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
     deviceContext->PSSetConstantBuffers(0, 1, cb_ps_ambientlight.GetAddressOf());
-    deviceContext->PSSetConstantBuffers(1, 1, cb_ps_pointlight.GetAddressOf());
     deviceContext->PSSetConstantBuffers(2, 1, cb_ps_camera.GetAddressOf());
     deviceContext->PSSetConstantBuffers(3, 1, cb_ps_lightsCount.GetAddressOf());
 

@@ -24,8 +24,8 @@ private:
     bool initializeScene();
     void initSprites();
 
-    std::unique_ptr<Renderer> renderer{ new ForwardRenderer{} };
-    //std::unique_ptr<Renderer> renderer{ new DeferredRenderer{} };
+    //std::unique_ptr<Renderer> renderer{ new ForwardRenderer{} };
+    std::unique_ptr<Renderer> renderer{ new DeferredRenderer{} };
     std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
     std::unique_ptr<DirectX::SpriteFont> spriteFont;
 

@@ -1,14 +1,13 @@
 #pragma once
 
 #include <DirectXMath.h>
-#include "../Graphics/ConstantBuffer.h"
 #include "../Graphics/GraphicsState.h"
 #include "../HID/Mouse.h"
 #include "../HID/Keyboard.h"
 #include "../Graphics/RenderableGameObject.h"
 #include "../Graphics/Light.h"
 #include "../Graphics/Camera3D.h"
-
+#include "../Timer.h"
 namespace App {
 
 	class Scene {
@@ -33,5 +32,6 @@ namespace App {
 		virtual void updateGameObjects();
 		Scene() = default;
 		std::vector<const NGameObject::RenderableGameObject*> p_renderables;
+		Timer timer;
 	};
 }

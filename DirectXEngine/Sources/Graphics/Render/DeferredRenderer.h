@@ -29,21 +29,21 @@ public:
 
 private:
     bool initShaders() override;
-    void createSamplerState() override;
     void geometryPass(const App::Scene* const scene, const float bgcolor[4], const DirectX::XMMATRIX& viewProj);
     void lightPass(const App::Scene* const scene, const float bgcolor[4], const DirectX::XMMATRIX& viewProj);
-
+    bool initVertexBuffers();
     void drawLights(
         const LightInfo& lightInfo,
         const XMMATRIX& viewProj
     );
 
+    VertexBuffer<VertexPosition3D> light_pass_vertex_buf;
+    IndexBuffer light_pass_index_buf;
+
     VertexShader vs_geometry_pass;
     VertexShader vs_light_pass;
     PixelShader ps_geometry_pass;
     PixelShader ps_light_pass;
-
-    ComPtr<ID3D11SamplerState> perPixelSamplerState = nullptr;
 
     GBuffer gbuffer;
 };

@@ -33,13 +33,17 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     if (!playerPad.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
         return false;
     }
-    light.initialize(graphicsState, 100);
-    light.pointLights.emplace_back();
-    if(!light.pointLights.back().initialize("Resources\\Objects\\light.fbx", graphicsState.device)) {
-        return false;
-    }
 
-    p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad, &light.pointLights.back()};
+    p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad};
+    constexpr int max_light_cnt = 2;
+    light.initialize(graphicsState, max_light_cnt);
+    for (int i = 0; i < max_light_cnt; i++) {
+        light.pointLights.emplace_back();
+        if (!light.pointLights.back().initialize("Resources\\Objects\\light.fbx", graphicsState.device)) {
+            return false;
+        }
+        p_renderables.push_back(&light.pointLights.back());
+    }
 
     spriteBatch = std::make_unique<DirectX::SpriteBatch>(graphicsState.deviceContext);
     spriteFont = std::make_unique<DirectX::SpriteFont>(graphicsState.device, L"Resources\\Fonts\\comic_sans_ms_16.spritefont");
@@ -47,6 +51,7 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     imgui = ImGUIWInstance::getPInstance();
     camera.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
     reset();
+    timer.startTimer();
     return true;
 }
 
@@ -218,28 +223,41 @@ void PongScene::updateGUI() {
 }
 
 void PongScene::updateGameObjects() {
+    auto dt = timer.getMillisecondsElapsed();
+    update_time += dt;
+    timer.restartTimer();
+    if (update_time > 50) {
 
-    table.setRotation(0, 0, 0);
-    table.setPosition(tablePos);
-    table.setScale(tableWidth, tableHeight, tableLength);
+        table.setRotation(0, 0, 0);
+        table.setPosition(tablePos);
+        table.setScale(tableWidth, tableHeight, tableLength);
 
-    leftBorder.setPosition(leftBorderPos);
-    leftBorder.setScale(borderWidth, borderHeight, borderLength);
+        leftBorder.setPosition(leftBorderPos);
+        leftBorder.setScale(borderWidth, borderHeight, borderLength);
 
-    rightBorder.setPosition(rightBorderPos);
-    rightBorder.setScale(borderWidth, borderHeight, borderLength);
+        rightBorder.setPosition(rightBorderPos);
+        rightBorder.setScale(borderWidth, borderHeight, borderLength);
 
-    playerPad.setPosition(PlayerPos);
-    playerPad.setRotation(0, PI, 0);
-    playerPad.setScale(padWidth, padHeight, padLength);
+        playerPad.setPosition(PlayerPos);
+        playerPad.setRotation(0, PI, 0);
+        playerPad.setScale(padWidth, padHeight, padLength);
 
-    AIPad.setPosition(AIPos);
-    AIPad.setRotation(0, -PI, 0);
-    AIPad.setScale(padWidth, padHeight, padLength);
+        AIPad.setPosition(AIPos);
+        AIPad.setRotation(0, -PI, 0);
+        AIPad.setScale(padWidth, padHeight, padLength);
 
-    ball.setPosition(ballPosition);
-    ball.setScale(ballRadius, ballRadius, ballRadius);
+        ball.setPosition(ballPosition);
+        ball.setScale(ballRadius, ballRadius, ballRadius);
 
+        //for (int i = 0; i < light.getLightsCnt(); i++) {
+        //    auto& pl = light.pointLights[i];
+        //    auto& go = p_renderables[i]->getPositionFloat3();
+        //    pl.setPosition(1000 * sin(dt), 1000 * cos(dt), 1000 * sin(update_time) * cos(update_time));
+        //}
+
+        light.pointLights[0].setPosition(ballPosition);
+        light.pointLights[1].setPosition(PlayerPos);
+    }
 }
 
 void PongScene::pushBall() {
