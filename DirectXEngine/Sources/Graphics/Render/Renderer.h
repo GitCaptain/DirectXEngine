@@ -28,6 +28,7 @@ public:
     );
 
     static void createTexture(ID3D11Device* device, const CD3D11_TEXTURE2D_DESC& desc, ID3D11Texture2D** pptexture);
+    static void createTexture(ID3D11Device* device, const CD3D11_TEXTURE1D_DESC& desc, ID3D11Texture1D** pptexture);
 
     static void createRenderTargetView(
         ID3D11Device* device,

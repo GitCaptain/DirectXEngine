@@ -20,22 +20,24 @@ class LightInfo final {
     template<typename T>
     using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-    struct PointLightDesc {
-        PointLightDesc(
-            DirectX::XMFLOAT3 color,
-            DirectX::XMFLOAT3 attenuations,
-            DirectX::XMFLOAT3 pos,
-            float strength
-        );
-        DirectX::XMFLOAT3 lightColor;
-        float p1/*padding*/;
-        DirectX::XMFLOAT3 attenuations;
-        float p2/*padding*/;
-        DirectX::XMFLOAT3 position;
-        float lightStrength;
-    };
+    using PointLightDesc = int[10];
 
-    ComPtr<ID3D11Texture2D> lightTex = nullptr;
+    //struct PointLightDesc {
+    //    PointLightDesc(
+    //        DirectX::XMFLOAT3 color,
+    //        DirectX::XMFLOAT3 attenuations,
+    //        DirectX::XMFLOAT3 pos,
+    //        float strength
+    //    );
+    //    DirectX::XMFLOAT3 lightColor;
+    //    float p1/*padding*/;
+    //    DirectX::XMFLOAT3 attenuations;
+    //    float p2/*padding*/;
+    //    DirectX::XMFLOAT3 position;
+    //    float lightStrength;
+    //};
+
+    ComPtr<ID3D11Texture1D> lightTex = nullptr;
     ComPtr<ID3D11ShaderResourceView> lightView = nullptr;
     mutable std::vector<PointLightDesc> lightData;
 

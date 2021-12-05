@@ -37,6 +37,11 @@ void Renderer::createTexture(
     createTexture(device, textureDesc, pptexture);
 }
 
+void Renderer::createTexture(ID3D11Device* device, const CD3D11_TEXTURE1D_DESC& desc, ID3D11Texture1D** pptexture) {
+    HRESULT hr = device->CreateTexture1D(&desc, nullptr, pptexture);
+    COM_ERROR_IF_FAILED(hr, "Failed to create 2D texture.");
+}
+
 void Renderer::createTexture(ID3D11Device* device, const CD3D11_TEXTURE2D_DESC& desc, ID3D11Texture2D** pptexture) {
     HRESULT hr = device->CreateTexture2D(&desc, nullptr, pptexture);
     COM_ERROR_IF_FAILED(hr, "Failed to create 2D texture.");
