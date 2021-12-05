@@ -157,10 +157,16 @@ void Renderer::createDeviceAndSwapChain() {
     scd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
     scd.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
-    HRESULT hr = D3D11CreateDeviceAndSwapChain(bestAdapter.pAdapter,
+    UINT deviceFlags = 0;
+#ifndef NDEBUG
+    deviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
+    HRESULT hr = D3D11CreateDeviceAndSwapChain(
+        bestAdapter.pAdapter,
         D3D_DRIVER_TYPE_UNKNOWN,
         nullptr,
-        0,
+        deviceFlags,
         nullptr,
         0,
         D3D11_SDK_VERSION,
@@ -168,7 +174,8 @@ void Renderer::createDeviceAndSwapChain() {
         &swapChain,
         &device,
         nullptr,
-        &deviceContext);
+        &deviceContext
+    );
     COM_ERROR_IF_FAILED(hr, "Failed to create device and swapchain.");
 
 }
