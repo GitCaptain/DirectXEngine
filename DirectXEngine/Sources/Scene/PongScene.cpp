@@ -35,7 +35,7 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     }
 
     p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad};
-    constexpr int max_light_cnt = 2;
+    constexpr int max_light_cnt = 6;
     light.initialize(graphicsState, max_light_cnt);
     for (int i = 0; i < max_light_cnt; i++) {
         light.pointLights.emplace_back();
@@ -161,7 +161,6 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
 }
 
 void PongScene::updateGUI() {
-    return;
 #pragma region IMGUI drawing
 #ifndef NDEBUG
     imgui->startFrame();
@@ -246,14 +245,15 @@ void PongScene::updateGameObjects() {
     ball.setPosition(ballPosition);
     ball.setScale(ballRadius, ballRadius, ballRadius);
 
-    //for (int i = 0; i < light.getLightsCnt(); i++) {
-    //    auto& pl = light.pointLights[i];
-    //    auto& go = p_renderables[i]->getPositionFloat3();
-    //    pl.setPosition(1000 * sin(dt), 1000 * cos(dt), 1000 * sin(update_time) * cos(update_time));
-    //}
+    for (int i = 0; i < light.getLightsCnt(); i++) {
+        auto& pl = light.pointLights[i];
+        auto& go_pos = p_renderables[i]->getPositionFloat3();
+        pl.lightStrength = light.pointLights[0].lightStrength;
+        pl.lightColor = light.pointLights[0].lightColor;
+        pl.attenuations = light.pointLights[0].attenuations;
+        pl.setPosition(go_pos);
+    }
 
-    //light.pointLights[0].setPosition(AIPos);
-    //light.pointLights[1].setPosition(PlayerPos);
 }
 
 void PongScene::pushBall() {

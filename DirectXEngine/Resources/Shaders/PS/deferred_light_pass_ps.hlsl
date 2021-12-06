@@ -3,7 +3,7 @@
 Texture2D positionTex:        register(t0);
 Texture2D colorTex:           register(t1);
 Texture2D normalTex:          register(t2);
-Texture2D lightTexture:       register(t3);
+Texture1D lightTexture:       register(t3);
 
 float4 main(float4 screenPos: SV_POSITION) : SV_TARGET{
     float3 texCoord = float3(screenPos.xy, 0);

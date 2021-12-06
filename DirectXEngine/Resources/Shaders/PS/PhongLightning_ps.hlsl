@@ -8,7 +8,7 @@ struct PS_INPUT {
 };
 
 Texture2D objTexture:         register(t0);
-Texture2D lightTexture:       register(t1);
+Texture1D lightTexture:       register(t1);
 SamplerState objSamplerState: register(s0);
 
 float4 main(PS_INPUT input) : SV_TARGET {
