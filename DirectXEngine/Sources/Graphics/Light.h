@@ -1,15 +1,33 @@
 #pragma once
 #include "RenderableGameObject.h"
+#include <wrl/client.h>
+#include "GraphicsState.h"
 
-class Light : public NGameObject::RenderableGameObject {
-public:
-    bool initialize(ID3D11Device *device, ID3D11DeviceContext *deviceContext, ConstantBuffer<CB_VS_vertexshader> &cb_vs_vertexshader);
+struct PointLight final : public NGameObject::RenderableGameObject {
+    DirectX::XMFLOAT3 lightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
+    DirectX::XMFLOAT3 attenuations = DirectX::XMFLOAT3(1.0f, 0.1f, 0.1f);
+    float lightStrength = 1.0f;
+};
+
+struct AmbientLight final {
     DirectX::XMFLOAT3 lightColor = DirectX::XMFLOAT3(1.0f, 1.0f, 1.0f);
     float lightStrength = 1.0f;
+};
 
+class LightInfo final {
 
-    // ligth strength equation: strength = 1/(A + Bx +Cx*x)
-    float attenuation_a = 1.0f;
-    float attenuation_b = 0.1f;
-    float attenuation_c = 0.1f;
+    template<typename T>
+    using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+    ComPtr<ID3D11Texture1D> lightTex = nullptr;
+    ComPtr<ID3D11ShaderResourceView> lightView = nullptr;
+    static constexpr size_t FLOATS_PER_DATA_ELEMENT = 10;
+    mutable std::vector<float> lightData;
+
+public:
+    bool initialize(GraphicsState& state, size_t max_light_cnt);
+    ID3D11ShaderResourceView* const* getLightTextureSRV(GraphicsState& state) const;
+    int getLightsCnt() const noexcept;
+    AmbientLight ambient;
+    std::vector<PointLight> pointLights;
 };

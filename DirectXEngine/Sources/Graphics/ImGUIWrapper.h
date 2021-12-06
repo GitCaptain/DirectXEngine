@@ -54,7 +54,7 @@ private:
 	friend class ImGUIWInstance;
 	bool initialized = false;
 	void doAssertion();
-	void initialize(HWND hwnd, GraphicsState& state);
+	void initialize(HWND hwnd, const GraphicsState& state);
 	void destroy();
 	ImGUIW() = default;
 	~ImGUIW() = default;
@@ -71,5 +71,5 @@ public:
 	ImGUIWInstance() = default;
 	~ImGUIWInstance();
 	static ImGUIW* getPInstance();
-	static ImGUIW* getPInstance(HWND hwnd, GraphicsState& state);
+	static ImGUIW* getPInstance(HWND hwnd, const GraphicsState& state);
 };

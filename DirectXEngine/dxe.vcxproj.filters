@@ -114,9 +114,6 @@
     <ClCompile Include="Sources\Graphics\RenderableGameObject.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\Graphics\Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Sources\Graphics\GameObject2D.cpp">
       <Filter>Source Files\Graphics</Filter>
     </ClCompile>
@@ -173,6 +170,21 @@
     </ClCompile>
     <ClCompile Include="Sources\Utils\StringHelper.cpp">
       <Filter>Source Files\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\Render\ForwardRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\Render\DeferredRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\Render\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Scene\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\Graphics\Light.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -593,6 +605,15 @@
     <ClInclude Include="Sources\Utils\StringHelper.h">
       <Filter>Headers\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Sources\Graphics\Render\ForwardRenderer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\Render\Renderer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Sources\Graphics\Render\DeferredRenderer.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\VS\vertexshader.hlsl">
@@ -614,6 +635,9 @@
       <Filter>Файлы ресурсов</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PS\PhongLightning_ps.hlsl" />
+    <FxCompile Include="Resources\Shaders\PS\deferred_geometry_pass_ps.hlsl" />
+    <FxCompile Include="Resources\Shaders\PS\deferred_light_pass_ps.hlsl" />
+    <FxCompile Include="Resources\Shaders\VS\deferred_light_pass_vs.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <None Include="dev\Scripts\prepare_imgui.ps1">
@@ -664,5 +688,8 @@
     <None Include="ThirdParty\include\assimp\vector3.inl">
       <Filter>Third Party\Headers\assimp</Filter>
     </None>
+    <None Include="Resources\Shaders\PS\ConstantBuffers.hlsli" />
+    <None Include="Resources\Shaders\PS\calculate_phong.hlsli" />
+    <None Include="Resources\Shaders\PS\calculate_phong_tex.hlsli" />
   </ItemGroup>
 </Project>

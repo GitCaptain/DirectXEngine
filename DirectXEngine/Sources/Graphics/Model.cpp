@@ -18,13 +18,11 @@ bool FloatEqual(const float a, const float b, const float epsilon = 5e-7) {
 #endif
 }
 
-bool Model::initialize(const std::string& filePath, 
-                            ID3D11Device* device,
-                            ID3D11DeviceContext* deviceContext,
-                            ConstantBuffer<CB_VS_vertexshader>& cb_vs_vertexshader) {
+bool Model::initialize(
+    const std::string& filePath,
+    ID3D11Device* device
+) {
     this->device = device;
-    this->deviceContext = deviceContext;
-    this->cb_vs_vertexshader = &cb_vs_vertexshader;
 
     try {
         if (!loadModel(filePath)) {
@@ -39,18 +37,8 @@ bool Model::initialize(const std::string& filePath,
     return true; 
 }
 
-void Model::draw(const XMMATRIX& worldMatrix, const XMMATRIX& viewProjectionMatrix) {
-
-    deviceContext->VSSetConstantBuffers(0, 1, cb_vs_vertexshader->GetAddressOf());
-    XMMATRIX worldViewProjectionMatrix = worldMatrix * viewProjectionMatrix;
-    for (size_t i = 0; i < meshes.size(); i++) {
-        // TODO: I removed XMMATRIX transpose from here to vertexshader.
-        // have to figure out what is better for performance
-        cb_vs_vertexshader->data.worldViewProjectionMatrix = meshes[i].getTransformMatrix() * worldViewProjectionMatrix;
-        cb_vs_vertexshader->data.worldMatrix = meshes[i].getTransformMatrix() * worldMatrix;
-        cb_vs_vertexshader->applyChanges();
-        meshes[i].draw();
-    }
+const std::vector<Mesh>& Model::getMeshes() const {
+    return meshes;
 }
 
 bool Model::loadModel(const std::string& filePath) {
@@ -126,10 +114,10 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     std::vector<Texture> textures = LoadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, scene);
 
-    return Mesh(device, deviceContext, vertices, indices, textures, transformMatrix);
+    return Mesh(device, vertices, indices, textures, transformMatrix);
 }
 
-TextureStorageType NModel::Model::determineTextureStorageType(
+TextureStorageType Model::determineTextureStorageType(
     const aiScene* pScene,
     aiMaterial* pMaterial,
     size_t index,
@@ -179,7 +167,7 @@ TextureStorageType NModel::Model::determineTextureStorageType(
     return TextureStorageType::None;
 } 
 
-std::vector<Texture> NModel::Model::LoadMaterialTextures(
+std::vector<Texture> Model::LoadMaterialTextures(
     aiMaterial* pMaterial,
     aiTextureType textureType,
     const aiScene* pScene
@@ -244,7 +232,7 @@ std::vector<Texture> NModel::Model::LoadMaterialTextures(
     return materialTextures;
 }
 
-int NModel::Model::getTextureIndex(aiString* pStr) {
+int Model::getTextureIndex(aiString* pStr) {
     assert(pStr->length >= 2);
     return atoi(&pStr->C_Str()[1]);
 }

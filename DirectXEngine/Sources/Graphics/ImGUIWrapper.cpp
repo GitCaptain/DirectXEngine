@@ -4,7 +4,7 @@ void ImGUIW::doAssertion() {
     assert(initialized && "You should initilize Imgui before start using it");
 }
 
-void ImGUIW::initialize(HWND hwnd, GraphicsState& state) {
+void ImGUIW::initialize(HWND hwnd, const GraphicsState& state) {
 #ifdef ENABLE_IMGUI
     // setup ImGUI
     IMGUI_CHECKVERSION();
@@ -82,7 +82,7 @@ ImGUIW* ImGUIWInstance::getPInstance() {
 #endif
 }
 
-ImGUIW* ImGUIWInstance::getPInstance(HWND hwnd, GraphicsState& state) {
+ImGUIW* ImGUIWInstance::getPInstance(HWND hwnd, const GraphicsState& state) {
 #ifdef ENABLE_IMGUI
     assert(!imguiInitialized && "ImGui already initialized. Use same function without parameters to get instance.");
     imgui.initialize(hwnd, state);

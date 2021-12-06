@@ -3,6 +3,7 @@
 #include <d3d11.h>
 #include <wrl/client.h>
 #include <vector>
+#include <exception>
 #include "..\ErrorLogger.h"
 
 class AdapterData {
@@ -17,4 +18,8 @@ public:
     static std::vector<AdapterData> getAdapters();
 private:
     static std::vector<AdapterData> adapters;
+};
+
+struct AdapterException: public std::exception {
+    using std::exception::exception;
 };

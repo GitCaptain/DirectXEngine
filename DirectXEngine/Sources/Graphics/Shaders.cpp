@@ -5,7 +5,7 @@ bool VertexShader::initialize(ID3D11Device* device,
                               D3D11_INPUT_ELEMENT_DESC* layoutDescription, 
                               UINT numElements) {
     
-    HRESULT hr = D3DReadFileToBlob(shaderpath.c_str(), shaderBuffer.GetAddressOf());
+    HRESULT hr = D3DReadFileToBlob(shaderpath.c_str(), &shaderBuffer);
     
     if (FAILED(hr)) {
         std::wstring errorMsg = L"Failed to load shader: ";
@@ -14,7 +14,7 @@ bool VertexShader::initialize(ID3D11Device* device,
         return false;
     }
 
-    hr = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, shader.GetAddressOf());
+    hr = device->CreateVertexShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &shader);
 
     if (FAILED(hr)) {
         std::wstring errorMsg = L"Failed to create vertex shader: ";
@@ -52,7 +52,7 @@ ID3D11InputLayout* VertexShader::getInputLayout() {
 }
 
 bool PixelShader::initialize(ID3D11Device* device, std::wstring shaderpath) {
-    HRESULT hr = D3DReadFileToBlob(shaderpath.c_str(), shaderBuffer.GetAddressOf());
+    HRESULT hr = D3DReadFileToBlob(shaderpath.c_str(), &shaderBuffer);
 
     if (FAILED(hr)) {
         std::wstring errorMsg = L"Failed to load shader: ";
@@ -61,7 +61,7 @@ bool PixelShader::initialize(ID3D11Device* device, std::wstring shaderpath) {
         return false;
     }
 
-    hr = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, shader.GetAddressOf());
+    hr = device->CreatePixelShader(shaderBuffer->GetBufferPointer(), shaderBuffer->GetBufferSize(), nullptr, &shader);
 
     if (FAILED(hr)) {
         std::wstring errorMsg = L"Failed to create pixel shader: ";

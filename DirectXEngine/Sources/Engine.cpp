@@ -25,3 +25,11 @@ void Engine::Update() {
 void Engine::renderFrame() {
     gfx.renderFrame();
 }
+
+void Engine::postRender() {
+    gfx.postRender();
+}
+
+void Engine::present() {
+    gfx.present();
+}

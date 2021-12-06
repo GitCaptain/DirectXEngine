@@ -9,22 +9,22 @@
 #include "assimp/scene.h"
 #include "Texture.h"
 
-class Mesh {
+class Mesh final {
 public:
     Mesh(ID3D11Device* device,
-        ID3D11DeviceContext* deviceContext,
         std::vector<Vertex3D>& vertices,
         std::vector<DWORD>& indices,
         std::vector<Texture> &textures,
         const DirectX::XMMATRIX &transformMatrix);
     Mesh(const Mesh &mesh) = default;
-    void draw();
-    const DirectX::XMMATRIX& getTransformMatrix();
+    const DirectX::XMMATRIX& getTransformMatrix() const;
+    const VertexBuffer<Vertex3D>& getVertexBuffer() const;
+    const IndexBuffer& getIndexBuffer() const;
+    const Texture* getTexture(aiTextureType texType = aiTextureType_DIFFUSE) const;
 
 private:
     VertexBuffer<Vertex3D> vertexBuffer;
     IndexBuffer indexBuffer;
-    ID3D11DeviceContext* deviceContext;
     std::vector<Texture> textures;
     DirectX::XMMATRIX transformMatrix;
 };

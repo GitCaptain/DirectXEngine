@@ -8,14 +8,14 @@ namespace NModel {
 
     using namespace DirectX;
 
-    class Model {
+    class Model final {
     
     public:
-        bool initialize(const std::string& filePath,
-                        ID3D11Device *device, 
-                        ID3D11DeviceContext *deviceContext,
-                        ConstantBuffer<CB_VS_vertexshader> &cb_vs_vertexshader);
-        void draw(const XMMATRIX& worldMatrix, const XMMATRIX &viewProjectionMatrix);
+        bool initialize(
+            const std::string& filePath,
+            ID3D11Device *device
+        );
+        const std::vector<Mesh>& getMeshes() const;
 
     private:
         bool loadModel(const std::string& filePath);
@@ -30,8 +30,6 @@ namespace NModel {
         
         std::vector<Mesh> meshes;
         ID3D11Device* device = nullptr;
-        ID3D11DeviceContext* deviceContext = nullptr;
-        ConstantBuffer<CB_VS_vertexshader> *cb_vs_vertexshader = nullptr;
         std::string directory = "";
      };
 }

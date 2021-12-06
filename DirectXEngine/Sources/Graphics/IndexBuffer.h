@@ -10,7 +10,7 @@ public:
     IndexBuffer() = default;
     ID3D11Buffer* Get() const;
     ID3D11Buffer* const* GetAddressOf() const;
-    UINT getIndexCount();
+    UINT getIndexCount() const;
     HRESULT initialize(ID3D11Device *device, DWORD *data, UINT numIndices);
 
 private:

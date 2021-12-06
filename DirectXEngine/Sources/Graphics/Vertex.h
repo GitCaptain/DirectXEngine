@@ -10,6 +10,12 @@ struct Vertex3D {
     DirectX::XMFLOAT3 normal;
 };
 
+struct VertexPosition3D {
+    VertexPosition3D() = default;
+    VertexPosition3D(float x, float y): pos(x, y) {}
+    DirectX::XMFLOAT2 pos;
+};
+
 struct Vertex2D {
     Vertex2D() = default;
     Vertex2D(float x, float y, float z, float u, float v):
