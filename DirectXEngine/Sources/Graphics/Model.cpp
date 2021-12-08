@@ -190,6 +190,8 @@ std::vector<Texture> Model::LoadMaterialTextures(
                 }
                 return materialTextures;
             }
+            case aiTextureType_NORMALS: {}
+            case aiTextureType_SPECULAR: {}
             default:
                 throw std::invalid_argument(std::format("Unexpected AiTextureType: {}", static_cast<int>(textureType)));
         }

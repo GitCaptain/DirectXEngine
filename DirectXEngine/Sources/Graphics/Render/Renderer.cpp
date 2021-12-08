@@ -80,6 +80,7 @@ bool Renderer::initRenderer(HWND renderWindowHandle, int windowWidth, int window
     try {
         createDeviceAndSwapChain();
         createBackBufferRenderTargets();
+        createDepthStencilBuffer();
         createDepthStencilState();
         createViewPort();
         createRasterizerState();
@@ -132,7 +133,17 @@ AdapterData Renderer::selectAdapter() {
 
 void Renderer::createDepthStencilBuffer() {
     createTexture(device.Get(), &depthStencilBuffer, windowWidth, windowHeight, D3D11_BIND_DEPTH_STENCIL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-    HRESULT hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, &depthStencilView);
+    //CD3D11_DEPTH_STENCIL_VIEW_DESC descDSV(D3D11_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D24_UNORM_S8_UINT);
+    HRESULT hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), /*&descDSV*/ nullptr, &depthStencilView);
+    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
+}
+
+void Renderer::createDepthStencilState() {
+    // Create depth stencil state
+    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
+    depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS;
+
+    HRESULT hr = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
     COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
 }
 
@@ -191,16 +202,6 @@ void Renderer::createBackBufferRenderTargets() {
     COM_ERROR_IF_FAILED(hr, "swapChain GetBuffer failed.");
 
     createRenderTargetView(device.Get(), backBuffer.Get(), &renderTargetView);
-    createDepthStencilBuffer();
-}
-
-void Renderer::createDepthStencilState() {
-    // Create depth stencil state
-    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
-    depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
-    HRESULT hr = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
-    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
 }
 
 void Renderer::createViewPort() {
