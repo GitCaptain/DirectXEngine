@@ -96,6 +96,6 @@ namespace App {
         } gs;
 
         double update_time = 0;
-
+        bool usemodels = true;
     };
 }

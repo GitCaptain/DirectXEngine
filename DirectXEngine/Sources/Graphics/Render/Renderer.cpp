@@ -81,6 +81,7 @@ bool Renderer::initRenderer(HWND renderWindowHandle, int windowWidth, int window
         createDeviceAndSwapChain();
         createBackBufferRenderTargets();
         createDepthStencilState();
+        createDepthStencilBuffer();
         createViewPort();
         createRasterizerState();
         createBlendState();
@@ -130,9 +131,18 @@ AdapterData Renderer::selectAdapter() {
     return *bestAdapter;
 }
 
+
+void Renderer::createDepthStencilState() {
+    // Create depth stencil state
+    const CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
+    HRESULT hr = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
+    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
+}
+
 void Renderer::createDepthStencilBuffer() {
-    createTexture(device.Get(), &depthStencilBuffer, windowWidth, windowHeight, D3D11_BIND_DEPTH_STENCIL, DXGI_FORMAT_D24_UNORM_S8_UINT);
-    HRESULT hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), nullptr, &depthStencilView);
+    createTexture(device.Get(), &depthStencilBuffer, windowWidth, windowHeight, D3D11_BIND_DEPTH_STENCIL, DXGI_FORMAT_D32_FLOAT);
+    CD3D11_DEPTH_STENCIL_VIEW_DESC descDSV(D3D11_DSV_DIMENSION_TEXTURE2D, DXGI_FORMAT_D32_FLOAT);
+    HRESULT hr = device->CreateDepthStencilView(depthStencilBuffer.Get(), &descDSV, &depthStencilView);
     COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
 }
 
@@ -191,21 +201,13 @@ void Renderer::createBackBufferRenderTargets() {
     COM_ERROR_IF_FAILED(hr, "swapChain GetBuffer failed.");
 
     createRenderTargetView(device.Get(), backBuffer.Get(), &renderTargetView);
-    createDepthStencilBuffer();
-}
-
-void Renderer::createDepthStencilState() {
-    // Create depth stencil state
-    CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
-    depthStencilDesc.DepthFunc = D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
-    HRESULT hr = device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
-    COM_ERROR_IF_FAILED(hr, "Failed to create depth Stencil view.");
 }
 
 void Renderer::createViewPort() {
     viewport.TopLeftX = 0.0f;
     viewport.TopLeftY = 0.0f;
+    viewport.MinDepth = 0.0f;
+    viewport.MaxDepth = 1.0f;
     viewport.Width = static_cast<float>(windowWidth);
     viewport.Height = static_cast<float>(windowHeight);
 }
