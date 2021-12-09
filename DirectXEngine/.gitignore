@@ -342,3 +342,7 @@ healthchecksdb
 
 # DirectXTK libs
 !libs/**
+
+# Build/Run artifacts
+ThirdParty/**
+imgui.ini
