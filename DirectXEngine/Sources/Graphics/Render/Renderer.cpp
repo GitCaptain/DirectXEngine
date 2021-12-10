@@ -196,7 +196,7 @@ void Renderer::createDeviceAndSwapChain() {
 
 void Renderer::createBackBufferRenderTargets() {
     ComPtr<ID3D11Texture2D> backBuffer;
-    HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), static_cast<void**>(&backBuffer));
+    HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
     COM_ERROR_IF_FAILED(hr, "swapChain GetBuffer failed.");
 
     createRenderTargetView(device.Get(), backBuffer.Get(), &renderTargetView);
