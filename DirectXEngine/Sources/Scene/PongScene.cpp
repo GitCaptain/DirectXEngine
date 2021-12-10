@@ -176,7 +176,6 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
 void PongScene::updateGUI() {
 #pragma region IMGUI drawing
 #ifndef NDEBUG
-    imgui->startFrame();
 
     imgui->newWindow("Light controls")
         .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &light.ambient.lightColor.x, 0.01f, 0.0f, 1.0f)
@@ -225,7 +224,6 @@ void PongScene::updateGUI() {
         //.attach<IMGUIFN::DRAGFLOAT>("radius", &ballRadius, 1.f, 0.0f, 100.f)
         .attach<IMGUIFN::DRAGFLOAT>("speed", &ballSpeed, 1.f, 0.0f, 100.f)
         .end();
-    imgui->endFrame();
 #endif
 #pragma endregion
     // Score

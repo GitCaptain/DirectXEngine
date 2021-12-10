@@ -190,40 +190,38 @@ std::vector<Texture> Model::LoadMaterialTextures(
                 }
                 return materialTextures;
             }
-            case aiTextureType_NORMALS: {}
-            case aiTextureType_SPECULAR: {}
             default:
                 throw std::invalid_argument(std::format("Unexpected AiTextureType: {}", static_cast<int>(textureType)));
         }
     }
-    else {
-        for (size_t i = 0; i < textureCount; i++) {
-            aiString path;
-            pMaterial->GetTexture(textureType, i, &path);
-            TextureStorageType storageType = determineTextureStorageType(pScene, pMaterial, i, textureType);
-            switch (storageType) {
-                case TextureStorageType::EmbeddedIndexCompressed: {
-                    int index = getTextureIndex(&path);
-                    materialTextures.emplace_back(device, 
-                                                  reinterpret_cast<const uint8_t*>(pScene->mTextures[index]->pcData),
-                                                  pScene->mTextures[index]->mWidth, // actual size in bytes 
-                                                  textureType);
-                    break;
-                }
-                case TextureStorageType::EmbeddedCompressed: {
-                    const aiTexture* pTexture = pScene->GetEmbeddedTexture(path.C_Str());
-                    materialTextures.emplace_back(device,
-                                                  reinterpret_cast<const uint8_t*>(pTexture->pcData),
-                                                  pTexture->mWidth, // actual size in bytes 
-                                                  textureType);
-                    break;
-                }
-                case TextureStorageType::Disk: {
-                    std::string fileName = directory + '\\' + path.C_Str();
-                    materialTextures.emplace_back(device, fileName, textureType);
-                    break;
-                }
+    for (size_t i = 0; i < textureCount; i++) {
+        aiString path;
+        pMaterial->GetTexture(textureType, i, &path);
+        TextureStorageType storageType = determineTextureStorageType(pScene, pMaterial, i, textureType);
+        switch (storageType) {
+            case TextureStorageType::EmbeddedIndexCompressed: {
+                int index = getTextureIndex(&path);
+                materialTextures.emplace_back(device,
+                                              reinterpret_cast<const uint8_t*>(pScene->mTextures[index]->pcData),
+                                              pScene->mTextures[index]->mWidth, // actual size in bytes
+                                              textureType);
+                break;
             }
+            case TextureStorageType::EmbeddedCompressed: {
+                const aiTexture* pTexture = pScene->GetEmbeddedTexture(path.C_Str());
+                materialTextures.emplace_back(device,
+                                              reinterpret_cast<const uint8_t*>(pTexture->pcData),
+                                              pTexture->mWidth, // actual size in bytes
+                                              textureType);
+                break;
+            }
+            case TextureStorageType::Disk: {
+                std::string fileName = directory + '\\' + path.C_Str();
+                materialTextures.emplace_back(device, fileName, textureType);
+                break;
+            }
+            default:
+                throw std::invalid_argument(std::format("Unexpected AiTextureType: {}", static_cast<int>(textureType)));
         }
     }
 

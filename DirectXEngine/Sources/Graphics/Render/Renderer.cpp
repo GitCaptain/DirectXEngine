@@ -131,7 +131,6 @@ AdapterData Renderer::selectAdapter() {
     return *bestAdapter;
 }
 
-
 void Renderer::createDepthStencilState() {
     // Create depth stencil state
     const CD3D11_DEPTH_STENCIL_DESC depthStencilDesc(D3D11_DEFAULT);
@@ -197,7 +196,7 @@ void Renderer::createDeviceAndSwapChain() {
 
 void Renderer::createBackBufferRenderTargets() {
     ComPtr<ID3D11Texture2D> backBuffer;
-    HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), static_cast<void**>(&backBuffer));
+    HRESULT hr = swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), &backBuffer);
     COM_ERROR_IF_FAILED(hr, "swapChain GetBuffer failed.");
 
     createRenderTargetView(device.Get(), backBuffer.Get(), &renderTargetView);
@@ -278,6 +277,9 @@ bool Renderer::initConstantBuffers() {
 
         hr = cb_ps_lightsCount.initialize(device.Get(), deviceContext.Get());
         COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_lightsCount constant buffer.");
+
+        hr = cb_ps_graphicsSettings.initialize(device.Get(), deviceContext.Get());
+        COM_ERROR_IF_FAILED(hr, "Failed to initialize cb_ps_graphicsSettings constant buffer.");
     }
     catch (const COMException& e) {
         ErrorLogger::log(e);

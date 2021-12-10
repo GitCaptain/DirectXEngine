@@ -79,8 +79,9 @@ bool DeferredRenderer::initShaders() {
     return true;
 }
 
-void DeferredRenderer::renderScene(const App::Scene* const scene, const float bgcolor[4]) {
+void DeferredRenderer::renderScene(const App::Scene* const scene, const GraphicsSettings* gs, const float bgcolor[4]) {
     const DirectX::XMMATRIX viewProj = scene->getViewMatrix() * scene->getProjectionMatrix();
+    gSettings = gs;
     geometryPass(scene, bgcolor, viewProj);
     lightPass(scene, bgcolor, viewProj);
 }
@@ -136,6 +137,7 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
     deviceContext->PSSetConstantBuffers(0, 1, cb_ps_ambientlight.GetAddressOf());
     deviceContext->PSSetConstantBuffers(2, 1, cb_ps_camera.GetAddressOf());
     deviceContext->PSSetConstantBuffers(3, 1, cb_ps_lightsCount.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(4, 1, cb_ps_graphicsSettings.GetAddressOf());
 
     // do not use DepthStencil buffer, we already render only what we need to the texture
     deviceContext->OMSetDepthStencilState(nullptr, 0);
@@ -152,6 +154,9 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
     cb_ps_camera.data.cameraWorldPosition = camPos;
     cb_ps_camera.applyChanges();
     ///
+
+    cb_ps_graphicsSettings.data.gamma = gSettings->gammaCoef;
+    cb_ps_graphicsSettings.applyChanges();
 
     const LightInfo& lightInfo = scene->getLightInfo();
     drawLights(lightInfo, viewProj);

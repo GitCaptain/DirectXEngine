@@ -32,4 +32,6 @@ private:
     Timer fpsTimer;
     std::unique_ptr<App::Scene> renderScene{new App::PongScene{}};
     ImGUIW *imgui = nullptr;
+
+    GraphicsSettings gSettings;
 };

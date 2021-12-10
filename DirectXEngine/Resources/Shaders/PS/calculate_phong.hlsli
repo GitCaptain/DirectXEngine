@@ -1,3 +1,4 @@
+#pragma once
 #include "ConstantBuffers.hlsli"
 
 float4 calculateLight(float3 worldPosition, float3 sampleColor, float3 normal) {

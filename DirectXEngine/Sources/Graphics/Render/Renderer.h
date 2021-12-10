@@ -12,7 +12,7 @@ public:
     virtual bool initRenderer(HWND renderWindowHandle, int windowWidth, int windowHeight);
     virtual GraphicsState& getGraphicsState();
     virtual void preparePipeline();
-    virtual void renderScene(const App::Scene * const scene, const float bgcolor[4]) = 0;
+    virtual void renderScene(const App::Scene *scene, const GraphicsSettings *gs, const float bgcolor[4]) = 0;
     virtual void present(size_t syncInterval, size_t flags);
     virtual ~Renderer() = default;
 
@@ -99,4 +99,5 @@ protected:
     ConstantBuffer<CB_PS_Ambientlight> cb_ps_ambientlight{};
     ConstantBuffer<CB_PS_Camera> cb_ps_camera{};
     ConstantBuffer<CB_PS_LightsCount> cb_ps_lightsCount{};
+    ConstantBuffer<CB_PS_GraphicsSettings> cb_ps_graphicsSettings{};
 };

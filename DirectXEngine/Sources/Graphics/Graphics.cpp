@@ -19,7 +19,7 @@ bool Graphics::initialize(HWND hwnd, int width, int height) {
 void Graphics::renderFrame() {
     renderer->preparePipeline();
     const float bgcolor[4] = { 0.f, 0.f, 0.f, 1.f };
-    renderer->renderScene(renderScene.get(), bgcolor);
+    renderer->renderScene(renderScene.get(), &gSettings, bgcolor);
 }
 
 void Graphics::update(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
@@ -39,7 +39,14 @@ void Graphics::postRender() {
     spriteBatch->Begin();
     spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
     spriteBatch->End();
+    imgui->startFrame();
+
+    imgui->newWindow("settings")
+        .attach<IMGUIFN::DRAGFLOAT>("gamma", &gSettings.gammaCoef, 0.1f, 0.1f, 3.0f)
+        .end();
+
     renderScene->postRender();
+    imgui->endFrame();
 }
 
 void Graphics::present() {

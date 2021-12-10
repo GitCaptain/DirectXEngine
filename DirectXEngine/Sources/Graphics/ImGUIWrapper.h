@@ -53,6 +53,7 @@ public:
 private:
 	friend class ImGUIWInstance;
 	bool initialized = false;
+	bool frameStarted = false;
 	void doAssertion();
 	void initialize(HWND hwnd, const GraphicsState& state);
 	void destroy();

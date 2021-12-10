@@ -1,3 +1,5 @@
+#pragma once
+
 cbuffer ambientLightBuffer: register(b0) {
     float3 ambientLightColor;
     float ambientLightStrength;
@@ -18,4 +20,8 @@ cbuffer cameraBuffer: register(b2) {
 
 cbuffer lightsCountBuffer: register(b3) {
     int lightsCount;
+}
+
+cbuffer lightsCountBuffer : register(b4) {
+    float gamma;
 }
