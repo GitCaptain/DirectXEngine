@@ -10,5 +10,5 @@ struct GraphicsState {
 };
 
 struct GraphicsSettings {
-    float gammaCoef = 1.0f;
+    float gammaCoef = 2.2f;
 };
