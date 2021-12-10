@@ -8,3 +8,7 @@ struct GraphicsState {
     ID3D11Device* device = nullptr;
     ID3D11DeviceContext* deviceContext = nullptr;
 };
+
+struct GraphicsSettings {
+    float gammaCoef = 1.0f;
+};
