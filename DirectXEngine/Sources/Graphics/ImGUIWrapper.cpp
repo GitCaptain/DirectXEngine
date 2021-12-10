@@ -37,19 +37,23 @@ bool ImGUIW::handleMsg(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 void ImGUIW::startFrame() {
 #ifdef ENABLE_IMGUI
     doAssertion();
+    assert(!frameStarted && "frame started already");
     ImGui_ImplDX11_NewFrame();
     ImGui_ImplWin32_NewFrame();
     ImGui::NewFrame();
+    frameStarted = true;
 #endif
 }
 
 void ImGUIW::endFrame() {
 #ifdef ENABLE_IMGUI
     doAssertion();
+    assert(frameStarted && "frame not started yet");
     // Assemble Together Draw data
     ImGui::Render();
     // render draw data
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+    frameStarted = false;
 #endif
 }
 
