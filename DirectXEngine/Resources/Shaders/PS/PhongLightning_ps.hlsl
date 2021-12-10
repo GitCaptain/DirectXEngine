@@ -1,4 +1,5 @@
 #include "calculate_phong_tex.hlsli"
+#include "gamma_correction.hlsli"
 
 struct PS_INPUT {
     float4 inPosition : SV_POSITION;
@@ -13,5 +14,7 @@ SamplerState objSamplerState: register(s0);
 
 float4 main(PS_INPUT input) : SV_TARGET {
     float3 sampleColor = objTexture.Sample(objSamplerState, input.inTexCoord);
-    return calculateLightTex(input.inWorldPosition, sampleColor, input.inNormal, lightTexture);
+    float4 lightedColor = calculateLightTex(input.inWorldPosition, sampleColor, input.inNormal, lightTexture);
+    float4 correctedColor = getGammaCorrectedColor(lightedColor, gamma);
+    return correctedColor;
 }

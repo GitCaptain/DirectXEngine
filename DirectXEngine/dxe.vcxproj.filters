@@ -691,5 +691,6 @@
     <None Include="Resources\Shaders\PS\ConstantBuffers.hlsli" />
     <None Include="Resources\Shaders\PS\calculate_phong.hlsli" />
     <None Include="Resources\Shaders\PS\calculate_phong_tex.hlsli" />
+    <None Include="Resources\Shaders\PS\gamma_correction.hlsli" />
   </ItemGroup>
 </Project>

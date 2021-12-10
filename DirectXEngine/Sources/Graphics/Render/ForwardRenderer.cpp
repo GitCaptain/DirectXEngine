@@ -26,13 +26,14 @@ void ForwardRenderer::preparePipeline() {
     deviceContext->PSSetConstantBuffers(0, 1, cb_ps_ambientlight.GetAddressOf());
     deviceContext->PSSetConstantBuffers(2, 1, cb_ps_camera.GetAddressOf());
     deviceContext->PSSetConstantBuffers(3, 1, cb_ps_lightsCount.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(4, 1, cb_ps_graphicsSettings.GetAddressOf());
 
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
     deviceContext->OMSetRenderTargets(1, renderTargetView.GetAddressOf(), depthStencilView.Get());
 }
 
-void ForwardRenderer::renderScene(const App::Scene* const scene, const float bgcolor[4] ) {
+void ForwardRenderer::renderScene(const App::Scene* const scene, const GraphicsSettings* gs, const float bgcolor[4] ) {
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
     // update lights (only one light allowed in forward renderer for now)
@@ -58,6 +59,9 @@ void ForwardRenderer::renderScene(const App::Scene* const scene, const float bgc
     cb_ps_camera.data.cameraWorldPosition = camPos;
     cb_ps_camera.applyChanges();
     ///
+
+    cb_ps_graphicsSettings.data.gamma = gs->gammaCoef;
+    cb_ps_graphicsSettings.applyChanges();
 
     const std::vector<const RenderableGameObject*>& renderables = scene->getRenderables();
     const DirectX::XMMATRIX viewProj = scene->getViewMatrix() * scene->getProjectionMatrix();

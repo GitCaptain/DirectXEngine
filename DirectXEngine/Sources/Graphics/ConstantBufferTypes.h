@@ -26,6 +26,10 @@ struct CB_PS_LightsCount {
     int lightCount;
 };
 
+struct CB_PS_GraphicsSettings {
+    float gamma;
+};
+
 struct CB_PS_PointLight {
     DirectX::XMFLOAT3 color;
     float strength;
