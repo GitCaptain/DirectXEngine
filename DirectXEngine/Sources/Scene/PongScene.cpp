@@ -15,7 +15,7 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     windowWidth = graphicsState.windowWidth;
     windowHeight = graphicsState.windowHeight;
 
-    if (!ball.initialize("Resources\\Objects\\wooden_sphere\\wooden_sphere.obj", graphicsState.device)) {
+    if (!ball.initialize("Resources\\Objects\\golf_ball\\10507_Golf Ball_v1_L3.obj", graphicsState.device)) {
         return false;
     }
     if (!leftBorder.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
@@ -24,27 +24,15 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     if (!rightBorder.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
         return false;
     }
-    if (usemodels) {
-        if (!table.initialize("Resources\\Objects\\pingpongtable\\10520_pingpongtable_L2.obj", graphicsState.device)) {
-            return false;
-        }
-        if (!AIPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState.device)) {
-            return false;
-        }
-        if (!playerPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState.device)) {
-            return false;
-        }
+
+    if (!table.initialize("Resources\\Objects\\pingpongtable\\10520_pingpongtable_L2.obj", graphicsState.device)) {
+        return false;
     }
-    else {
-        if (!table.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
-            return false;
-        }
-        if (!AIPad.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
-            return false;
-        }
-        if (!playerPad.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
-            return false;
-        }
+    if (!AIPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState.device)) {
+        return false;
+    }
+    if (!playerPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState.device)) {
+        return false;
     }
 
     p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad};
@@ -235,17 +223,12 @@ void PongScene::updateGUI() {
 
 void PongScene::updateGameObjects() {
 
-    if (!usemodels) {
-        table.setPosition(tablePos);
-        table.setRotation(0, 0, 0);
-        table.setScale(tableWidth, tableHeight, tableLength);
-    }
-    else {
-        auto lowerPos = tablePos;
-        lowerPos.y -= 100;
-        table.setPosition(lowerPos);
-        table.setRotation(PI/2, PI/2, PI/2);
-    }
+
+    auto lowerPos = tablePos;
+    lowerPos.y -= 100;
+    table.setPosition(lowerPos);
+    table.setRotation(PI/2, PI/2, PI/2);
+
     leftBorder.setPosition(leftBorderPos);
     leftBorder.setScale(borderWidth, borderHeight, borderLength);
 
@@ -253,21 +236,11 @@ void PongScene::updateGameObjects() {
     rightBorder.setScale(borderWidth, borderHeight, borderLength);
 
     playerPad.setPosition(PlayerPos);
-    if (!usemodels) {
-        playerPad.setRotation(0, PI, 0);
-        playerPad.setScale(padWidth, padHeight, padLength);
-    }
-    else {
-        playerPad.setRotation(PI/2, PI, 0);
-    }
+    playerPad.setRotation(PI/2, PI, 0);
+
     AIPad.setPosition(AIPos);
-    if (!usemodels) {
-        AIPad.setRotation(0, -PI, 0);
-        AIPad.setScale(padWidth, padHeight, padLength);
-    }
-    else {
-        AIPad.setRotation(PI/2, -PI, 0);
-    }
+    AIPad.setRotation(PI/2, -PI, 0);
+
     ball.setPosition(ballPosition);
     ball.setScale(ballRadius, ballRadius, ballRadius);
 
