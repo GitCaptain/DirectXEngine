@@ -48,15 +48,17 @@ namespace App {
 
         ImGUIW* imgui = nullptr;
 
-        const float tableWidth = 180;
+
+        const XMFLOAT3 leftBorderPos{ -75, 2, 0 };
+        const XMFLOAT3 rightBorderPos{ 75, 2, 0 };
+
+        const float tableWidth = rightBorderPos.x - leftBorderPos.x;
         const float tableLength = 280;
         const XMFLOAT3 tablePos = { 0, 0, 0 };
 
         float borderWidth = 1;
         float borderLength = tableLength;
         float borderHeight = 5;
-        XMFLOAT3 leftBorderPos{-90, 2, 0};
-        const XMFLOAT3 rightBorderPos{90, 2, 0};
 
         const float padWidth = 16;
         const float padHeight = 18;
