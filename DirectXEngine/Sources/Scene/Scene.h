@@ -34,8 +34,8 @@ namespace App {
         virtual void updateGameObjects();
         virtual void updateProjectionSetting();
         Scene() = default;
+
         std::vector<const NGameObject::RenderableGameObject*> p_renderables;
-        Timer timer;
         GraphicsState* graphicsState = nullptr;
         GraphicsSettings* graphicsSettings = nullptr;
         struct ProjectionSettings {

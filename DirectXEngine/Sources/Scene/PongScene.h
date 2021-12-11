@@ -63,7 +63,6 @@ namespace App {
         const float padWidth = 16;
         const float padHeight = 18;
         const float padLength = 2;
-        const float defaultPadSpeed = 0.3;
         const XMFLOAT3 DefaultPlayerPos = { 0, -15,  -tableLength / 2 };
         const XMFLOAT3 DefaultAIPos = { 0, -15, tableLength / 2 };
         const XMFLOAT3 AIToPlayerDirection = DefaultPlayerPos - DefaultAIPos;
@@ -87,6 +86,7 @@ namespace App {
         float playerSpeed{};
         float AISpeed{};
         float ballSpeed{};
+        const float defaultPadSpeed = 0.15;
 
         const float PI = std::numbers::pi_v<float>;
 
@@ -101,8 +101,7 @@ namespace App {
         } gs;
 
         const float AIWaitTime = 1000.0f; // time (millis) to wait after goal before pushing the ball
-
-        double update_time = 0;
+        Timer AIDelayTimer;
         bool free_camera = false;
     };
 }

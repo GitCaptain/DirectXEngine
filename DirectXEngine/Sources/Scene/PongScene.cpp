@@ -82,7 +82,7 @@ void PongScene::reset() {
 
     camera.setPosition(DefaultPlayerPos.x, tablePos.y + 50, DefaultPlayerPos.z - 20);
     camera.setLookAtPos((DefaultPlayerPos + tablePos)/2);
-    timer.restartTimer();
+    AIDelayTimer.restartTimer();
 }
 
 void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
@@ -274,8 +274,8 @@ void PongScene::updateGameObjects() {
     }
     updateProjectionSetting();
 
-    if(gs.ballside == GameState::AI && timer.getMillisecondsElapsed() > AIWaitTime) {
-        timer.stopTimer();
+    if(gs.ballside == GameState::AI && AIDelayTimer.getMillisecondsElapsed() > AIWaitTime) {
+        AIDelayTimer.stopTimer();
         AISpeed = defaultPadSpeed;
         pushBall();
     }
