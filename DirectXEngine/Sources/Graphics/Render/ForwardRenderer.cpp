@@ -60,8 +60,7 @@ void ForwardRenderer::renderScene(const App::Scene* const scene, const GraphicsS
     cb_ps_camera.applyChanges();
     ///
 
-    cb_ps_graphicsSettings.data.gamma = gs->gammaCoef;
-    cb_ps_graphicsSettings.applyChanges();
+    applyGraphicsSettings(gs);
 
     const std::vector<const RenderableGameObject*>& renderables = scene->getRenderables();
     const DirectX::XMMATRIX viewProj = scene->getViewMatrix() * scene->getProjectionMatrix();

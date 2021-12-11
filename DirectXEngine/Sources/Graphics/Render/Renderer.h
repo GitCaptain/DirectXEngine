@@ -66,6 +66,7 @@ protected:
     virtual void createBlendState();
     virtual void createSamplerState();
     virtual void fillGraphicsState();
+    virtual void applyGraphicsSettings(const GraphicsSettings* gSettings);
     virtual bool initConstantBuffers();
     virtual void draw(
         const std::vector<const RenderableGameObject*>& renderables,

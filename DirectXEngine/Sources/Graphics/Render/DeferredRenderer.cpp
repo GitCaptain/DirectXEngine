@@ -155,8 +155,7 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
     cb_ps_camera.applyChanges();
     ///
 
-    cb_ps_graphicsSettings.data.gamma = gSettings->gammaCoef;
-    cb_ps_graphicsSettings.applyChanges();
+    applyGraphicsSettings(gSettings);
 
     const LightInfo& lightInfo = scene->getLightInfo();
     drawLights(lightInfo, viewProj);

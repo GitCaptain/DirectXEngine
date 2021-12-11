@@ -692,5 +692,6 @@
     <None Include="Resources\Shaders\PS\calculate_phong.hlsli" />
     <None Include="Resources\Shaders\PS\calculate_phong_tex.hlsli" />
     <None Include="Resources\Shaders\PS\gamma_correction.hlsli" />
+    <None Include="Resources\Shaders\PS\tone_mapping.hlsli" />
   </ItemGroup>
 </Project>

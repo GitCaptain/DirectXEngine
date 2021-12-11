@@ -28,6 +28,8 @@ struct CB_PS_LightsCount {
 
 struct CB_PS_GraphicsSettings {
     float gamma;
+    float exposure;
+    bool hdr;
 };
 
 struct CB_PS_PointLight {

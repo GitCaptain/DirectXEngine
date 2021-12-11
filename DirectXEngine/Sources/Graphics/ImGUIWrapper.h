@@ -1,6 +1,7 @@
 #pragma once
 
-#include <windows.h>
+#include <Windows.h>
+#include <utility>
 #include "GraphicsState.h"
 
 #ifdef ENABLE_IMGUI
@@ -17,6 +18,7 @@ enum class IMGUIFN {
 	DRAGFLOAT,
 	DRAGFLOAT3,
 	TEXT,
+	CHECKBOX,
 };
 
 class ImGUIW {
@@ -25,15 +27,19 @@ public:
 	struct window {
 		window(const char* title);
 		template<IMGUIFN fn, typename ... PARAMS>
-		constexpr window& attach(PARAMS ...params) {
+		constexpr window& attach(PARAMS&& ...params) {
+
 			if constexpr (fn == IMGUIFN::DRAGFLOAT) {
-				ImGui::DragFloat(params...);
+				ImGui::DragFloat(std::forward<PARAMS>(params)...);
 			} 
 			else if constexpr (fn == IMGUIFN::DRAGFLOAT3) {
-				ImGui::DragFloat3(params...);
+				ImGui::DragFloat3(std::forward<PARAMS>(params)...);
 			}
 			else if constexpr (fn == IMGUIFN::TEXT) {
-				ImGui::Text(params...);
+				ImGui::Text(std::forward<PARAMS>(params)...);
+			}
+			else if constexpr (fn == IMGUIFN::CHECKBOX) {
+				ImGui::Checkbox(std::forward<PARAMS>(params)...);
 			}
 			else {
 				static_assert("MISSED IMGUI FUNCTION" && false);

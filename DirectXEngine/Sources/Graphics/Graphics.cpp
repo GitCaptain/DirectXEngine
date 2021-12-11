@@ -43,6 +43,8 @@ void Graphics::postRender() {
 
     imgui->newWindow("settings")
         .attach<IMGUIFN::DRAGFLOAT>("gamma", &gSettings.gammaCoef, 0.1f, 0.1f, 3.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("exposure", &gSettings.exposure, 0.1f, 0.0f, 5.0f)
+        .attach<IMGUIFN::CHECKBOX>("hdr", &gSettings.hdr)
         .end();
 
     renderScene->postRender();

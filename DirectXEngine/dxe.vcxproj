@@ -521,6 +521,7 @@
     <None Include="Resources\Shaders\PS\calculate_phong_tex.hlsli" />
     <None Include="Resources\Shaders\PS\ConstantBuffers.hlsli" />
     <None Include="Resources\Shaders\PS\gamma_correction.hlsli" />
+    <None Include="Resources\Shaders\PS\tone_mapping.hlsli" />
     <None Include="ThirdParty\include\assimp\.editorconfig" />
     <None Include="ThirdParty\include\assimp\color4.inl" />
     <None Include="ThirdParty\include\assimp\config.h.in" />
