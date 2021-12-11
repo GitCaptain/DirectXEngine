@@ -31,7 +31,6 @@ namespace App {
         void updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) override;
         void updateGUI() override;
         void updateGameObjects() override;
-
     private:
 
         std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
@@ -59,8 +58,8 @@ namespace App {
         const XMFLOAT3 leftBorderPos{-90, 2, 0};
         const XMFLOAT3 rightBorderPos{90, 2, 0};
 
-        const float padWidth = 20;
-        const float padHeight = 10;
+        const float padWidth = 16;
+        const float padHeight = 18;
         const float padLength = 2;
 
         const XMFLOAT3 DefaultPlayerPos = { 0, -15,  -tableLength / 2 };
@@ -85,11 +84,13 @@ namespace App {
         int windowHeight = 0;
 
         struct GameState {
-            enum { PLAYER = 0, AI = 1};
+            enum STATES { PLAYER = 0, AI = 1, NONE = 2};
             int AIScore = 0;
             int playerScore = 0;
-            bool ballside = PLAYER;
+            STATES ballside = PLAYER;
         } gs;
+
+        const float AIWaitTime = 1000.0f; // time (millis) to wait after goal before pushing the ball
 
         double update_time = 0;
         bool free_camera = false;

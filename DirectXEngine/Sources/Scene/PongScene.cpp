@@ -53,7 +53,6 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
     imgui = ImGUIWInstance::getPInstance();
     updateProjectionSetting();
     reset();
-    timer.startTimer();
     return true;
 }
 
@@ -73,6 +72,7 @@ void PongScene::reset() {
     ballSpeed = 0;
     camera.setPosition(DefaultPlayerPos.x, tablePos.y + 50, DefaultPlayerPos.z - 20);
     camera.setLookAtPos((DefaultPlayerPos + tablePos)/2);
+    timer.restartTimer();
 }
 
 void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
@@ -121,7 +121,7 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
             camera.adjustPosition(0.0f, -camPosAdjMultiplier, 0.0f);
         }
     }
-    if (kbd.isKeyPressed(VK_UP)) {
+    if (kbd.isKeyPressed(VK_UP) && gs.ballside == GameState::PLAYER) {
         pushBall();
     }
     if (kbd.isKeyPressed(VK_LEFT)) {
@@ -228,7 +228,6 @@ void PongScene::updateGUI() {
 
 void PongScene::updateGameObjects() {
 
-
     auto lowerPos = tablePos;
     lowerPos.y -= 100;
     table.setPosition(lowerPos);
@@ -258,10 +257,15 @@ void PongScene::updateGameObjects() {
         pl.setPosition(go_pos);
     }
     updateProjectionSetting();
+
+    if(gs.ballside == GameState::AI && timer.getMillisecondsElapsed() > AIWaitTime) {
+        timer.stopTimer();
+        pushBall();
+    }
 }
 
 void PongScene::pushBall() {
-    if (ballSpeed != 0) {
+    if (gs.ballside == GameState::NONE) {
         return; // ball is moving already
     }
     ballSpeed = 0.0005;
@@ -271,6 +275,7 @@ void PongScene::pushBall() {
     else {
         ballDirection = AIToPlayerDirection;
     }
+    gs.ballside = GameState::NONE;
 }
 
 void PongScene::updateAI(float dt) {
