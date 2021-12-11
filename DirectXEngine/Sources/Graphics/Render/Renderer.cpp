@@ -259,6 +259,13 @@ void Renderer::fillGraphicsState() {
     graphicsState.deviceContext = deviceContext.Get();
 }
 
+void Renderer::applyGraphicsSettings(const GraphicsSettings* gSettings) {
+    cb_ps_graphicsSettings.data.gamma = gSettings->gammaCoef;
+    cb_ps_graphicsSettings.data.exposure = gSettings->exposure;
+    cb_ps_graphicsSettings.data.hdr = gSettings->hdr;
+    cb_ps_graphicsSettings.applyChanges();
+}
+
 bool Renderer::initConstantBuffers() {
 
     // initialize constants buffers
