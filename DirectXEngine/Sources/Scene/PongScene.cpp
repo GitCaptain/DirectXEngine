@@ -88,9 +88,11 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
 
     while (!mouse.isEventBufferEmpty()) {
         auto me = mouse.readEvent();
-        if (mouse.isRightDown()) {
-            if (me.getType() == HID::MouseEvent::EventType::RAW_MOVE) {
-                camera.adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
+        if (free_camera) {
+            if (mouse.isRightDown()) {
+                if (me.getType() == HID::MouseEvent::EventType::RAW_MOVE) {
+                    camera.adjustRotation(me.getPosY() * 0.01f, me.getPosX() * 0.01f, 0.0f);
+                }
             }
         }
     }
@@ -199,13 +201,13 @@ void PongScene::updateGUI() {
     //    .attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
     //    .attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
     //    .end();
-    //imgui->newWindow("player pad controls")
-    //    .attach<IMGUIFN::DRAGFLOAT3>("position", &PlayerPos.x, 1, -200.f, 200.f)
+    imgui->newWindow("player pad controls")
+        .attach<IMGUIFN::DRAGFLOAT3>("position", &PlayerPos.x, 1, -200.f, 200.f)
     //    .attach<IMGUIFN::DRAGFLOAT>("speed", &playerSpeed, 1, -200.f, 200.f)
     //    .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
     //    .attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
     //    .attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
-    //    .end();
+        .end();
     //imgui->newWindow("AI pad controls")
     //    .attach<IMGUIFN::DRAGFLOAT3>("position", &AIPos.x, 1, -200.f, 200.f)
     //    .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
@@ -214,8 +216,8 @@ void PongScene::updateGUI() {
     //    .end();
     imgui->newWindow("ball controls")
         .attach<IMGUIFN::DRAGFLOAT3>("position", &ballPosition.x, 1, -200.f, 200.f)
-        .attach<IMGUIFN::DRAGFLOAT>("radius", &ballRadius, 1.f, 0.0f, 100.f)
-        .attach<IMGUIFN::DRAGFLOAT>("speed", &ballSpeed, 1.f, 0.0f, 100.f)
+        //.attach<IMGUIFN::DRAGFLOAT>("radius", &ballRadius, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("speed", &ballSpeed, 0.0001f, 0.0f, 100.f)
         .end();
 #endif
 #pragma endregion
@@ -268,7 +270,7 @@ void PongScene::pushBall() {
     if (gs.ballside == GameState::NONE) {
         return; // ball is moving already
     }
-    ballSpeed = 0.0005;
+    ballSpeed = defaultBallSpeed;
     if (gs.ballside == GameState::PLAYER) {
         ballDirection = PlayerToAIDirection;
     }
@@ -291,29 +293,9 @@ void PongScene::updateAI(float dt) {
 }
 
 void PongScene::checkCollision() {
-    // Check for collisions
-    if (ballPosition.x + ballRadius >= rightBorderPos.x || ballPosition.x - ballRadius <= leftBorderPos.x) {
+    // Check for collisions with table borders
+    if (ballPosition.x + ballRadWidth >= rightBorderPos.x || ballPosition.x - ballRadWidth <= leftBorderPos.x) {
         ballDirection.x *= -1;
-    }
-
-    // TODO: change these borders
-    if (ballDirection.z < 0 && DefaultPlayerPos.z + ballRadius <= ballPosition.z && ballPosition.z <= DefaultPlayerPos.z + padLength / 2 + ballRadius) {
-        if (PlayerPos.x - padWidth / 2 - ballRadius <= ballPosition.x && ballPosition.x <= PlayerPos.x + padWidth / 2 + ballRadius) {
-            // in player window for shot
-            ballDirection.z *= -1;
-            ballDirection.x += (ballPosition.x - PlayerPos.x) * (PI/2/padWidth); // ((pi/4)/(width/2)) - max angle is 45
-            std::cout << std::format("xdir: {}\n", ballDirection.x);
-            return;
-        }
-    }
-    if (ballDirection.z > 0 && DefaultAIPos.z - padLength / 2 <= ballPosition.z + ballRadius && ballPosition.z + ballRadius <= DefaultAIPos.z) {
-        if (AIPos.x - padWidth / 2 - ballRadius <= ballPosition.x && ballPosition.x <= AIPos.x + padWidth / 2 + ballRadius) {
-            //in ai window for shot
-            ballDirection.z *= -1;
-            ballDirection.x += (ballPosition.x - AIPos.x) * (PI / 2 / padWidth);
-            std::cout << std::format("xdir: {}\n", ballDirection.x);
-            return;
-        }
     }
 
     // Check for goal
@@ -328,6 +310,41 @@ void PongScene::checkCollision() {
         gs.AIScore += 1;
         reset();
     }
+
+    auto updateBall = [&](const XMFLOAT3& relPos) {
+        ballDirection.z *= -1;
+        const float reflectAngle = PI / 4 * (ballPosition.x - relPos.x) / maxXDiff; // max angle is 45 degrees
+        if (reflectAngle == 0) {
+            ballDirection.x = 0;
+        }
+        else {
+            ballDirection.x = ballDirection.z / tan(reflectAngle); // z * ctg(ang), !! ang != 0 && ang != pi/2
+            ballDirection.x = std::min(100.f, std::max(-100.f, ballDirection.x));
+        }
+        OutputDebugStringA(std::format("reflectAngle: {}, xdir: {}\n", reflectAngle, ballDirection.x).c_str());
+        if (ballSpeed < maximumBallSpeed) {
+            ballSpeed += deltaBallSpeed;
+        }
+    };
+
+    // check if we are near the pad
+    if(ballDirection.z == AIToPlayerDirection.z && DefaultPlayerPos.z + padLength/2 >= ballPosition.z - ballRadWidth) {
+        // check if we are in pos to strike
+        if(PlayerPos.x - maxXDiff <= ballPosition.x && ballPosition.x <= PlayerPos.x + maxXDiff) {
+            updateBall(PlayerPos);
+            return;
+        }
+    }
+
+    // check if we are near the pad
+    if (ballDirection.z == PlayerToAIDirection.z && DefaultAIPos.z - padLength / 2 <= ballPosition.z + ballRadWidth) {
+        // check if we are in pos to strike
+        if (AIPos.x - maxXDiff <= ballPosition.x && ballPosition.x <= AIPos.x + maxXDiff) {
+            updateBall(AIPos);
+            return;
+        }
+    }
+
 }
 
 const LightInfo& PongScene::getLightInfo() const {

@@ -46,7 +46,7 @@ namespace App {
 
         float cameraSpeed = 0.1f;
 
-        ImGUIW* imgui;
+        ImGUIW* imgui = nullptr;
 
         const float tableWidth = 180;
         const float tableLength = 280;
@@ -55,7 +55,7 @@ namespace App {
         float borderWidth = 1;
         float borderLength = tableLength;
         float borderHeight = 5;
-        const XMFLOAT3 leftBorderPos{-90, 2, 0};
+        XMFLOAT3 leftBorderPos{-90, 2, 0};
         const XMFLOAT3 rightBorderPos{90, 2, 0};
 
         const float padWidth = 16;
@@ -70,9 +70,16 @@ namespace App {
         XMFLOAT3 PlayerPos{};
         XMFLOAT3 AIPos{};
 
-        float ballRadius = 2;
+        const float ballRadius = 2;
+        const float ballRadWidth = 2.125f * ballRadius;
+        const float defaultBallSpeed = 0.0005;
+        const float maximumBallSpeed = defaultBallSpeed * 4;
+        const float deltaBallSpeed = defaultBallSpeed / 10;
         XMFLOAT3 ballPosition{};
         XMFLOAT3 ballDirection{};
+
+
+        const float maxXDiff = padWidth / 2 + ballRadWidth;
 
         float playerSpeed{};
         float AISpeed{};
