@@ -5,12 +5,13 @@
 
 using namespace App;
 
-bool PongScene::initialize(GraphicsState& graphicsState) {
+bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graphicsSettings) {
 
     assert(graphicsState.device && "device is nullptr");
     assert(graphicsState.deviceContext && "deviceContext is nullptr");
 
     this->graphicsState = &graphicsState;
+    this->graphicsSettings = &graphicsSettings;
 
     windowWidth = graphicsState.windowWidth;
     windowHeight = graphicsState.windowHeight;
@@ -50,30 +51,27 @@ bool PongScene::initialize(GraphicsState& graphicsState) {
     spriteFont = std::make_unique<DirectX::SpriteFont>(graphicsState.device, L"Resources\\Fonts\\comic_sans_ms_16.spritefont");
 
     imgui = ImGUIWInstance::getPInstance();
-    camera.setProjectionValues(90.0f, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), 0.1f, 3000.0f);
+    updateProjectionSetting();
     reset();
     timer.startTimer();
     return true;
 }
 
 void PongScene::reset() {
-    leftBorderPos = { -tableWidth / 2, 2 * tableHeight, 0 };
-    rightBorderPos = { tableWidth / 2, 2 * tableHeight, 0 };
-
     PlayerPos = DefaultPlayerPos;
     AIPos = DefaultAIPos;
-
+    float ballz = tableLength / 2 - 2.5 * ballRadius;
     if (gs.ballside == GameState::AI) {
-        ballPosition = { AIPos.x, 2.f, tableLength / 2 - 3};
+        ballPosition = { AIPos.x, 2.f, ballz};
     }
     else { 
-        ballPosition = { PlayerPos.x, 2.f, -tableLength / 2 + 3};
+        ballPosition = { PlayerPos.x, 2.f, -ballz};
     }
 
     playerSpeed = 0.3;
     AISpeed = 0.3;
     ballSpeed = 0;
-    camera.setPosition(DefaultPlayerPos.x, tablePos.y + tableHeight + 50, DefaultPlayerPos.z - 20);
+    camera.setPosition(DefaultPlayerPos.x, tablePos.y + 50, DefaultPlayerPos.z - 20);
     camera.setLookAtPos((DefaultPlayerPos + tablePos)/2);
 }
 
@@ -97,38 +95,40 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
         }
     }
 
-    float cameraSpeedMultiplyer = 1.0f;
+    if (free_camera) {
+        float cameraSpeedMultiplyer = 1.0f;
 
-    if (kbd.isKeyPressed(VK_SHIFT)) {
-        cameraSpeedMultiplyer *= 50;
-        dt *= 50;
+        if (kbd.isKeyPressed(VK_SHIFT)) {
+            cameraSpeedMultiplyer = 50.0f;
+        }
+        float camPosAdjMultiplier = cameraSpeed * cameraSpeedMultiplyer * dt;
+        if (kbd.isKeyPressed('W')) {
+            camera.adjustPosition(camera.getForwardVector() * camPosAdjMultiplier);
+        }
+        if (kbd.isKeyPressed('S')) {
+            camera.adjustPosition(camera.getBackwardVector() * camPosAdjMultiplier);
+        }
+        if (kbd.isKeyPressed('A')) {
+            camera.adjustPosition(camera.getLeftVector() * camPosAdjMultiplier);
+        }
+        if (kbd.isKeyPressed('D')) {
+            camera.adjustPosition(camera.getRightVector() * camPosAdjMultiplier);
+        }
+        if (kbd.isKeyPressed(VK_SPACE)) {
+            camera.adjustPosition(0.0f, camPosAdjMultiplier, 0.0f);
+        }
+        if (kbd.isKeyPressed(VK_CONTROL)) {
+            camera.adjustPosition(0.0f, -camPosAdjMultiplier, 0.0f);
+        }
     }
-    if (kbd.isKeyPressed('W')) {
-        camera.adjustPosition(camera.getForwardVector() * cameraSpeed * cameraSpeedMultiplyer * dt);
-    }
-    if (kbd.isKeyPressed('S')) {
-        camera.adjustPosition(camera.getBackwardVector() * cameraSpeed * dt);
-    }
-    if (kbd.isKeyPressed('A')) {
-        camera.adjustPosition(camera.getLeftVector() * cameraSpeed * dt);
-    }
-    if (kbd.isKeyPressed('D')) {
-        camera.adjustPosition(camera.getRightVector() * cameraSpeed * dt);
-    }
-    if (kbd.isKeyPressed(VK_SPACE)) {
-        camera.adjustPosition(0.0f, cameraSpeed * dt, 0.0f);
-    }
-    if (kbd.isKeyPressed(VK_CONTROL)) {
-        camera.adjustPosition(0.0f, - cameraSpeed * dt, 0.0f);
-    }
-    if (kbd.isKeyPressed('Z')) {
+    if (kbd.isKeyPressed(VK_UP)) {
         pushBall();
     }
-    if (kbd.isKeyPressed('K')) {
+    if (kbd.isKeyPressed(VK_LEFT)) {
         PlayerPos.x -= playerSpeed * dt;
         PlayerPos.x = std::max(PlayerPos.x, leftBorderPos.x + padWidth / 2);
     }
-    if (kbd.isKeyPressed('L')) {
+    if (kbd.isKeyPressed(VK_RIGHT)) {
         PlayerPos.x += playerSpeed * dt;
         PlayerPos.x = std::min(PlayerPos.x, rightBorderPos.x - padWidth / 2);
     }
@@ -163,6 +163,11 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
 
 void PongScene::updateGUI() {
 #pragma region IMGUI drawing
+
+    imgui->newWindow("game settings")
+        .attach<IMGUIFN::CHECKBOX>("Free camera", &free_camera)
+        .end();
+
 #ifndef NDEBUG
 
     imgui->newWindow("Light controls")
@@ -176,31 +181,31 @@ void PongScene::updateGUI() {
         .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
         .attach<IMGUIFN::TEXT>("position: %.3f %.3f %.3f", camera.getPositionFloat3().x, camera.getPositionFloat3().y, camera.getPositionFloat3().z)
         .end();
-    imgui->newWindow("table controls")
-        //.attach<IMGUIFN::DRAGFLOAT3>("position", &tablePos.x, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &tableWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &tableHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &tableLength, 1.f, 0.0f, 100.f)
-        .end();
-    imgui->newWindow("left border controls")
-        //.attach<IMGUIFN::DRAGFLOAT3>("position", &leftBorderPos.x, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
-        .end();
-    imgui->newWindow("right border controls")
-        //.attach<IMGUIFN::DRAGFLOAT3>("position", &rightBorderPos.x, 1, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
-        .end();
-    imgui->newWindow("player pad controls")
-        .attach<IMGUIFN::DRAGFLOAT3>("position", &PlayerPos.x, 1, -200.f, 200.f)
-        .attach<IMGUIFN::DRAGFLOAT>("speed", &playerSpeed, 1, -200.f, 200.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
-        .end();
+    //imgui->newWindow("table controls")
+    //    .attach<IMGUIFN::DRAGFLOAT3>("position", &tablePos.x, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("width", &tableWidth, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("height", &tableHeight, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("length", &tableLength, 1.f, 0.0f, 100.f)
+    //    .end();
+    //imgui->newWindow("left border controls")
+    //    .attach<IMGUIFN::DRAGFLOAT3>("position", &leftBorderPos.x, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
+    //    .end();
+    //imgui->newWindow("right border controls")
+    //    .attach<IMGUIFN::DRAGFLOAT3>("position", &rightBorderPos.x, 1, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("width", &borderWidth, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("height", &borderHeight, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("length", &borderLength, 1.f, 0.0f, 100.f)
+    //    .end();
+    //imgui->newWindow("player pad controls")
+    //    .attach<IMGUIFN::DRAGFLOAT3>("position", &PlayerPos.x, 1, -200.f, 200.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("speed", &playerSpeed, 1, -200.f, 200.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("height", &padHeight, 1.f, 0.0f, 100.f)
+    //    .attach<IMGUIFN::DRAGFLOAT>("length", &padLength, 1.f, 0.0f, 100.f)
+    //    .end();
     //imgui->newWindow("AI pad controls")
     //    .attach<IMGUIFN::DRAGFLOAT3>("position", &AIPos.x, 1, -200.f, 200.f)
     //    .attach<IMGUIFN::DRAGFLOAT>("width", &padWidth, 1.f, 0.0f, 100.f)
@@ -209,7 +214,7 @@ void PongScene::updateGUI() {
     //    .end();
     imgui->newWindow("ball controls")
         .attach<IMGUIFN::DRAGFLOAT3>("position", &ballPosition.x, 1, -200.f, 200.f)
-        //.attach<IMGUIFN::DRAGFLOAT>("radius", &ballRadius, 1.f, 0.0f, 100.f)
+        .attach<IMGUIFN::DRAGFLOAT>("radius", &ballRadius, 1.f, 0.0f, 100.f)
         .attach<IMGUIFN::DRAGFLOAT>("speed", &ballSpeed, 1.f, 0.0f, 100.f)
         .end();
 #endif
@@ -252,7 +257,7 @@ void PongScene::updateGameObjects() {
         pl.attenuations = light.pointLights[0].attenuations;
         pl.setPosition(go_pos);
     }
-
+    updateProjectionSetting();
 }
 
 void PongScene::pushBall() {

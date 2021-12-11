@@ -14,13 +14,11 @@
 
 namespace App {
 
-    using namespace NGameObject;
-
     class PongScene final: public Scene {
     public:
         PongScene() = default;
         ~PongScene() = default;
-        bool initialize(GraphicsState& graphicsState) override;
+        bool initialize(GraphicsState& graphicsState, GraphicsSettings& graphicsSettings) override;
         void reset() override;
         const XMMATRIX& getViewMatrix() const override;
         const XMMATRIX& getProjectionMatrix() const override;
@@ -46,36 +44,34 @@ namespace App {
         RenderableGameObject playerPad;
         RenderableGameObject ball;
         LightInfo light;
-        Camera3D camera;
+
         float cameraSpeed = 0.1f;
 
-        GraphicsState* graphicsState = nullptr;
         ImGUIW* imgui;
 
-        const float tableWidth = 100;
-        const float tableLength = 200;
-        const float tableHeight = 1;
+        const float tableWidth = 180;
+        const float tableLength = 280;
         const XMFLOAT3 tablePos = { 0, 0, 0 };
 
-        const float borderWidth = 1;
-        const float borderLength = tableLength;
-        const float borderHeight = 5;
-        XMFLOAT3 leftBorderPos{};
-        XMFLOAT3 rightBorderPos{};
+        float borderWidth = 1;
+        float borderLength = tableLength;
+        float borderHeight = 5;
+        const XMFLOAT3 leftBorderPos{-90, 2, 0};
+        const XMFLOAT3 rightBorderPos{90, 2, 0};
 
         const float padWidth = 20;
         const float padHeight = 10;
         const float padLength = 2;
 
-        const XMFLOAT3 DefaultPlayerPos = { 0, 5,  -tableLength / 2 };
-        const XMFLOAT3 DefaultAIPos = { 0, 5, tableLength / 2 };
+        const XMFLOAT3 DefaultPlayerPos = { 0, -15,  -tableLength / 2 };
+        const XMFLOAT3 DefaultAIPos = { 0, -15, tableLength / 2 };
         const XMFLOAT3 AIToPlayerDirection = DefaultPlayerPos - DefaultAIPos;
         const XMFLOAT3 PlayerToAIDirection = DefaultAIPos - DefaultPlayerPos;
 
         XMFLOAT3 PlayerPos{};
         XMFLOAT3 AIPos{};
 
-        const float ballRadius = 1;
+        float ballRadius = 2;
         XMFLOAT3 ballPosition{};
         XMFLOAT3 ballDirection{};
 
@@ -96,5 +92,6 @@ namespace App {
         } gs;
 
         double update_time = 0;
+        bool free_camera = false;
     };
 }

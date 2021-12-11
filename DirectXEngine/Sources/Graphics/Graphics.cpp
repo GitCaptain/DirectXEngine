@@ -41,7 +41,10 @@ void Graphics::postRender() {
     spriteBatch->End();
     imgui->startFrame();
 
-    imgui->newWindow("settings")
+    imgui->newWindow("graphics settings")
+        .attach<IMGUIFN::DRAGFLOAT>("fov", &gSettings.fov, 1.f, 1.f, 180.f)
+        .attach<IMGUIFN::DRAGFLOAT>("nearZ", &gSettings.nearZ, 0.1f, 0.1f, 10.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("farZ", &gSettings.farZ, 100.f, 100.f, 5000.f)
         .attach<IMGUIFN::DRAGFLOAT>("gamma", &gSettings.gammaCoef, 0.1f, 0.1f, 3.0f)
         .attach<IMGUIFN::DRAGFLOAT>("exposure", &gSettings.exposure, 0.1f, 0.0f, 5.0f)
         .attach<IMGUIFN::CHECKBOX>("hdr", &gSettings.hdr)
@@ -61,7 +64,7 @@ bool Graphics::initializeRenderer(HWND hwnd, int width, int height) {
 }
 
 bool Graphics::initializeScene() {
-    return renderScene->initialize(getGraphicsState());
+    return renderScene->initialize(getGraphicsState(), gSettings);
 }
 
 void Graphics::initSprites() {
