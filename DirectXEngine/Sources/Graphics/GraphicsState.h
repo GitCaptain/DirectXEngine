@@ -11,4 +11,6 @@ struct GraphicsState {
 
 struct GraphicsSettings {
     float gammaCoef = 2.2f;
+    float exposure = 0.0f;
+    bool hdr = false;
 };
