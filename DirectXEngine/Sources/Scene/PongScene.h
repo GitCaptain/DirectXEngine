@@ -61,7 +61,7 @@ namespace App {
         const float padWidth = 16;
         const float padHeight = 18;
         const float padLength = 2;
-
+        const float defaultPadSpeed = 0.3;
         const XMFLOAT3 DefaultPlayerPos = { 0, -15,  -tableLength / 2 };
         const XMFLOAT3 DefaultAIPos = { 0, -15, tableLength / 2 };
         const XMFLOAT3 AIToPlayerDirection = DefaultPlayerPos - DefaultAIPos;
@@ -69,6 +69,7 @@ namespace App {
 
         XMFLOAT3 PlayerPos{};
         XMFLOAT3 AIPos{};
+        float AITargetPosX = DefaultAIPos.x;
 
         const float ballRadius = 2;
         const float ballRadWidth = 2.125f * ballRadius;

@@ -1,7 +1,7 @@
 #include "PongScene.h"
 #include <string>
 #include <format>
-#include <iostream>
+#include <cstdlib>
 
 using namespace App;
 
@@ -9,6 +9,8 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
 
     assert(graphicsState.device && "device is nullptr");
     assert(graphicsState.deviceContext && "deviceContext is nullptr");
+
+    std::srand(std::time(nullptr));
 
     this->graphicsState = &graphicsState;
     this->graphicsSettings = &graphicsSettings;
@@ -59,6 +61,16 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
 void PongScene::reset() {
     PlayerPos = DefaultPlayerPos;
     AIPos = DefaultAIPos;
+    playerSpeed = defaultPadSpeed;
+    AISpeed = defaultPadSpeed;
+    ballSpeed = 0;
+    if(gs.ballside == GameState::AI) {
+        // Move AI pad to random x position on the table before pushing the ball
+        const int randomXPos = std::rand();
+        AITargetPosX = leftBorderPos.x + tableWidth * ( static_cast<float>(randomXPos) / RAND_MAX);
+        AISpeed = defaultPadSpeed / 6;
+    }
+
     float ballz = tableLength / 2 - 2.5 * ballRadius;
     if (gs.ballside == GameState::AI) {
         ballPosition = { AIPos.x, 2.f, ballz};
@@ -67,9 +79,7 @@ void PongScene::reset() {
         ballPosition = { PlayerPos.x, 2.f, -ballz};
     }
 
-    playerSpeed = 0.3;
-    AISpeed = 0.3;
-    ballSpeed = 0;
+
     camera.setPosition(DefaultPlayerPos.x, tablePos.y + 50, DefaultPlayerPos.z - 20);
     camera.setLookAtPos((DefaultPlayerPos + tablePos)/2);
     timer.restartTimer();
@@ -250,6 +260,10 @@ void PongScene::updateGameObjects() {
     ball.setPosition(ballPosition);
     ball.setScale(ballRadius, ballRadius, ballRadius);
 
+    // if ball is in the game - it is AI target
+    if (gs.ballside == GameState::NONE) {
+        AITargetPosX = ballPosition.x;
+    }
     for (int i = 0; i < light.getLightsCnt(); i++) {
         auto& pl = light.pointLights[i];
         auto& go_pos = p_renderables[i]->getPositionFloat3();
@@ -262,6 +276,7 @@ void PongScene::updateGameObjects() {
 
     if(gs.ballside == GameState::AI && timer.getMillisecondsElapsed() > AIWaitTime) {
         timer.stopTimer();
+        AISpeed = defaultPadSpeed;
         pushBall();
     }
 }
@@ -282,10 +297,10 @@ void PongScene::pushBall() {
 
 void PongScene::updateAI(float dt) {
     // Move AI
-    if (AIPos.x < ballPosition.x) {
+    if (AIPos.x < AITargetPosX) {
         AIPos.x += dt * AISpeed;
     }
-    else if (AIPos.x > ballPosition.x) {
+    else if (AIPos.x > AITargetPosX) {
         AIPos.x -= dt * AISpeed;
     }
     AIPos.x = std::max(AIPos.x, leftBorderPos.x + padWidth / 2);
