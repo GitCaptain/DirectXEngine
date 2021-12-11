@@ -1,5 +1,6 @@
 #include "calculate_phong_tex.hlsli"
 #include "gamma_correction.hlsli"
+#include "tone_mapping.hlsli"
 
 Texture2D positionTex:        register(t0);
 Texture2D colorTex:           register(t1);
@@ -13,6 +14,14 @@ float4 main(float4 screenPos: SV_POSITION) : SV_TARGET{
     float3 worldPosition = positionTex.Load(texCoord);
 
     float4 lightedColor = calculateLightTex(worldPosition, sampleColor, normal, lightTexture);
+    if (hdr) {
+        if (exposure >= 0.01f) {
+            lightedColor = toneMap(lightedColor, exposure);
+        }
+        else {
+            lightedColor = toneMap(lightedColor);
+        }
+    }
     float4 correctedColor = getGammaCorrectedColor(lightedColor, gamma);
     return correctedColor;
 }

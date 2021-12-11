@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CALCULATE_PHONG_TEX_HLSLI_GUARD
+#define CALCULATE_PHONG_TEX_HLSLI_GUARD
 
 #include "ConstantBuffers.hlsli"
 
@@ -53,3 +54,5 @@ float4 calculateLightTex(float3 worldPosition, float3 sampleColor, float3 normal
 
     return float4(finalColor, 1.0f);
 }
+
+#endif // CALCULATE_PHONG_TEX_HLSLI_GUARD

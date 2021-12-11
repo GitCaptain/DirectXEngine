@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GAMMA_CORRECTION_HLSLI_GUARD
+#define GAMMA_CORRECTION_HLSLI_GUARD
 
 float4 getGammaCorrectedColor(float4 color, float gammaCoef) {
     float invertedGamma = 1 / gammaCoef;
@@ -6,3 +7,4 @@ float4 getGammaCorrectedColor(float4 color, float gammaCoef) {
     return float4(correctedColor, color.a);
 }
 
+#endif // GAMMA_CORRECTION_HLSLI_GUARD

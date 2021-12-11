@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CONSTANT_BUFFERS_HLSLI_GUARD
+#define CONSTANT_BUFFERS_HLSLI_GUARD
 
 cbuffer ambientLightBuffer: register(b0) {
     float3 ambientLightColor;
@@ -24,4 +25,8 @@ cbuffer lightsCountBuffer: register(b3) {
 
 cbuffer lightsCountBuffer : register(b4) {
     float gamma;
+    float exposure;
+    bool hdr;
 }
+
+#endif // CONSTANT_BUFFERS_HLSLI_GUARD
