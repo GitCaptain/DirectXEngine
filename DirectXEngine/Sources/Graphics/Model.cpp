@@ -113,8 +113,19 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     std::vector<Texture> textures = LoadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, scene);
     std::vector<Texture> specularTex = LoadMaterialTextures(material, aiTextureType_SPECULAR, scene);
+
+    float specPower, specStrength;
+    aiReturn load;
+    load = material->Get(AI_MATKEY_SHININESS, specPower);
+    if (load != aiReturn_SUCCESS) {
+        specPower = 1.0f;
+    }
+    load = material->Get(AI_MATKEY_SHININESS_STRENGTH, specStrength);
+    if(load != aiReturn_SUCCESS) {
+        specStrength = 1.0f;
+    }
     textures.insert(textures.end(), specularTex.begin(), specularTex.end());
-    return Mesh(device, vertices, indices, textures, transformMatrix);
+    return Mesh(device, vertices, indices, textures, transformMatrix, specPower, specStrength);
 }
 
 TextureStorageType Model::determineTextureStorageType(
