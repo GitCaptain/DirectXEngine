@@ -107,6 +107,7 @@ void DeferredRenderer::geometryPass(const App::Scene* const scene, const float b
 
     deviceContext->PSSetShader(ps_geometry_pass.getShader(), nullptr, 0);
     deviceContext->PSSetSamplers(0, 1, samplerState.GetAddressOf());
+    deviceContext->PSSetConstantBuffers(1, 1, cb_ps_pointlight.GetAddressOf());
 
     deviceContext->OMSetBlendState(nullptr, nullptr, 0xFFFFFFFF);
     deviceContext->OMSetDepthStencilState(depthStencilState.Get(), 0);
@@ -141,8 +142,11 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
 
     // do not use DepthStencil buffer, we already render only what we need to the texture
     deviceContext->OMSetDepthStencilState(nullptr, 0);
-    // Remove 2 previous render targets
-    ID3D11RenderTargetView* views[sz] = { renderTargetView.Get(), nullptr, nullptr };
+    // Remove all previous render targets
+    ID3D11RenderTargetView* views[sz] = { renderTargetView.Get()};
+    for(int i = 1; i < sz; i++) {
+        views[i] = nullptr;
+    }
     deviceContext->OMSetRenderTargets(sz, views, nullptr);
     // set gbuffer textures as current pass resource
     // only after unbinding it from previous pass render targets
@@ -153,7 +157,6 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
     const DirectX::XMFLOAT3 camPos = scene->getCameraInfo().getPositionFloat3();
     cb_ps_camera.data.cameraWorldPosition = camPos;
     cb_ps_camera.applyChanges();
-    ///
 
     applyGraphicsSettings(gSettings);
 
@@ -164,7 +167,7 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
 bool DeferredRenderer::initVertexBuffers() {
 
     constexpr size_t vcnt = 6;
-    VertexPosition3D vp[vcnt] = {
+    VertexPosition2D vp[vcnt] = {
         {-1, -1},
         {-1, 1},
         {1, 1},
@@ -179,7 +182,7 @@ bool DeferredRenderer::initVertexBuffers() {
 }
 
 void DeferredRenderer::drawLights(const LightInfo& lightInfo, const XMMATRIX& viewProj) {
-    prepareLights(lightInfo, 3);
+    prepareLights(lightInfo, 4);
     const UINT offset = 0;
     deviceContext->IASetVertexBuffers(0, 1, light_pass_vertex_buf.GetAddressOf(), light_pass_vertex_buf.getStridePtr(), &offset);
     deviceContext->Draw(light_pass_vertex_buf.getVertexCount(), 0);

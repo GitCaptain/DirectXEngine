@@ -16,16 +16,24 @@ float3 loadTexel3At(int pos, Texture1D srcTexture) {
     return res;
 }
 
-float4 calculateLightTex(float3 worldPosition, float3 sampleColor, float3 normal, Texture1D lightTexture) {
+float4 calculateLightTex(
+    float3 worldPosition,
+    float3 sampleColor,
+    float3 normal,
+    float3 specularColor,
+    float specularStrength,
+    float specularPower,
+    Texture1D lightTexture
+) {
 
     //ambient
-    float3 ambientLight = ambientLightColor * ambientLightStrength;
+    float3 ambientLight = cb_ambientLightColor * cb_ambientLightStrength;
 
     float3 diffuseLight = float3(0, 0, 0);
     float3 specularLight = float3(0, 0, 0);
-    [loop] for (int i = 0, texCoord = 0; i < lightsCount; i++, texCoord += 10) {
+    [loop] for (int i = 0, texCoord = 0; i < cb_lightsCount; i++, texCoord += 10) {
         //diffuse
-        float3 pointLightColor = loadTexel3At(texCoord, lightTexture);;
+        float3 pointLightColor = loadTexel3At(texCoord, lightTexture);
         float3 pointLightAttenuations = loadTexel3At(texCoord + 3, lightTexture);
         float3 pointLightPosition = loadTexel3At(texCoord + 6, lightTexture);
         float pointLightStrength = loadTexelAt(texCoord + 9, lightTexture);
@@ -42,11 +50,11 @@ float4 calculateLightTex(float3 worldPosition, float3 sampleColor, float3 normal
             float3 diffuseLightIntensity = max(dot(vectorToLight, normal), 0) / attenuationFactor;
             diffuseLight += pointLightColor * diffuseLightIntensity * pointLightStrength;
         }
-        ////specular
-        //float3 viewDirection = normalize(cameraWorldPos - worldPosition);
-        //float3 reflectDirection = reflect(-vectorToLight, normal);
-        //float specular = pow(max(dot(viewDirection, reflectDirection), 0.0), shinessPower);
-        //specularLight += specularStrength * specular * pointLightColor;
+        //specularColor
+        float3 viewDirection = normalize(cb_cameraWorldPos - worldPosition);
+        float3 reflectDirection = reflect(-vectorToLight, normal);
+        float specularIntensity = pow(max(dot(viewDirection, reflectDirection), 0.0), specularPower);
+        specularLight += specularStrength * specularIntensity * specularColor;
 
     }
 

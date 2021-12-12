@@ -2,31 +2,31 @@
 #define CONSTANT_BUFFERS_HLSLI_GUARD
 
 cbuffer ambientLightBuffer: register(b0) {
-    float3 ambientLightColor;
-    float ambientLightStrength;
+    float3 cb_ambientLightColor;
+    float cb_ambientLightStrength;
 }
 
 cbuffer PointLightBuffer: register(b1) {
-    float3 pointLightColor;
-    float pointLightStrength;
-    float3 pointLightPosition;
-    float specularStrength;
-    float3 pointLightattenuations;
-    float shinessPower;
+    float3 cb_pointLightColor;
+    float cb_pointLightStrength;
+    float3 cb_pointLightPosition;
+    float cb_specularStrength;
+    float3 cb_pointLightattenuations;
+    float cb_shinessPower;
 }
 
 cbuffer cameraBuffer: register(b2) {
-    float3 cameraWorldPos;
+    float3 cb_cameraWorldPos;
 }
 
 cbuffer lightsCountBuffer: register(b3) {
-    int lightsCount;
+    int cb_lightsCount;
 }
 
 cbuffer lightsCountBuffer : register(b4) {
-    float gamma;
-    float exposure;
-    bool hdr;
+    float cb_gamma;
+    float cb_exposure;
+    bool cb_hdr;
 }
 
 #endif // CONSTANT_BUFFERS_HLSLI_GUARD

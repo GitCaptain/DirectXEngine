@@ -4,8 +4,9 @@
 #include "Texture.h"
 #include "../ErrorLogger.h"
 
-Texture::Texture(ID3D11Device* device, const Colors::Color& color, aiTextureType type, bool forceSRGB) {
-    initialize1x1ColorTexture(device, color, type, forceSRGB);
+Texture::Texture(ID3D11Device* device, const Colors::Color& color, aiTextureType type) {
+    this->type = type;
+    initialize1x1ColorTexture(device, color);
 }
 
 Texture::Texture(
@@ -13,13 +14,13 @@ Texture::Texture(
     const Colors::Color* colorData,
     UINT width,
     UINT height,
-    aiTextureType type,
-    bool forceSRGB
+    aiTextureType type
 ) {
-    initializeColorTexture(device, colorData, width, height, type, forceSRGB);
+    this->type = type;
+    initializeColorTexture(device, colorData, width, height);
 }
 
-Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureType type, bool forceSRGB) {
+Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureType type) {
 
     this->type = type;
     HRESULT hr;
@@ -34,7 +35,7 @@ Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureTyp
             D3D11_BIND_SHADER_RESOURCE,
             0,
             0,
-            forceSRGB,
+            forceSRGB(),
             &texture,
             &diffuseTextureView
         );
@@ -48,18 +49,18 @@ Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureTyp
             D3D11_BIND_SHADER_RESOURCE,
             0,
             0,
-            forceSRGB ? DirectX::WIC_LOADER_FORCE_SRGB : DirectX::WIC_LOADER_DEFAULT,
+            forceSRGB() ? DirectX::WIC_LOADER_FORCE_SRGB : DirectX::WIC_LOADER_DEFAULT,
             &texture,
             &diffuseTextureView
         );
     }
     if (FAILED(hr)) {
-        initialize1x1ColorTexture(device, Colors::UnloadedTextureColor, type, forceSRGB);
+        initialize1x1ColorTexture(device, Colors::UnloadedTextureColor);
     }
     return;
 }
 
-Texture::Texture(ID3D11Device* device, const uint8_t* pData, size_t size, aiTextureType type, bool forceSRGB) {
+Texture::Texture(ID3D11Device* device, const uint8_t* pData, size_t size, aiTextureType type) {
     this->type = type;
     HRESULT hr = DirectX::CreateWICTextureFromMemoryEx(
         device,
@@ -70,7 +71,7 @@ Texture::Texture(ID3D11Device* device, const uint8_t* pData, size_t size, aiText
         D3D11_BIND_SHADER_RESOURCE,
         0,
         0,
-        forceSRGB? DirectX::WIC_LOADER_FORCE_SRGB: DirectX::WIC_LOADER_DEFAULT,
+        forceSRGB()? DirectX::WIC_LOADER_FORCE_SRGB: DirectX::WIC_LOADER_DEFAULT,
         texture.GetAddressOf(),
         diffuseTextureView.GetAddressOf()
     );
@@ -91,23 +92,18 @@ ID3D11ShaderResourceView* const* Texture::getTextureResourceViewAddress() const 
 
 void Texture::initialize1x1ColorTexture(
     ID3D11Device* device,
-    const Colors::Color& colorData,
-    aiTextureType type,
-    bool srgb
+    const Colors::Color& colorData
 ) {
-    initializeColorTexture(device, &colorData, 1, 1, type, srgb);
+    initializeColorTexture(device, &colorData, 1, 1);
 }
 
 void Texture::initializeColorTexture(
     ID3D11Device* device,
     const Colors::Color* colorData,
     UINT width,
-    UINT height,
-    aiTextureType type_,
-    bool srgb
+    UINT height
 ) {
-    type = type_;
-    DXGI_FORMAT textureFormat = srgb? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: DXGI_FORMAT_R8G8B8A8_UNORM;
+    DXGI_FORMAT textureFormat = forceSRGB()? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: DXGI_FORMAT_R8G8B8A8_UNORM;
     CD3D11_TEXTURE2D_DESC textureDesc(textureFormat, width, height);
     ID3D11Texture2D *p2DTexture = nullptr;
     D3D11_SUBRESOURCE_DATA initialData{};
@@ -119,4 +115,8 @@ void Texture::initializeColorTexture(
     CD3D11_SHADER_RESOURCE_VIEW_DESC srvDesc(D3D11_SRV_DIMENSION_TEXTURE2D, textureDesc.Format);
     hr = device->CreateShaderResourceView(texture.Get(), &srvDesc, diffuseTextureView.GetAddressOf());
     COM_ERROR_IF_FAILED(hr, "Failed to create shader resource view from texture generated from color data.");
+}
+
+bool Texture::forceSRGB() {
+    return type == aiTextureType_DIFFUSE;
 }

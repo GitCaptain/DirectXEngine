@@ -10,8 +10,8 @@ struct GBuffer final {
     template<typename T>
     using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-    static const int BUFFER_COUNT = 3;
-    enum BUFFER_DESC{WORLD_POSITION = 0, COLOR = 1, NORMAL = 2};
+    static const int BUFFER_COUNT = 4;
+    enum BUFFER_DESC{WORLD_POSITION = 0, COLOR = 1, NORMAL = 2, SPECULAR = 3};
 
     std::array<ComPtr<ID3D11Texture2D>, BUFFER_COUNT> renderTargetTextures{};
     std::array<ComPtr<ID3D11RenderTargetView>, BUFFER_COUNT> renderTargetViews{};
@@ -37,7 +37,7 @@ private:
         const XMMATRIX& viewProj
     );
 
-    VertexBuffer<VertexPosition3D> light_pass_vertex_buf;
+    VertexBuffer<VertexPosition2D> light_pass_vertex_buf;
     IndexBuffer light_pass_index_buf;
 
     VertexShader vs_geometry_pass;
