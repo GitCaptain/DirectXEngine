@@ -31,6 +31,7 @@ namespace App {
         void updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) override;
         void updateGUI() override;
         void updateGameObjects() override;
+        bool initGameObjects();
     private:
 
         std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
@@ -42,6 +43,7 @@ namespace App {
         RenderableGameObject AIPad;
         RenderableGameObject playerPad;
         RenderableGameObject ball;
+        std::array<RenderableGameObject, 10> stops;
         LightInfo light;
 
         float cameraSpeed = 0.1f;
@@ -103,8 +105,10 @@ namespace App {
         const float AIWaitTime = 1000.0f; // time (millis) to wait after goal before pushing the ball
         Timer AIDelayTimer;
 #ifndef NDEBUG
+        bool reset_camera = false;
         bool free_camera = true;
 #else
+        bool reset_camera = true;
         bool free_camera = false;
 #endif
 

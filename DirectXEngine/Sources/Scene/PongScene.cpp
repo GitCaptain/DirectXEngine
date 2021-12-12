@@ -18,32 +18,65 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
     windowWidth = graphicsState.windowWidth;
     windowHeight = graphicsState.windowHeight;
 
-    if (!ball.initialize("Resources\\Objects\\golf_ball\\10507_Golf Ball_v1_L3.obj", graphicsState.device)) {
-        return false;
-    }
-    if (!table.initialize("Resources\\Objects\\pingpongtable\\10520_pingpongtable_L2.obj", graphicsState.device)) {
-        return false;
-    }
-    if (!AIPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState.device)) {
-        return false;
-    }
-    if (!playerPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState.device)) {
+    if (!initGameObjects()) {
         return false;
     }
 
-    p_renderables = { &ball, &table, &AIPad, &playerPad};
+    spriteBatch = std::make_unique<DirectX::SpriteBatch>(graphicsState.deviceContext);
+    spriteFont = std::make_unique<DirectX::SpriteFont>(graphicsState.device, L"Resources\\Fonts\\comic_sans_ms_16.spritefont");
+
+    imgui = ImGUIWInstance::getPInstance();
+    updateProjectionSetting();
+    reset();
+    return true;
+}
+
+bool PongScene::initGameObjects() {
+    if (!ball.initialize("Resources\\Objects\\golf_ball\\10507_Golf Ball_v1_L3.obj", graphicsState->device)) {
+        return false;
+    }
+    if (!table.initialize("Resources\\Objects\\pingpongtable\\10520_pingpongtable_L2.obj", graphicsState->device)) {
+        return false;
+    }
+    if (!AIPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState->device)) {
+        return false;
+    }
+    if (!playerPad.initialize("Resources\\Objects\\Pingpong_paddle\\10519_Pingpong_paddle_v1_L3.obj", graphicsState->device)) {
+        return false;
+    }
+    p_renderables = { &ball, &table, &AIPad, &playerPad };
+
+    const float signGap = tableLength / (stops.size() / 2);
+    const float halfTable = tableLength / 2;
+    auto setupStopSigns = [&](int arrInd, const XMFLOAT3& rel) {
+        const int initInd = arrInd / 2;
+        if (!stops[arrInd].initialize("Resources\\Objects\\StopSign\\StopSign1.obj", graphicsState->device)) {
+            return false;
+        }
+        stops[arrInd].setRotation(-PI / 2, arrInd & 1 ? PI / 2 : -PI / 2, 0);
+        stops[arrInd].setScale(3, 3, 3);
+        stops[arrInd].setPosition(rel.x, rel.y, -halfTable + initInd * signGap);
+        p_renderables.push_back(&stops[arrInd]);
+        return true;
+    };
+    for (size_t i = 0; i < stops.size() / 2; i++) {
+        if (!setupStopSigns(2 * i, leftBorderPos) || !setupStopSigns(2 * i + 1, rightBorderPos)) {
+            return false;
+        }
+    }
+
     constexpr int max_light_cnt = 128;
-    light.initialize(graphicsState, max_light_cnt);
+    light.initialize(*graphicsState, max_light_cnt);
     light.ambient.lightStrength = 0.0;
     for (int i = 0; i < max_light_cnt; i++) {
         light.pointLights.emplace_back();
         auto& bulb = light.pointLights.back();
-        bulb.lightColor = {i % 2 ? 1.f: 0.f, i % 3? 1.f: 0.f, i % 5? 1.f: 0.f};
-        if(i%30 == 0) {
+        bulb.lightColor = { i % 2 ? 1.f : 0.f, i % 3 ? 1.f : 0.f, i % 5 ? 1.f : 0.f };
+        if (i % 30 == 0) {
             bulb.lightColor = { 1.0f, 1.0f, 1.0f };
         }
         bulb.attenuations = { 0.001, 0.001, 0.001 };
-        if (!bulb.initialize("Resources\\Objects\\light.fbx", graphicsState.device)) {
+        if (!bulb.initialize("Resources\\Objects\\light.fbx", graphicsState->device)) {
             return false;
         }
         bulb.setScale(0.5, 0.5, 0.5);
@@ -51,13 +84,13 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
     }
 
     light.pointLights[0].setPosition(AIPos);
-    light.pointLights[0].adjustPosition(padWidth/2, 0, 0);
+    light.pointLights[0].adjustPosition(padWidth / 2, 0, 0);
     light.pointLights[1].setPosition(AIPos);
     light.pointLights[1].adjustPosition(-padWidth / 2, 0, 0);
     light.pointLights[2].setPosition(AIPos);
-    light.pointLights[2].adjustPosition(0, padHeight/2, 0);
+    light.pointLights[2].adjustPosition(0, padHeight / 2, 0);
     light.pointLights[3].setPosition(AIPos);
-    light.pointLights[3].adjustPosition(0, -padHeight/2, 0);
+    light.pointLights[3].adjustPosition(0, -padHeight / 2, 0);
     light.pointLights[4].setPosition(PlayerPos);
     light.pointLights[4].adjustPosition(padWidth / 2, 0, 0);
     light.pointLights[5].setPosition(PlayerPos);
@@ -69,14 +102,13 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
 
 
     const size_t perBorderLightsCnt = 10;
-    const float halfTable = tableLength / 2;
     const float lightGap = tableLength / perBorderLightsCnt;
     for (size_t cnt = 0, i = 8; cnt < perBorderLightsCnt; cnt++, i++) {
-        light.pointLights[2*i].setPosition(leftBorderPos.x, leftBorderPos.y, -halfTable + i * lightGap);
-        light.pointLights[2*i].setRotation(0, PI/2, 0);
+        light.pointLights[2 * i].setPosition(leftBorderPos.x, leftBorderPos.y, -halfTable + i * lightGap);
+        light.pointLights[2 * i].setRotation(0, PI / 2, 0);
 
-        light.pointLights[2*i+1].setPosition(rightBorderPos.x, rightBorderPos.y, -halfTable + i * lightGap);
-        light.pointLights[2*i+1].setRotation(0, -PI/2, 0);
+        light.pointLights[2 * i + 1].setPosition(rightBorderPos.x, rightBorderPos.y, -halfTable + i * lightGap);
+        light.pointLights[2 * i + 1].setRotation(0, -PI / 2, 0);
     }
 
     const size_t perDimfloorBulbCnt = 10;
@@ -85,16 +117,9 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
     for (size_t wi = 0, i = 2 * perBorderLightsCnt; wi < perDimfloorBulbCnt; wi++) {
         for (size_t li = 0; li < perDimfloorBulbCnt; li++, i++) {
             light.pointLights[i].setPosition(leftBorderPos.x + wi * widthGap, 50, DefaultPlayerPos.z + li * lengthGap);
-            light.pointLights[i].setRotation(PI/2, 0, 0);
+            light.pointLights[i].setRotation(PI / 2, 0, 0);
         }
     }
-
-    spriteBatch = std::make_unique<DirectX::SpriteBatch>(graphicsState.deviceContext);
-    spriteFont = std::make_unique<DirectX::SpriteFont>(graphicsState.device, L"Resources\\Fonts\\comic_sans_ms_16.spritefont");
-
-    imgui = ImGUIWInstance::getPInstance();
-    updateProjectionSetting();
-    reset();
     return true;
 }
 
@@ -217,6 +242,7 @@ void PongScene::updateGUI() {
 
     imgui->newWindow("game settings")
         .attach<IMGUIFN::CHECKBOX>("Free camera", &free_camera)
+        .attach<IMGUIFN::CHECKBOX>("Reset camera", &reset_camera)
         .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
         .end();
 
