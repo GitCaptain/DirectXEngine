@@ -34,6 +34,7 @@ namespace Colors {
         };
     };
 
+    const Color NoSpecularTextureColor(0, 0, 0);
     const Color UnloadedTextureColor(0, 255, 0);
     const Color UnhandledTextureColor(250, 0, 0);
 }
