@@ -141,8 +141,11 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
 
     // do not use DepthStencil buffer, we already render only what we need to the texture
     deviceContext->OMSetDepthStencilState(nullptr, 0);
-    // Remove 2 previous render targets
-    ID3D11RenderTargetView* views[sz] = { renderTargetView.Get(), nullptr, nullptr };
+    // Remove all previous render targets
+    ID3D11RenderTargetView* views[sz] = { renderTargetView.Get()};
+    for(int i = 1; i < sz; i++) {
+        views[i] = nullptr;
+    }
     deviceContext->OMSetRenderTargets(sz, views, nullptr);
     // set gbuffer textures as current pass resource
     // only after unbinding it from previous pass render targets
