@@ -83,24 +83,6 @@ bool PongScene::initGameObjects() {
         p_renderables.push_back(&bulb);
     }
 
-    light.pointLights[0].setPosition(AIPos);
-    light.pointLights[0].adjustPosition(padWidth / 2, 0, 0);
-    light.pointLights[1].setPosition(AIPos);
-    light.pointLights[1].adjustPosition(-padWidth / 2, 0, 0);
-    light.pointLights[2].setPosition(AIPos);
-    light.pointLights[2].adjustPosition(0, padHeight / 2, 0);
-    light.pointLights[3].setPosition(AIPos);
-    light.pointLights[3].adjustPosition(0, -padHeight / 2, 0);
-    light.pointLights[4].setPosition(PlayerPos);
-    light.pointLights[4].adjustPosition(padWidth / 2, 0, 0);
-    light.pointLights[5].setPosition(PlayerPos);
-    light.pointLights[5].adjustPosition(-padWidth / 2, 0, 0);
-    light.pointLights[6].setPosition(PlayerPos);
-    light.pointLights[6].adjustPosition(0, padHeight / 2, 0);
-    light.pointLights[7].setPosition(PlayerPos);
-    light.pointLights[7].adjustPosition(0, -padHeight / 2, 0);
-
-
     const size_t perBorderLightsCnt = 10;
     const float lightGap = tableLength / perBorderLightsCnt;
     for (size_t cnt = 0, i = 8; cnt < perBorderLightsCnt; cnt++, i++) {
@@ -144,8 +126,10 @@ void PongScene::reset() {
         ballPosition = { PlayerPos.x, 2.f, -ballz};
     }
 
-    camera.setPosition(DefaultPlayerPos.x, tablePos.y + 50, DefaultPlayerPos.z - 20);
-    camera.setLookAtPos((DefaultPlayerPos + tablePos)/2);
+    if (reset_camera) {
+        camera.setPosition(DefaultPlayerPos.x, tablePos.y + 50, DefaultPlayerPos.z - 20);
+        camera.setLookAtPos((DefaultPlayerPos + tablePos) / 2);
+    }
     AIDelayTimer.restartTimer();
 }
 
@@ -325,6 +309,24 @@ void PongScene::updateGameObjects() {
 
     ball.setPosition(ballPosition);
     ball.setScale(ballRadius, ballRadius, ballRadius);
+
+    const float lightUp = 20;
+    light.pointLights[0].setPosition(AIPos);
+    light.pointLights[0].adjustPosition(padWidth / 2, lightUp, 0);
+    light.pointLights[1].setPosition(AIPos);
+    light.pointLights[1].adjustPosition(-padWidth / 2, lightUp, 0);
+    light.pointLights[2].setPosition(AIPos);
+    light.pointLights[2].adjustPosition(0, padHeight / 2 + lightUp, 0);
+    light.pointLights[3].setPosition(AIPos);
+    light.pointLights[3].adjustPosition(0, -padHeight / 2 + lightUp, 0);
+    light.pointLights[4].setPosition(PlayerPos);
+    light.pointLights[4].adjustPosition(padWidth / 2, lightUp, 0);
+    light.pointLights[5].setPosition(PlayerPos);
+    light.pointLights[5].adjustPosition(-padWidth / 2, lightUp, 0);
+    light.pointLights[6].setPosition(PlayerPos);
+    light.pointLights[6].adjustPosition(0, padHeight / 2 + lightUp, 0);
+    light.pointLights[7].setPosition(PlayerPos);
+    light.pointLights[7].adjustPosition(0, -padHeight / 2 + lightUp, 0);
 
     // if ball is in the game - it is AI target
     if (gs.ballside == GameState::NONE) {
