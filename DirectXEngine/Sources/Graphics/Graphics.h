@@ -34,4 +34,5 @@ private:
     ImGUIW *imgui = nullptr;
 
     GraphicsSettings gSettings;
+    bool showfps = false;
 };
