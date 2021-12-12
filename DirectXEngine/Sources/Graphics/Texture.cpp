@@ -35,7 +35,7 @@ Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureTyp
             D3D11_BIND_SHADER_RESOURCE,
             0,
             0,
-            doForceSRGB(),
+            forceSRGB(),
             &texture,
             &diffuseTextureView
         );
@@ -49,7 +49,7 @@ Texture::Texture(ID3D11Device* device, const std::string& filePath, aiTextureTyp
             D3D11_BIND_SHADER_RESOURCE,
             0,
             0,
-            doForceSRGB() ? DirectX::WIC_LOADER_FORCE_SRGB : DirectX::WIC_LOADER_DEFAULT,
+            forceSRGB() ? DirectX::WIC_LOADER_FORCE_SRGB : DirectX::WIC_LOADER_DEFAULT,
             &texture,
             &diffuseTextureView
         );
@@ -71,7 +71,7 @@ Texture::Texture(ID3D11Device* device, const uint8_t* pData, size_t size, aiText
         D3D11_BIND_SHADER_RESOURCE,
         0,
         0,
-        doForceSRGB()? DirectX::WIC_LOADER_FORCE_SRGB: DirectX::WIC_LOADER_DEFAULT,
+        forceSRGB()? DirectX::WIC_LOADER_FORCE_SRGB: DirectX::WIC_LOADER_DEFAULT,
         texture.GetAddressOf(),
         diffuseTextureView.GetAddressOf()
     );
@@ -103,7 +103,7 @@ void Texture::initializeColorTexture(
     UINT width,
     UINT height
 ) {
-    DXGI_FORMAT textureFormat = doForceSRGB()? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: DXGI_FORMAT_R8G8B8A8_UNORM;
+    DXGI_FORMAT textureFormat = forceSRGB()? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB: DXGI_FORMAT_R8G8B8A8_UNORM;
     CD3D11_TEXTURE2D_DESC textureDesc(textureFormat, width, height);
     ID3D11Texture2D *p2DTexture = nullptr;
     D3D11_SUBRESOURCE_DATA initialData{};
@@ -117,6 +117,6 @@ void Texture::initializeColorTexture(
     COM_ERROR_IF_FAILED(hr, "Failed to create shader resource view from texture generated from color data.");
 }
 
-bool Texture::doForceSRGB() {
+bool Texture::forceSRGB() {
     return type == aiTextureType_DIFFUSE;
 }

@@ -42,7 +42,7 @@ private:
         UINT width,
         UINT height
     );
-    bool doForceSRGB();
+    bool forceSRGB();
     Microsoft::WRL::ComPtr<ID3D11Resource> texture = nullptr;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> diffuseTextureView = nullptr;
     aiTextureType type = aiTextureType::aiTextureType_UNKNOWN;
