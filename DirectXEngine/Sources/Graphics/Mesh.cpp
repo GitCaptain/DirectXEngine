@@ -1,10 +1,14 @@
 #include "Mesh.h"
 
-Mesh::Mesh(ID3D11Device* device,
-           std::vector<Vertex3D>& vertices,
-           std::vector<DWORD> &indices,
-           std::vector<Texture>& textures,
-           const DirectX::XMMATRIX& transformMatrix): textures(textures), transformMatrix(transformMatrix) {
+Mesh::Mesh(
+    ID3D11Device* device,
+    std::vector<Vertex3D>& vertices,
+    std::vector<DWORD> &indices,
+    std::vector<Texture>& textures,
+    const DirectX::XMMATRIX& transformMatrix,
+    float specularPower,
+    float specularStrength
+): textures(textures), transformMatrix(transformMatrix), specPower(specularPower), specStrength(specularStrength) {
 
     HRESULT hr = vertexBuffer.initialize(device, vertices.data(), vertices.size());
     COM_ERROR_IF_FAILED(hr, "Failed to initialize vertex buffer for mesh");
@@ -32,4 +36,8 @@ const Texture* Mesh::getTexture(aiTextureType texType) const {
         }
     }
     return nullptr;
+}
+
+const std::pair<float, float> Mesh::getSpecularParams() const {
+    return {specPower, specStrength};
 }
