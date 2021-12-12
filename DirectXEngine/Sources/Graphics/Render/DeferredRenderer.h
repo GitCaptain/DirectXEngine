@@ -37,7 +37,7 @@ private:
         const XMMATRIX& viewProj
     );
 
-    VertexBuffer<VertexPosition3D> light_pass_vertex_buf;
+    VertexBuffer<VertexPosition2D> light_pass_vertex_buf;
     IndexBuffer light_pass_index_buf;
 
     VertexShader vs_geometry_pass;

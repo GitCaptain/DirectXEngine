@@ -164,7 +164,7 @@ void DeferredRenderer::lightPass(const App::Scene* const scene, const float bgco
 bool DeferredRenderer::initVertexBuffers() {
 
     constexpr size_t vcnt = 6;
-    VertexPosition3D vp[vcnt] = {
+    VertexPosition2D vp[vcnt] = {
         {-1, -1},
         {-1, 1},
         {1, 1},
