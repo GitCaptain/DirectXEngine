@@ -306,13 +306,26 @@ void Renderer::draw(const std::vector<const RenderableGameObject*>& renderables,
             const VertexBuffer<Vertex3D>& vertexBuffer = mesh.getVertexBuffer();
             const IndexBuffer& indexBuffer = mesh.getIndexBuffer();
             const UINT offset = 0;
-            const Texture* const t = mesh.getTexture();
-            if (t) {
-                deviceContext->PSSetShaderResources(0, 1, t->getTextureResourceViewAddress());
+            const Texture* const diffuseTex = mesh.getTexture();
+            const Texture* const specularTex = mesh.getTexture(aiTextureType_SPECULAR);
+            if (diffuseTex) {
+                deviceContext->PSSetShaderResources(0, 1, diffuseTex->getTextureResourceViewAddress());
             }
+            if(specularTex) {
+                deviceContext->PSSetShaderResources(1, 1, specularTex->getTextureResourceViewAddress());
+            }
+
+            // set transform matrix
             cb_vs_vertexshader.data.worldViewProjectionMatrix = mesh.getTransformMatrix() * worldViewProjectionMatrix;
             cb_vs_vertexshader.data.worldMatrix = mesh.getTransformMatrix() * worldMatrix;
             cb_vs_vertexshader.applyChanges();
+
+            // set specular info
+            auto spec = mesh.getSpecularParams();
+            cb_ps_pointlight.data.shinessPower = spec.first;
+            cb_ps_pointlight.data.specularStrength = spec.second;
+            cb_ps_pointlight.applyChanges();
+
             deviceContext->IASetVertexBuffers(0, 1, vertexBuffer.GetAddressOf(), vertexBuffer.getStridePtr(), &offset);
             deviceContext->IASetIndexBuffer(indexBuffer.Get(), DXGI_FORMAT::DXGI_FORMAT_R32_UINT, 0);
             deviceContext->DrawIndexed(indexBuffer.getIndexCount(), 0, 0);

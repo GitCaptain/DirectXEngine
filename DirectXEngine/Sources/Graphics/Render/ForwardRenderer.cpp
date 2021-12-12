@@ -36,29 +36,13 @@ void ForwardRenderer::preparePipeline() {
 void ForwardRenderer::renderScene(const App::Scene* const scene, const GraphicsSettings* gs, const float bgcolor[4] ) {
     deviceContext->ClearRenderTargetView(renderTargetView.Get(), bgcolor);
     deviceContext->ClearDepthStencilView(depthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-    // update lights (only one light allowed in forward renderer for now)
     const LightInfo& light = scene->getLightInfo();
-    prepareLights(light, 1);
-    //cb_ps_ambientlight.data.color = light.ambient.lightColor;
-    //cb_ps_ambientlight.data.strength = light.ambient.lightStrength;
-    //cb_ps_ambientlight.applyChanges();
-
-    //cb_ps_pointlight.data.color = light.pointLights[0].lightColor;
-    //cb_ps_pointlight.data.strength = light.pointLights[0].lightStrength;
-    //cb_ps_pointlight.data.position = light.pointLights[0].getPositionFloat3();
-    //cb_ps_pointlight.data.attenuations = light.pointLights[0].attenuations;
-
-    //// Should be configured from the material
-    //cb_ps_pointlight.data.shinessPower = 32;
-    //cb_ps_pointlight.data.specularStrength = 0.5;
-
-    //cb_ps_pointlight.applyChanges();
+    prepareLights(light, 2);
 
     // update camera
     const DirectX::XMFLOAT3 camPos = scene->getCameraInfo().getPositionFloat3();
     cb_ps_camera.data.cameraWorldPosition = camPos;
     cb_ps_camera.applyChanges();
-    ///
 
     applyGraphicsSettings(gs);
 
