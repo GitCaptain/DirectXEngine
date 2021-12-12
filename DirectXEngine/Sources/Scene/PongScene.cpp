@@ -21,13 +21,6 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
     if (!ball.initialize("Resources\\Objects\\golf_ball\\10507_Golf Ball_v1_L3.obj", graphicsState.device)) {
         return false;
     }
-    if (!leftBorder.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
-        return false;
-    }
-    if (!rightBorder.initialize("Resources\\Objects\\cube3d.fbx", graphicsState.device)) {
-        return false;
-    }
-
     if (!table.initialize("Resources\\Objects\\pingpongtable\\10520_pingpongtable_L2.obj", graphicsState.device)) {
         return false;
     }
@@ -38,15 +31,62 @@ bool PongScene::initialize(GraphicsState& graphicsState, GraphicsSettings& graph
         return false;
     }
 
-    p_renderables = { &ball, &leftBorder, &rightBorder, &table, &AIPad, &playerPad};
-    constexpr int max_light_cnt = 6;
+    p_renderables = { &ball, &table, &AIPad, &playerPad};
+    constexpr int max_light_cnt = 128;
     light.initialize(graphicsState, max_light_cnt);
+    light.ambient.lightStrength = 0.0;
     for (int i = 0; i < max_light_cnt; i++) {
         light.pointLights.emplace_back();
-        if (!light.pointLights.back().initialize("Resources\\Objects\\light.fbx", graphicsState.device)) {
+        auto& bulb = light.pointLights.back();
+        bulb.lightColor = {i % 2 ? 1.f: 0.f, i % 3? 1.f: 0.f, i % 5? 1.f: 0.f};
+        if(i%30 == 0) {
+            bulb.lightColor = { 1.0f, 1.0f, 1.0f };
+        }
+        bulb.attenuations = { 0.001, 0.001, 0.001 };
+        if (!bulb.initialize("Resources\\Objects\\light.fbx", graphicsState.device)) {
             return false;
         }
-        p_renderables.push_back(&light.pointLights.back());
+        bulb.setScale(0.5, 0.5, 0.5);
+        p_renderables.push_back(&bulb);
+    }
+
+    light.pointLights[0].setPosition(AIPos);
+    light.pointLights[0].adjustPosition(padWidth/2, 0, 0);
+    light.pointLights[1].setPosition(AIPos);
+    light.pointLights[1].adjustPosition(-padWidth / 2, 0, 0);
+    light.pointLights[2].setPosition(AIPos);
+    light.pointLights[2].adjustPosition(0, padHeight/2, 0);
+    light.pointLights[3].setPosition(AIPos);
+    light.pointLights[3].adjustPosition(0, -padHeight/2, 0);
+    light.pointLights[4].setPosition(PlayerPos);
+    light.pointLights[4].adjustPosition(padWidth / 2, 0, 0);
+    light.pointLights[5].setPosition(PlayerPos);
+    light.pointLights[5].adjustPosition(-padWidth / 2, 0, 0);
+    light.pointLights[6].setPosition(PlayerPos);
+    light.pointLights[6].adjustPosition(0, padHeight / 2, 0);
+    light.pointLights[7].setPosition(PlayerPos);
+    light.pointLights[7].adjustPosition(0, -padHeight / 2, 0);
+
+
+    const size_t perBorderLightsCnt = 10;
+    const float halfTable = tableLength / 2;
+    const float lightGap = tableLength / perBorderLightsCnt;
+    for (size_t cnt = 0, i = 8; cnt < perBorderLightsCnt; cnt++, i++) {
+        light.pointLights[2*i].setPosition(leftBorderPos.x, leftBorderPos.y, -halfTable + i * lightGap);
+        light.pointLights[2*i].setRotation(0, PI/2, 0);
+
+        light.pointLights[2*i+1].setPosition(rightBorderPos.x, rightBorderPos.y, -halfTable + i * lightGap);
+        light.pointLights[2*i+1].setRotation(0, -PI/2, 0);
+    }
+
+    const size_t perDimfloorBulbCnt = 10;
+    const float widthGap = tableWidth / perDimfloorBulbCnt;
+    const float lengthGap = tableLength / perDimfloorBulbCnt;
+    for (size_t wi = 0, i = 2 * perBorderLightsCnt; wi < perDimfloorBulbCnt; wi++) {
+        for (size_t li = 0; li < perDimfloorBulbCnt; li++, i++) {
+            light.pointLights[i].setPosition(leftBorderPos.x + wi * widthGap, 50, DefaultPlayerPos.z + li * lengthGap);
+            light.pointLights[i].setRotation(PI/2, 0, 0);
+        }
     }
 
     spriteBatch = std::make_unique<DirectX::SpriteBatch>(graphicsState.deviceContext);
@@ -78,7 +118,6 @@ void PongScene::reset() {
     else { 
         ballPosition = { PlayerPos.x, 2.f, -ballz};
     }
-
 
     camera.setPosition(DefaultPlayerPos.x, tablePos.y + 50, DefaultPlayerPos.z - 20);
     camera.setLookAtPos((DefaultPlayerPos + tablePos)/2);
@@ -150,12 +189,12 @@ void PongScene::updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) {
     if (kbd.isKeyPressed('B')) {
         camera.setPosition(ball.getPositionFloat3());
     }
-    if (kbd.isKeyPressed('C')) {
-        DirectX::XMVECTOR lightPosition = camera.getPositionVector();
-        lightPosition += camera.getForwardVector();
-        light.pointLights[0].setPosition(lightPosition);
-        light.pointLights[0].setRotation(camera.getRotationFloat3());
-    }
+    //if (kbd.isKeyPressed('C')) {
+    //    DirectX::XMVECTOR lightPosition = camera.getPositionVector();
+    //    lightPosition += camera.getForwardVector();
+    //    light.pointLights[0].setPosition(lightPosition);
+    //    light.pointLights[0].setRotation(camera.getRotationFloat3());
+    //}
 
     // If ball doesn't move, stick it to the pad
     if (ballSpeed == 0) {
@@ -178,9 +217,8 @@ void PongScene::updateGUI() {
 
     imgui->newWindow("game settings")
         .attach<IMGUIFN::CHECKBOX>("Free camera", &free_camera)
+        .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
         .end();
-
-#ifndef NDEBUG
 
     imgui->newWindow("Light controls")
         .attach<IMGUIFN::DRAGFLOAT3>("Ambient light color", &light.ambient.lightColor.x, 0.01f, 0.0f, 1.0f)
@@ -189,6 +227,8 @@ void PongScene::updateGUI() {
         .attach<IMGUIFN::DRAGFLOAT3>("Dynamic light Color", &light.pointLights[0].lightColor.x, 0.01f, 0.1f, 1.0f)
         .attach<IMGUIFN::DRAGFLOAT>("Dynamic light Strength", &light.pointLights[0].lightStrength, 0.01f, 0.1f, 1.0f)
         .end();
+
+#ifndef NDEBUG
     imgui->newWindow("Camera controls")
         .attach<IMGUIFN::DRAGFLOAT>("Camera speed", &cameraSpeed, 0.005f, 0.0f, 0.1f)
         .attach<IMGUIFN::TEXT>("position: %.3f %.3f %.3f", camera.getPositionFloat3().x, camera.getPositionFloat3().y, camera.getPositionFloat3().z)
@@ -255,7 +295,7 @@ void PongScene::updateGameObjects() {
     playerPad.setRotation(PI/2, PI, 0);
 
     AIPad.setPosition(AIPos);
-    AIPad.setRotation(PI/2, -PI, 0);
+    AIPad.setRotation(PI/2, 0, 0);
 
     ball.setPosition(ballPosition);
     ball.setScale(ballRadius, ballRadius, ballRadius);
@@ -266,11 +306,8 @@ void PongScene::updateGameObjects() {
     }
     for (int i = 0; i < light.getLightsCnt(); i++) {
         auto& pl = light.pointLights[i];
-        auto& go_pos = p_renderables[i]->getPositionFloat3();
         pl.lightStrength = light.pointLights[0].lightStrength;
-        pl.lightColor = light.pointLights[0].lightColor;
         pl.attenuations = light.pointLights[0].attenuations;
-        pl.setPosition(go_pos);
     }
     updateProjectionSetting();
 

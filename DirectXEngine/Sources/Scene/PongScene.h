@@ -102,6 +102,11 @@ namespace App {
 
         const float AIWaitTime = 1000.0f; // time (millis) to wait after goal before pushing the ball
         Timer AIDelayTimer;
+#ifndef NDEBUG
+        bool free_camera = true;
+#else
         bool free_camera = false;
+#endif
+
     };
 }
