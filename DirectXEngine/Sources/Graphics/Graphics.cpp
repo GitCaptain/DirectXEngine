@@ -36,15 +36,29 @@ void Graphics::postRender() {
         fpsCounter = 0;
         fpsTimer.restartTimer();
     }
-    spriteBatch->Begin();
-    spriteFont->DrawString(spriteBatch.get(), fpsString.c_str(), DirectX::XMFLOAT2(0, 0), DirectX::Colors::White, 0.0f, DirectX::XMFLOAT2(0.0f, 0.0f), DirectX::XMFLOAT2(1.0f, 1.0f));
-    spriteBatch->End();
+    if (showfps) {
+        spriteBatch->Begin();
+        spriteFont->DrawString(
+            spriteBatch.get(),
+            fpsString.c_str(),
+            DirectX::XMFLOAT2(0, 0),
+            DirectX::Colors::White,
+            0.0f,
+            DirectX::XMFLOAT2(0.0f, 0.0f),
+            DirectX::XMFLOAT2(1.0f, 1.0f)
+        );
+        spriteBatch->End();
+    }
     imgui->startFrame();
 
-    imgui->newWindow("settings")
+    imgui->newWindow("graphics settings")
+        .attach<IMGUIFN::DRAGFLOAT>("fov", &gSettings.fov, 1.f, 1.f, 180.f)
+        .attach<IMGUIFN::DRAGFLOAT>("nearZ", &gSettings.nearZ, 0.1f, 0.1f, 10.0f)
+        .attach<IMGUIFN::DRAGFLOAT>("farZ", &gSettings.farZ, 100.f, 100.f, 5000.f)
         .attach<IMGUIFN::DRAGFLOAT>("gamma", &gSettings.gammaCoef, 0.1f, 0.1f, 3.0f)
         .attach<IMGUIFN::DRAGFLOAT>("exposure", &gSettings.exposure, 0.1f, 0.0f, 5.0f)
         .attach<IMGUIFN::CHECKBOX>("hdr", &gSettings.hdr)
+        .attach<IMGUIFN::CHECKBOX>("show FPS", &showfps)
         .end();
 
     renderScene->postRender();
@@ -61,7 +75,7 @@ bool Graphics::initializeRenderer(HWND hwnd, int width, int height) {
 }
 
 bool Graphics::initializeScene() {
-    return renderScene->initialize(getGraphicsState());
+    return renderScene->initialize(getGraphicsState(), gSettings);
 }
 
 void Graphics::initSprites() {

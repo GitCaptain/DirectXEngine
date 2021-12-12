@@ -10,6 +10,9 @@ struct GraphicsState {
 };
 
 struct GraphicsSettings {
+    float fov = 90.f;
+    float nearZ = 0.1f;
+    float farZ = 3000.f;
     float gammaCoef = 2.2f;
     float exposure = 0.0f;
     bool hdr = false;

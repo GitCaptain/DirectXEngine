@@ -14,13 +14,11 @@
 
 namespace App {
 
-    using namespace NGameObject;
-
     class PongScene final: public Scene {
     public:
         PongScene() = default;
         ~PongScene() = default;
-        bool initialize(GraphicsState& graphicsState) override;
+        bool initialize(GraphicsState& graphicsState, GraphicsSettings& graphicsSettings) override;
         void reset() override;
         const XMMATRIX& getViewMatrix() const override;
         const XMMATRIX& getProjectionMatrix() const override;
@@ -33,7 +31,7 @@ namespace App {
         void updateInput(HID::Keyboard& kbd, HID::Mouse& mouse, float dt) override;
         void updateGUI() override;
         void updateGameObjects() override;
-
+        bool initGameObjects();
     private:
 
         std::unique_ptr<DirectX::SpriteBatch> spriteBatch;
@@ -45,43 +43,52 @@ namespace App {
         RenderableGameObject AIPad;
         RenderableGameObject playerPad;
         RenderableGameObject ball;
+        std::array<RenderableGameObject, 10> stops;
         LightInfo light;
-        Camera3D camera;
+
         float cameraSpeed = 0.1f;
 
-        GraphicsState* graphicsState = nullptr;
-        ImGUIW* imgui;
+        ImGUIW* imgui = nullptr;
 
-        const float tableWidth = 100;
-        const float tableLength = 200;
-        const float tableHeight = 1;
+
+        const XMFLOAT3 leftBorderPos{ -75, 2, 0 };
+        const XMFLOAT3 rightBorderPos{ 75, 2, 0 };
+
+        const float tableWidth = rightBorderPos.x - leftBorderPos.x;
+        const float tableLength = 280;
         const XMFLOAT3 tablePos = { 0, 0, 0 };
 
-        const float borderWidth = 1;
-        const float borderLength = tableLength;
-        const float borderHeight = 5;
-        XMFLOAT3 leftBorderPos{};
-        XMFLOAT3 rightBorderPos{};
+        float borderWidth = 1;
+        float borderLength = tableLength;
+        float borderHeight = 5;
 
-        const float padWidth = 20;
-        const float padHeight = 10;
+        const float padWidth = 16;
+        const float padHeight = 18;
         const float padLength = 2;
-
-        const XMFLOAT3 DefaultPlayerPos = { 0, 5,  -tableLength / 2 };
-        const XMFLOAT3 DefaultAIPos = { 0, 5, tableLength / 2 };
+        const XMFLOAT3 DefaultPlayerPos = { 0, -15,  -tableLength / 2 };
+        const XMFLOAT3 DefaultAIPos = { 0, -15, tableLength / 2 };
         const XMFLOAT3 AIToPlayerDirection = DefaultPlayerPos - DefaultAIPos;
         const XMFLOAT3 PlayerToAIDirection = DefaultAIPos - DefaultPlayerPos;
 
         XMFLOAT3 PlayerPos{};
         XMFLOAT3 AIPos{};
+        float AITargetPosX = DefaultAIPos.x;
 
-        const float ballRadius = 1;
+        const float ballRadius = 2;
+        const float ballRadWidth = 2.125f * ballRadius;
+        const float defaultBallSpeed = 0.0005;
+        const float maximumBallSpeed = defaultBallSpeed * 4;
+        const float deltaBallSpeed = defaultBallSpeed / 10;
         XMFLOAT3 ballPosition{};
         XMFLOAT3 ballDirection{};
+
+
+        const float maxXDiff = padWidth / 2 + ballRadWidth;
 
         float playerSpeed{};
         float AISpeed{};
         float ballSpeed{};
+        const float defaultPadSpeed = 0.15;
 
         const float PI = std::numbers::pi_v<float>;
 
@@ -89,13 +96,21 @@ namespace App {
         int windowHeight = 0;
 
         struct GameState {
-            enum { PLAYER = 0, AI = 1};
+            enum STATES { PLAYER = 0, AI = 1, NONE = 2};
             int AIScore = 0;
             int playerScore = 0;
-            bool ballside = PLAYER;
+            STATES ballside = PLAYER;
         } gs;
 
-        double update_time = 0;
-        bool usemodels = true;
+        const float AIWaitTime = 1000.0f; // time (millis) to wait after goal before pushing the ball
+        Timer AIDelayTimer;
+#ifndef NDEBUG
+        bool reset_camera = false;
+        bool free_camera = true;
+#else
+        bool reset_camera = true;
+        bool free_camera = false;
+#endif
+
     };
 }
