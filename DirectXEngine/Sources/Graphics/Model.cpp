@@ -95,7 +95,6 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
         vertex.normal.y = normalVector.y;
         vertex.normal.z = normalVector.z;
 
-        // TODO: what if mesh doesn't have a texture?
         if (mesh->mTextureCoords[0]) {
             vertex.texCoord.x = static_cast<float>(mesh->mTextureCoords[0][i].x);
             vertex.texCoord.y = static_cast<float>(mesh->mTextureCoords[0][i].y);
@@ -113,7 +112,8 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene, const XMMATRIX& tran
 
     aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
     std::vector<Texture> textures = LoadMaterialTextures(material, aiTextureType::aiTextureType_DIFFUSE, scene);
-
+    std::vector<Texture> specularTex = LoadMaterialTextures(material, aiTextureType_SPECULAR, scene);
+    textures.insert(textures.end(), specularTex.begin(), specularTex.end());
     return Mesh(device, vertices, indices, textures, transformMatrix);
 }
 
@@ -145,7 +145,7 @@ TextureStorageType Model::determineTextureStorageType(
     }
 
     // check if texture is an embedded texture, but not indexed
-    // (path will be texture's name instread of #)
+    // (path will be texture's name instead of #)
     auto pTex = pScene->GetEmbeddedTexture(texturePath.c_str());
     if (pTex != nullptr) {
         if (pTex->mHeight == 0) {
@@ -179,15 +179,26 @@ std::vector<Texture> Model::LoadMaterialTextures(
     if (textureCount == 0) { // no textures =>
         storageType = TextureStorageType::None;
         aiColor3D aiColor(0.0f, 0.0f, 0.0f);
+        auto emplaceTexture =
+            [&materialTextures=materialTextures, &device=device, &textureType=textureType, &aiColor=aiColor]
+            (const aiReturn& colorLoadStatus, const Colors::Color& ExceptionColor)
+        {
+            if (colorLoadStatus != AI_SUCCESS) {
+                materialTextures.emplace_back(device, ExceptionColor, textureType);
+            }
+            else {
+                materialTextures.emplace_back(device, Colors::Color(aiColor.r * 255, aiColor.g * 255, aiColor.b * 255), textureType);
+            }
+        };
         switch (textureType) {
             case aiTextureType_DIFFUSE: {
                 const aiReturn colorLoadStatus = pMaterial->Get(AI_MATKEY_COLOR_DIFFUSE, aiColor);
-                if (colorLoadStatus != AI_SUCCESS) { // in case of absence of texture color, use UnloadedColor
-                    materialTextures.emplace_back(device, Colors::UnloadedTextureColor, textureType);
-                }
-                else {
-                    materialTextures.emplace_back(device, Colors::Color(aiColor.r * 255, aiColor.g * 255, aiColor.b * 255), textureType);
-                }
+                emplaceTexture(colorLoadStatus, Colors::UnloadedTextureColor);
+                return materialTextures;
+            }
+            case aiTextureType_SPECULAR: {
+                const aiReturn colorLoadStatus = pMaterial->Get(AI_MATKEY_COLOR_SPECULAR, aiColor);
+                emplaceTexture(colorLoadStatus, Colors::NoSpecularTextureColor);
                 return materialTextures;
             }
             default:
@@ -201,18 +212,22 @@ std::vector<Texture> Model::LoadMaterialTextures(
         switch (storageType) {
             case TextureStorageType::EmbeddedIndexCompressed: {
                 int index = getTextureIndex(&path);
-                materialTextures.emplace_back(device,
-                                              reinterpret_cast<const uint8_t*>(pScene->mTextures[index]->pcData),
-                                              pScene->mTextures[index]->mWidth, // actual size in bytes
-                                              textureType);
+                materialTextures.emplace_back(
+                    device,
+                    reinterpret_cast<const uint8_t*>(pScene->mTextures[index]->pcData),
+                    pScene->mTextures[index]->mWidth, // actual size in bytes
+                    textureType
+                );
                 break;
             }
             case TextureStorageType::EmbeddedCompressed: {
                 const aiTexture* pTexture = pScene->GetEmbeddedTexture(path.C_Str());
-                materialTextures.emplace_back(device,
-                                              reinterpret_cast<const uint8_t*>(pTexture->pcData),
-                                              pTexture->mWidth, // actual size in bytes
-                                              textureType);
+                materialTextures.emplace_back(
+                    device,
+                    reinterpret_cast<const uint8_t*>(pTexture->pcData),
+                    pTexture->mWidth, // actual size in bytes
+                    textureType
+                );
                 break;
             }
             case TextureStorageType::Disk: {
